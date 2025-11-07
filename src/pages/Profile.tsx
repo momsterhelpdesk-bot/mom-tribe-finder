@@ -116,6 +116,14 @@ export default function Profile() {
           </Button>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="fixed bottom-20 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
+        <div className="max-w-2xl mx-auto flex items-center justify-center gap-2">
+          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
+          <span className="text-sm text-muted-foreground">Together, moms thrive!</span>
+        </div>
+      </footer>
     </div>
   );
 }

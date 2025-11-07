@@ -25,8 +25,8 @@ export default function Auth() {
           </h1>
         </div>
         
-        <p className="text-center text-muted-foreground mb-8 italic">
-          "Μαμάδες Μαζί, Δυνατές Πάντα"
+        <p className="text-center text-muted-foreground mb-8 italic text-lg">
+          "Together, moms thrive!"
         </p>
 
         <div className="space-y-4">
