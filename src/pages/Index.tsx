@@ -1,6 +1,7 @@
 import Navigation from "@/components/Navigation";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, MessageCircle, Calendar, ShoppingBag, Users, MapPin } from "lucide-react";
 import logoFull from "@/assets/logo-full.jpg";
@@ -58,6 +59,12 @@ const Index = () => {
           <p className="text-2xl text-foreground mb-8 font-medium">
             Together, moms thrive!
           </p>
+          
+          <div className="mb-8">
+            <Badge variant="secondary" className="text-sm px-4 py-2">
+              📍 Διαθέσιμο στη Θεσσαλονίκη - Σύντομα σε περισσότερες πόλεις!
+            </Badge>
+          </div>
           
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             Connect with amazing moms in your area. Share experiences, plan playdates, 

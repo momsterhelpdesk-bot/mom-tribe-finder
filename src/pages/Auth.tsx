@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
@@ -30,6 +31,12 @@ export default function Auth() {
         <p className="text-center text-muted-foreground mb-8 italic text-lg">
           "Together, moms thrive!"
         </p>
+
+        <div className="text-center mb-6">
+          <Badge variant="secondary" className="text-xs px-3 py-1">
+            📍 Διαθέσιμο στη Θεσσαλονίκη
+          </Badge>
+        </div>
 
         <div className="space-y-4">
           {!isLogin && (
