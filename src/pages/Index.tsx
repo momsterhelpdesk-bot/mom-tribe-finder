@@ -70,7 +70,12 @@ const Index = () => {
                 Join Momster
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="text-lg px-8">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-lg px-8"
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               Learn More
             </Button>
           </div>
@@ -78,7 +83,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-secondary/30">
+      <section id="features" className="py-20 px-4 bg-secondary/30">
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>
