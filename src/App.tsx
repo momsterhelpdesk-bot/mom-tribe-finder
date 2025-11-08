@@ -11,6 +11,7 @@ import Events from "./pages/Events";
 import Marketplace from "./pages/Marketplace";
 import Map from "./pages/Map";
 import Profile from "./pages/Profile";
+import PrivacyTerms from "./pages/PrivacyTerms";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/marketplace" element={<><Marketplace /><BottomNav /></>} />
           <Route path="/map" element={<><Map /><BottomNav /></>} />
           <Route path="/profile" element={<><Profile /><BottomNav /></>} />
+          <Route path="/privacy-terms" element={<PrivacyTerms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

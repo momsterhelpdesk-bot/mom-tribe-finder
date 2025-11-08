@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,6 +61,12 @@ export default function Auth() {
               {isLogin ? "Sign up" : "Sign in"}
             </button>
           </p>
+        </div>
+
+        <div className="mt-6 text-center">
+          <Link to="/privacy-terms" className="text-xs text-muted-foreground hover:text-primary underline">
+            Πολιτική Απορρήτου & Όροι Χρήσης
+          </Link>
         </div>
       </Card>
     </div>

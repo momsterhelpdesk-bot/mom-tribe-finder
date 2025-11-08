@@ -138,7 +138,10 @@ const Index = () => {
             <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
             <span className="text-xl font-bold text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>Momster</span>
           </div>
-          <p className="text-muted-foreground">&copy; 2025 Momster. Built with love for moms everywhere.</p>
+          <p className="text-muted-foreground mb-2">&copy; 2025 Momster. Built with love for moms everywhere.</p>
+          <Link to="/privacy-terms" className="text-sm text-muted-foreground hover:text-primary underline">
+            Πολιτική Απορρήτου & Όροι Χρήσης
+          </Link>
         </div>
       </footer>
     </div>
