@@ -1,10 +1,16 @@
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MessageCircle, Flag } from "lucide-react";
+import { toast } from "sonner";
 import mascot from "@/assets/mascot.jpg";
 
 export default function Chats() {
+  const handleReportProfile = (name: string) => {
+    toast.success(`Αναφορά για ${name} καταχωρήθηκε`);
+  };
+
   const chats = [
     {
       id: 1,
@@ -48,15 +54,15 @@ export default function Chats() {
           {chats.map((chat) => (
             <Card
               key={chat.id}
-              className="p-4 hover:shadow-md transition-shadow cursor-pointer"
+              className="p-4 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-4">
-                <Avatar className="w-14 h-14">
+                <Avatar className="w-14 h-14 cursor-pointer">
                   <AvatarImage src={chat.avatar} alt={chat.name} />
                   <AvatarFallback>{chat.name[0]}</AvatarFallback>
                 </Avatar>
                 
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 cursor-pointer">
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-semibold text-foreground">{chat.name}</h3>
                     <span className="text-xs text-muted-foreground">{chat.time}</span>
@@ -64,9 +70,22 @@ export default function Chats() {
                   <p className="text-sm text-muted-foreground truncate">{chat.lastMessage}</p>
                 </div>
 
-                {chat.unread > 0 && (
-                  <Badge className="rounded-full px-2">{chat.unread}</Badge>
-                )}
+                <div className="flex items-center gap-2">
+                  {chat.unread > 0 && (
+                    <Badge className="rounded-full px-2">{chat.unread}</Badge>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReportProfile(chat.name);
+                    }}
+                  >
+                    <Flag className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}

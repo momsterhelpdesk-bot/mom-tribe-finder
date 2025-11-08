@@ -9,6 +9,7 @@ import logoFull from "@/assets/logo-full.jpg";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary/30 p-4">
@@ -48,7 +49,26 @@ export default function Auth() {
             <Input id="password" type="password" placeholder="••••••••" />
           </div>
 
-          <Button className="w-full" size="lg">
+          {!isLogin && (
+            <div className="flex items-start gap-2 py-2">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-border"
+                required
+              />
+              <Label htmlFor="terms" className="text-sm leading-tight cursor-pointer">
+                Αποδέχομαι τους{" "}
+                <Link to="/privacy-terms" className="text-primary hover:underline" target="_blank">
+                  Όρους Χρήσης και την Πολιτική Απορρήτου
+                </Link>
+              </Label>
+            </div>
+          )}
+
+          <Button className="w-full" size="lg" disabled={!isLogin && !acceptedTerms}>
             {isLogin ? "Sign In" : "Sign Up"}
           </Button>
 
