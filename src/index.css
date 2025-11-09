@@ -107,7 +107,7 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
-    background-image: url('/src/assets/floral-bg.jpg');
+    background-image: url('./assets/floral-bg.jpg');
     background-repeat: repeat;
     background-size: 400px;
     background-attachment: fixed;

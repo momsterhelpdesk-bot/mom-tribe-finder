@@ -60,12 +60,6 @@ const Index = () => {
             Together, moms thrive!
           </p>
           
-          <div className="mb-8">
-            <Badge variant="secondary" className="text-sm px-4 py-2">
-              📍 Διαθέσιμο στη Θεσσαλονίκη - Σύντομα σε περισσότερες πόλεις!
-            </Badge>
-          </div>
-          
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             Connect with amazing moms in your area. Share experiences, plan playdates, 
             and build lasting friendships in a supportive community.
