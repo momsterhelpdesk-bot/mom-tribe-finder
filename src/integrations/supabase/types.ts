@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      profile_reports: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          reason: string
+          reported_profile_id: string
+          reporter_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reason: string
+          reported_profile_id: string
+          reporter_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          reason?: string
+          reported_profile_id?: string
+          reporter_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_reports_reported_profile_id_fkey"
+            columns: ["reported_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           area: string
@@ -24,8 +72,11 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          interests: string[] | null
+          is_blocked: boolean | null
           match_preference: string
           mom_badge: string | null
+          profile_completed: boolean | null
           profile_photo_url: string | null
           selfie_photo_url: string | null
           updated_at: string | null
@@ -40,8 +91,11 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          interests?: string[] | null
+          is_blocked?: boolean | null
           match_preference: string
           mom_badge?: string | null
+          profile_completed?: boolean | null
           profile_photo_url?: string | null
           selfie_photo_url?: string | null
           updated_at?: string | null
@@ -56,8 +110,11 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          interests?: string[] | null
+          is_blocked?: boolean | null
           match_preference?: string
           mom_badge?: string | null
+          profile_completed?: boolean | null
           profile_photo_url?: string | null
           selfie_photo_url?: string | null
           updated_at?: string | null
@@ -82,6 +139,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      verification_requests: {
+        Row: {
+          admin_notes: string | null
+          child_names: string
+          created_at: string | null
+          id: string
+          profile_id: string
+          selfie_photo_url: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          child_names: string
+          created_at?: string | null
+          id?: string
+          profile_id: string
+          selfie_photo_url: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          child_names?: string
+          created_at?: string | null
+          id?: string
+          profile_id?: string
+          selfie_photo_url?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_requests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
