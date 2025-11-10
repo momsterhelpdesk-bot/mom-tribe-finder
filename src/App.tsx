@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ProfileSetup from "./pages/ProfileSetup";
+import PhotoVerification from "./pages/PhotoVerification";
+import Admin from "./pages/Admin";
 import Discover from "./pages/Discover";
 import Chats from "./pages/Chats";
 import Events from "./pages/Events";
@@ -26,6 +29,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/profile-setup" element={<ProfileSetup />} />
+          <Route path="/photo-verification" element={<PhotoVerification />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/discover" element={<><Discover /><BottomNav /></>} />
           <Route path="/chats" element={<><Chats /><BottomNav /></>} />
           <Route path="/events" element={<><Events /><BottomNav /></>} />
