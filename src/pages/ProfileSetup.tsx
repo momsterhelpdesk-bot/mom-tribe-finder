@@ -155,16 +155,17 @@ export default function ProfileSetup() {
       if (profilePhoto) {
         const fileExt = profilePhoto.name.split('.').pop();
         const fileName = `${userId}-${Date.now()}.${fileExt}`;
+        const filePath = `${userId}/${fileName}`;
         
         const { error: uploadError } = await supabase.storage
           .from('profile-photos')
-          .upload(fileName, profilePhoto, { upsert: true });
+          .upload(filePath, profilePhoto, { upsert: true });
 
         if (uploadError) throw uploadError;
 
         const { data: { publicUrl } } = supabase.storage
           .from('profile-photos')
-          .getPublicUrl(fileName);
+          .getPublicUrl(filePath);
 
         photoUrl = publicUrl;
       }
