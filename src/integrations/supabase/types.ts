@@ -81,6 +81,7 @@ export type Database = {
           area: string
           child_age_group: string
           child_names: string | null
+          children: Json | null
           city: string
           created_at: string | null
           email: string
@@ -94,12 +95,14 @@ export type Database = {
           profile_photo_url: string | null
           selfie_photo_url: string | null
           updated_at: string | null
+          username: string | null
           verified_status: boolean | null
         }
         Insert: {
           area: string
           child_age_group: string
           child_names?: string | null
+          children?: Json | null
           city: string
           created_at?: string | null
           email: string
@@ -113,12 +116,14 @@ export type Database = {
           profile_photo_url?: string | null
           selfie_photo_url?: string | null
           updated_at?: string | null
+          username?: string | null
           verified_status?: boolean | null
         }
         Update: {
           area?: string
           child_age_group?: string
           child_names?: string | null
+          children?: Json | null
           city?: string
           created_at?: string | null
           email?: string
@@ -132,6 +137,7 @@ export type Database = {
           profile_photo_url?: string | null
           selfie_photo_url?: string | null
           updated_at?: string | null
+          username?: string | null
           verified_status?: boolean | null
         }
         Relationships: []

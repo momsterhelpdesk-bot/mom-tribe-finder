@@ -45,34 +45,62 @@ export default function Admin() {
   };
 
   const loadData = async () => {
-    // Load verification requests
+    // Load verification requests - use profiles instead of profiles_safe for admin
     const { data: requests } = await supabase
       .from('verification_requests')
-      .select(`
-        *,
-        profiles:profile_id (
-          full_name,
-          email
-        )
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
-    setVerificationRequests(requests || []);
+    if (requests) {
+      // Fetch profile data separately for each request
+      const requestsWithProfiles = await Promise.all(
+        requests.map(async (req) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, email')
+            .eq('id', req.profile_id)
+            .single();
+          
+          return {
+            ...req,
+            profiles: profile
+          };
+        })
+      );
+      setVerificationRequests(requestsWithProfiles);
+    }
 
     // Load reports
     const { data: reportData } = await supabase
       .from('profile_reports')
-      .select(`
-        *,
-        reported_profile:reported_profile_id (
-          full_name,
-          email
-        ),
-        reporter:reporter_id (
-          full_name
-        )
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
+
+    if (reportData) {
+      // Fetch profile data separately for each report
+      const reportsWithProfiles = await Promise.all(
+        reportData.map(async (report) => {
+          const { data: reportedProfile } = await supabase
+            .from('profiles')
+            .select('full_name, email')
+            .eq('id', report.reported_profile_id)
+            .single();
+          
+          const { data: reporter } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', report.reporter_id)
+            .single();
+          
+          return {
+            ...report,
+            reported_profile: reportedProfile,
+            reporter: reporter
+          };
+        })
+      );
+      setReports(reportsWithProfiles);
+    }
 
     setReports(reportData || []);
   };
