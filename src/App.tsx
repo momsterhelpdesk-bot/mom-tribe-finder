@@ -11,7 +11,7 @@ import PhotoVerification from "./pages/PhotoVerification";
 import Admin from "./pages/Admin";
 import Discover from "./pages/Discover";
 import Chats from "./pages/Chats";
-import Events from "./pages/Events";
+import AskMoms from "./pages/AskMoms";
 import Marketplace from "./pages/Marketplace";
 import Map from "./pages/Map";
 import Profile from "./pages/Profile";
@@ -36,7 +36,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/discover" element={<><Discover /><BottomNav /></>} />
           <Route path="/chats" element={<><Chats /><BottomNav /></>} />
-          <Route path="/events" element={<><Events /><BottomNav /></>} />
+          <Route path="/ask-moms" element={<><AskMoms /><BottomNav /></>} />
           <Route path="/marketplace" element={<><Marketplace /><BottomNav /></>} />
           <Route path="/map" element={<><Map /><BottomNav /></>} />
           <Route path="/profile" element={<><Profile /><BottomNav /></>} />
