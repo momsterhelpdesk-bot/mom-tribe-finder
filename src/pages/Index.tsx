@@ -20,19 +20,14 @@ const Index = () => {
       description: "Chat safely with other moms to plan playdates, share advice, or just have a friendly conversation."
     },
     {
-      icon: <Calendar className="h-8 w-8" />,
-      title: "Local Events",
-      description: "Discover and create family-friendly events, workshops, and meetups in your community."
-    },
-    {
       icon: <ShoppingBag className="h-8 w-8" />,
       title: "Marketplace",
       description: "Exchange, sell, or donate kids' items with trusted moms in your local area."
     },
     {
       icon: <Heart className="h-8 w-8" />,
-      title: "Support Groups",
-      description: "Join discussion groups around parenting topics, education, and local resources."
+      title: "Ρώτα μια μαμά - Discussion Forums",
+      description: "Ask questions, share experiences and get support in our judgment-free community. No criticism, only love 💕"
     },
     {
       icon: <MapPin className="h-8 w-8" />,
