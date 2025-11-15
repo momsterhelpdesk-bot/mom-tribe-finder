@@ -17,6 +17,7 @@ import Profile from "./pages/Profile";
 import PrivacyTerms from "./pages/PrivacyTerms";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
+import AuthGuard from "./components/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -27,17 +28,17 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<><Index /><BottomNav /></>} />
+          <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth-callback" element={<AuthCallback />} />
-          <Route path="/profile-setup" element={<ProfileSetup />} />
-          <Route path="/photo-verification" element={<PhotoVerification />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/discover" element={<><Discover /><BottomNav /></>} />
-          <Route path="/chats" element={<><Chats /><BottomNav /></>} />
-          <Route path="/ask-moms" element={<><AskMoms /><BottomNav /></>} />
-          <Route path="/marketplace" element={<><Marketplace /><BottomNav /></>} />
-          <Route path="/profile" element={<><Profile /><BottomNav /></>} />
+          <Route path="/profile-setup" element={<AuthGuard><ProfileSetup /></AuthGuard>} />
+          <Route path="/photo-verification" element={<AuthGuard><PhotoVerification /></AuthGuard>} />
+          <Route path="/admin" element={<AuthGuard><Admin /></AuthGuard>} />
+          <Route path="/discover" element={<AuthGuard><><Discover /><BottomNav /></></AuthGuard>} />
+          <Route path="/chats" element={<AuthGuard><><Chats /><BottomNav /></></AuthGuard>} />
+          <Route path="/ask-moms" element={<AuthGuard><><AskMoms /><BottomNav /></></AuthGuard>} />
+          <Route path="/marketplace" element={<AuthGuard><><Marketplace /><BottomNav /></></AuthGuard>} />
+          <Route path="/profile" element={<AuthGuard><><Profile /><BottomNav /></></AuthGuard>} />
           <Route path="/privacy-terms" element={<PrivacyTerms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
