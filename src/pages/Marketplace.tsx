@@ -1,145 +1,184 @@
-import { useEffect } from "react";
-import { Card } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Heart, MapPin } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Heart, ShoppingBag, Sparkles } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
-import MomsterMascot from "@/components/MomsterMascot";
-import { useMascot } from "@/hooks/use-mascot";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Marketplace() {
-  const { mascotConfig, visible, hideMascot, showEmptyMarketplace } = useMascot();
-  
-  const items = [
-    {
-      id: 1,
-      title: "Baby Stroller - Like New",
-      price: "€120",
-      condition: "Excellent",
-      seller: "Sarah Johnson",
-      location: "Downtown, 2 km away",
-      image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400",
-      isFree: false
-    },
-    {
-      id: 2,
-      title: "Toddler Clothes Bundle (12-18m)",
-      price: "Free",
-      condition: "Good",
-      seller: "Maria Papadopoulou",
-      location: "Kolonaki, 1.5 km away",
-      image: "https://images.unsplash.com/photo-1519457431-44ccd64a579b?w=400",
-      isFree: true
-    },
-    {
-      id: 3,
-      title: "High Chair",
-      price: "€45",
-      condition: "Good",
-      seller: "Emma Wilson",
-      location: "Suburbs, 4 km away",
-      image: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400",
-      isFree: false
-    },
-    {
-      id: 4,
-      title: "Baby Books Collection",
-      price: "€20",
-      condition: "Excellent",
-      seller: "Anna Dimitriou",
-      location: "City Center, 1 km away",
-      image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400",
-      isFree: false
-    }
-  ];
+  const [showRules, setShowRules] = useState(false);
+  const [notified, setNotified] = useState(false);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    if (items.length === 0) {
-      showEmptyMarketplace();
-    }
-  }, [items.length, showEmptyMarketplace]);
+  const handleNotifyMe = () => {
+    setNotified(true);
+    toast({
+      title: "🌷 Τέλεια!",
+      description: "Θα σε ενημερώσουμε μόλις ανοίξει το Marketplace!",
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative">
-      <img 
-        src={mascot} 
-        alt="Momster Mascot" 
-        className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none"
-      />
-      <div className="max-w-6xl mx-auto pt-20 pb-24 px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
-            Αγορά
-          </h1>
-          <Button>Νέα Καταχώριση</Button>
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-accent/10 relative overflow-hidden">
+      {/* Watercolor hearts decoration */}
+      <div className="fixed inset-0 pointer-events-none opacity-10">
+        {[...Array(20)].map((_, i) => (
+          <Heart
+            key={i}
+            className="absolute text-primary animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${20 + Math.random() * 30}px`,
+              height: `${20 + Math.random() * 30}px`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 2}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="max-w-2xl mx-auto pt-24 pb-32 px-4 relative z-10">
+        {/* Mascot with hearts animation */}
+        <div className="flex justify-center mb-8 relative">
+          <div className="relative animate-bounce">
+            <img 
+              src={mascot} 
+              alt="Momster Mascot" 
+              className="w-32 h-32 object-contain drop-shadow-lg"
+            />
+            <Heart className="absolute -top-2 -right-2 w-6 h-6 text-primary fill-primary animate-pulse" />
+            <Heart className="absolute -bottom-2 -left-2 w-5 h-5 text-primary fill-primary animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <Sparkles className="absolute top-0 left-0 w-4 h-4 text-accent animate-pulse" style={{ animationDelay: '1s' }} />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item) => (
-            <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-48 object-cover"
-                />
-                <button className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-secondary transition-colors">
-                  <Heart className="w-5 h-5 text-primary" />
-                </button>
-                {item.isFree && (
-                  <Badge className="absolute top-2 left-2 bg-mint text-mint-foreground">
-                    Free
-                  </Badge>
-                )}
-              </div>
+        {/* Main content card */}
+        <div className="bg-card/90 backdrop-blur-md rounded-3xl shadow-xl border border-primary/20 p-8 text-center space-y-6">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <ShoppingBag className="w-8 h-8 text-primary" />
+            <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
+              Marketplace
+            </h1>
+            <span className="text-2xl">🌸</span>
+          </div>
 
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-bold text-foreground">{item.title}</h3>
-                  <span className="font-bold text-primary">{item.price}</span>
-                </div>
+          <div className="space-y-2">
+            <p className="text-lg text-primary font-medium" style={{ fontFamily: "'Pacifico', cursive" }}>
+              Από μαμά σε μαμά… με αγάπη 🤍
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Ανταλλαγές, αγορές & πωλήσεις αγαπημένων pre-loved θησαυρών
+            </p>
+          </div>
 
-                <Badge variant="outline" className="mb-3">
-                  {item.condition}
-                </Badge>
+          <div className="bg-secondary/30 rounded-2xl p-6 space-y-4">
+            <h2 className="text-xl font-bold text-foreground">Coming Soon 🌸</h2>
+            <div className="space-y-3 text-foreground/90">
+              <p className="leading-relaxed">
+                Ετοιμάζουμε τον πιο γλυκό & ασφαλή μαμαδο-χώρο<br />
+                αγοραπωλησίας, ανταλλαγών & δωρεών 🤍
+              </p>
+              <p className="leading-relaxed">
+                Μαζί θα δώσουμε δεύτερη ζωή<br />
+                σε ό,τι αγάπησαν τα μικρά μας 🧸
+              </p>
+              <p className="text-sm italic text-muted-foreground">
+                Λίγη υπομονή… φορτώνουμε με αγάπη! 💕
+              </p>
+            </div>
+          </div>
 
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
-                    <span>{item.location}</span>
-                  </div>
-                  <p>Seller: {item.seller}</p>
-                </div>
+          <div className="space-y-3">
+            <Button 
+              onClick={handleNotifyMe}
+              disabled={notified}
+              className="w-full text-base"
+              size="lg"
+            >
+              💞 {notified ? "Θα σε ειδοποιήσουμε!" : "Θέλω να ειδοποιηθώ όταν ανοίξει"}
+            </Button>
+            
+            <Button 
+              onClick={() => setShowRules(true)}
+              variant="outline"
+              className="w-full"
+            >
+              🌸 Δες τους κανόνες του Marketplace
+            </Button>
+          </div>
 
-                <Button className="w-full mt-4" variant="outline">
-                  Contact Seller
-                </Button>
-              </div>
-            </Card>
-          ))}
+          {/* Categories preview */}
+          <div className="pt-6 border-t border-border/50">
+            <p className="text-sm font-semibold text-muted-foreground mb-3">Κατηγορίες που έρχονται:</p>
+            <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+              <div>👶 Βρεφικά είδη</div>
+              <div>🧸 Παιχνίδια</div>
+              <div>👗 Ρουχαλάκια</div>
+              <div>📚 Βιβλία</div>
+              <div>🍼 Θηλασμός</div>
+              <div>🛏️ Έπιπλα</div>
+              <div>🎁 Party items</div>
+              <div>🌿 Eco-friendly</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="fixed bottom-20 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-2">
-          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
-          <span className="text-sm text-muted-foreground">Together, moms thrive!</span>
-        </div>
-      </footer>
+      {/* Rules Dialog */}
+      <Dialog open={showRules} onOpenChange={setShowRules}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl" style={{ fontFamily: "'Pacifico', cursive" }}>
+              🌸 Mom-Code Marketplace
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Από μαμά σε μαμά με αγάπη 🤍
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 text-foreground">
+            <div className="space-y-3">
+              <p className="flex items-start gap-2">
+                <span className="font-bold">1️⃣</span>
+                <span>Μοιραζόμαστε με καλοσύνη & σεβασμό</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="font-bold">2️⃣</span>
+                <span>Ασφαλείς συναλλαγές: όλες οι αγορές γίνονται μέσα από την πλατφόρμα</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="font-bold">3️⃣</span>
+                <span>Αντικείμενα σε καλή κατάσταση — τίποτα χαλασμένο ή επικίνδυνο</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="font-bold">4️⃣</span>
+                <span>Σεβασμός στις προτιμήσεις, ηλικία παιδιών & συμφωνημένες τιμές</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="font-bold">5️⃣</span>
+                <span>Ότι δεν σας ταιριάζει, απλώς προσπεράστε — χωρίς αρνητικό σχόλιο</span>
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="font-bold">6️⃣</span>
+                <span>Η πλατφόρμα φροντίζει όλες τις διαδικασίες ώστε να είναι εύκολες, ασφαλείς και αξιόπιστες 🌷</span>
+              </p>
+            </div>
 
-      {mascotConfig && (
-        <MomsterMascot
-          state={mascotConfig.state}
-          message={mascotConfig.message}
-          visible={visible}
-          showButton={mascotConfig.showButton}
-          buttonText={mascotConfig.buttonText}
-          onButtonClick={mascotConfig.onButtonClick}
-          duration={mascotConfig.duration}
-          onHide={hideMascot}
-        />
-      )}
+            <div className="bg-secondary/30 rounded-lg p-4 space-y-2">
+              <p className="font-semibold text-sm">Trust & Safety Badges:</p>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <span className="bg-background px-2 py-1 rounded">✔️ Verified</span>
+                <span className="bg-background px-2 py-1 rounded">🔒 Trusted</span>
+                <span className="bg-background px-2 py-1 rounded">❤️ Mom Approved</span>
+                <span className="bg-background px-2 py-1 rounded">⚡ Fast Responder</span>
+                <span className="bg-background px-2 py-1 rounded">🤝 Safe Exchange</span>
+                <span className="bg-background px-2 py-1 rounded">🌱 Eco-Friendly</span>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -9,6 +9,7 @@ export default function BottomNav() {
     { path: "/discover", icon: Heart, label: "Discover" },
     { path: "/map", icon: MapPin, label: "Map" },
     { path: "/ask-moms", icon: MessageCircle, label: "Ρώτα μαμά" },
+    { path: "/marketplace", icon: ShoppingBag, label: "Marketplace" },
     { path: "/chats", icon: MessageCircle, label: "Chats" },
     { path: "/profile", icon: User, label: "Profile" },
   ];
