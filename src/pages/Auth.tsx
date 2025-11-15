@@ -155,12 +155,12 @@ export default function Auth() {
         <img 
           src={mascot} 
           alt="Momster Mascot" 
-          className="absolute -bottom-10 -right-10 w-32 h-32 opacity-10 object-contain"
+          className="absolute -bottom-10 -right-10 w-32 h-32 opacity-10 object-contain animate-[bounce_3s_ease-in-out_infinite]"
         />
         
         <div className="flex flex-col items-center mb-6 relative z-10">
-          <img src={logoFull} alt="Momster Logo" className="h-16 mb-4" />
-          <h1 className="text-3xl font-bold text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>
+          <img src={logoFull} alt="Momster Logo" className="h-24 mb-4 animate-fade-in" />
+          <h1 className="text-3xl font-bold text-primary animate-scale-in" style={{ fontFamily: "'Pacifico', cursive" }}>
             Momster
           </h1>
         </div>

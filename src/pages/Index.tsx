@@ -49,10 +49,10 @@ const Index = () => {
       <section className="pt-32 pb-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
           <div className="mb-8 flex justify-center">
-            <img src={logoFull} alt="Momster Logo" className="w-64 h-64 object-contain" />
+            <img src={logoFull} alt="Momster Logo" className="w-80 h-80 object-contain animate-scale-in" />
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 text-primary leading-tight" style={{ fontFamily: "'Pacifico', cursive" }}>
+          <h1 className="text-5xl md:text-7xl font-bold mb-4 text-primary leading-tight animate-fade-in" style={{ fontFamily: "'Pacifico', cursive" }}>
             Momster
           </h1>
           

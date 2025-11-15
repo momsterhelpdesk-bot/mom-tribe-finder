@@ -73,7 +73,7 @@ export default function Discover() {
       <img 
         src={mascot} 
         alt="Momster Mascot" 
-        className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none"
+        className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none animate-[bounce_3s_ease-in-out_infinite]"
       />
       <div className="max-w-md mx-auto pt-20 pb-24">
         <h1 className="text-2xl font-bold text-center mb-6 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>

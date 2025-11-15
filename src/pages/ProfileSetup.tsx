@@ -199,8 +199,8 @@ export default function ProfileSetup() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 py-12">
-      <Card className="max-w-2xl mx-auto p-8">
-        <h1 className="text-3xl font-bold text-center mb-2">Συμπληρώστε το Προφίλ σας</h1>
+      <Card className="max-w-2xl mx-auto p-8 animate-fade-in">
+        <h1 className="text-3xl font-bold text-center mb-2 animate-scale-in">Συμπληρώστε το Προφίλ σας</h1>
         <p className="text-center text-muted-foreground mb-8">
           Αυτά τα στοιχεία θα μας βοηθήσουν να σας συνδέσουμε με τις κατάλληλες μαμάδες
         </p>
