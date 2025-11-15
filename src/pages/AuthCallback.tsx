@@ -23,29 +23,20 @@ export default function AuthCallback() {
           .eq('id', session.user.id)
           .single();
 
-        // If profile doesn't exist, create it
+        // If profile doesn't exist yet, wait a bit and retry (trigger might be running)
         if (profileError && profileError.code === 'PGRST116') {
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              id: session.user.id,
-              full_name: session.user.user_metadata.full_name || session.user.user_metadata.name || '',
-              email: session.user.email || '',
-              city: '',
-              area: '',
-              child_age_group: '',
-              match_preference: '',
-              children: [],
-              profile_completed: false
-            });
-
-          if (insertError) {
-            console.error('Error creating profile:', insertError);
-            toast.error("Σφάλμα κατά τη δημιουργία προφίλ");
-          }
+          await new Promise(resolve => setTimeout(resolve, 1000));
           
-          navigate("/profile-setup");
-          return;
+          const { data: retryProfile } = await supabase
+            .from('profiles')
+            .select('profile_completed')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (!retryProfile?.profile_completed) {
+            navigate("/profile-setup");
+            return;
+          }
         }
 
         // If profile exists but not completed, go to setup

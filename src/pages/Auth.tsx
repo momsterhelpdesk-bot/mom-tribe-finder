@@ -78,23 +78,6 @@ export default function Auth() {
       if (error) throw error;
 
       if (data.user) {
-        // Create profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            full_name: validData.fullName,
-            email: validData.email,
-            city: '',
-            area: '',
-            child_age_group: '',
-            match_preference: '',
-            children: [],
-            profile_completed: false
-          });
-
-        if (profileError) throw profileError;
-
         toast.success("Λογαριασμός δημιουργήθηκε! Συμπληρώστε το προφίλ σας.");
         showWelcome();
         setTimeout(() => navigate("/profile-setup"), 2000);
