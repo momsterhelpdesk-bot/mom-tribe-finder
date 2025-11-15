@@ -89,6 +89,7 @@ export default function Auth() {
             area: '',
             child_age_group: '',
             match_preference: '',
+            children: [],
             profile_completed: false
           });
 
@@ -155,7 +156,7 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/profile-setup`,
+          redirectTo: `${window.location.origin}/auth-callback`,
         }
       });
 

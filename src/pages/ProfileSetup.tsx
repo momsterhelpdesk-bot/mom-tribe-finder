@@ -7,13 +7,17 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { z } from "zod";
 
 const profileSetupSchema = z.object({
+  username: z.string().trim().min(3, { message: "Το username πρέπει να είναι τουλάχιστον 3 χαρακτήρες" }).max(20, { message: "Το username πρέπει να είναι μικρότερο από 20 χαρακτήρες" }).regex(/^[a-zA-Z0-9_]+$/, { message: "Το username μπορεί να περιέχει μόνο γράμματα, αριθμούς και _" }),
   city: z.string().trim().min(1, { message: "Η πόλη είναι υποχρεωτική" }).max(100, { message: "Η πόλη πρέπει να είναι μικρότερη από 100 χαρακτήρες" }),
   area: z.string().trim().min(1, { message: "Η περιοχή είναι υποχρεωτική" }).max(100, { message: "Η περιοχή πρέπει να είναι μικρότερη από 100 χαρακτήρες" }),
-  childAgeGroup: z.string().min(1, { message: "Η ηλικία του παιδιού είναι υποχρεωτική" }),
+  children: z.array(z.object({
+    name: z.string().max(50).optional(),
+    ageGroup: z.string().min(1, { message: "Η ηλικία είναι υποχρεωτική" })
+  })).min(1, { message: "Προσθέστε τουλάχιστον ένα παιδί" }),
   matchPreference: z.string().min(1, { message: "Η προτίμηση είναι υποχρεωτική" }),
   interests: z.array(z.string()).min(1, { message: "Επέλεξε τουλάχιστον ένα ενδιαφέρον" }).max(20, { message: "Μέγιστο 20 ενδιαφέροντα" })
 });
@@ -50,9 +54,10 @@ export default function ProfileSetup() {
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   
+  const [username, setUsername] = useState("");
   const [city, setCity] = useState("");
   const [area, setArea] = useState("");
-  const [childAgeGroup, setChildAgeGroup] = useState("");
+  const [children, setChildren] = useState<Array<{ name?: string; ageGroup: string }>>([{ ageGroup: "" }]);
   const [matchPreference, setMatchPreference] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
@@ -80,9 +85,13 @@ export default function ProfileSetup() {
       }
 
       if (profile) {
+        setUsername(profile.username || "");
         setCity(profile.city || "");
         setArea(profile.area || "");
-        setChildAgeGroup(profile.child_age_group || "");
+        const childrenData = profile.children as Array<{ name?: string; ageGroup: string }> || [];
+        if (Array.isArray(childrenData) && childrenData.length > 0) {
+          setChildren(childrenData);
+        }
         setMatchPreference(profile.match_preference || "");
         setInterests(profile.interests || []);
         setProfilePhotoPreview(profile.profile_photo_url || "");
@@ -123,9 +132,10 @@ export default function ProfileSetup() {
 
     // Validate inputs
     const validation = profileSetupSchema.safeParse({
+      username,
       city,
       area,
-      childAgeGroup,
+      children,
       matchPreference,
       interests
     });
@@ -164,9 +174,11 @@ export default function ProfileSetup() {
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
+          username: validData.username,
           city: validData.city,
           area: validData.area,
-          child_age_group: validData.childAgeGroup,
+          children: validData.children,
+          child_age_group: validData.children[0]?.ageGroup || '',
           match_preference: validData.matchPreference,
           interests: validData.interests,
           profile_photo_url: photoUrl,
@@ -224,6 +236,21 @@ export default function ProfileSetup() {
             </div>
           </div>
 
+          {/* Username */}
+          <div className="space-y-2">
+            <Label htmlFor="username">Username *</Label>
+            <Input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="π.χ. maria_mom"
+              required
+            />
+            <p className="text-xs text-muted-foreground">
+              3-20 χαρακτήρες, μόνο γράμματα, αριθμοί και _
+            </p>
+          </div>
+
           {/* City */}
           <div className="space-y-2">
             <Label htmlFor="city">Πόλη *</Label>
@@ -251,19 +278,63 @@ export default function ProfileSetup() {
             />
           </div>
 
-          {/* Child Age Group */}
+          {/* Children */}
           <div className="space-y-2">
-            <Label htmlFor="child-age">Ηλικία Παιδιών *</Label>
-            <Select value={childAgeGroup} onValueChange={setChildAgeGroup} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Επιλέξτε ηλικιακή ομάδα" />
-              </SelectTrigger>
-              <SelectContent>
-                {CHILD_AGE_GROUPS.map(age => (
-                  <SelectItem key={age} value={age}>{age}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Παιδιά *</Label>
+            <p className="text-sm text-muted-foreground mb-3">
+              Προσθέστε τα παιδιά σας (το όνομα είναι προαιρετικό)
+            </p>
+            {children.map((child, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <Input
+                  placeholder="Όνομα (προαιρετικό)"
+                  value={child.name || ""}
+                  onChange={(e) => {
+                    const newChildren = [...children];
+                    newChildren[index] = { ...newChildren[index], name: e.target.value };
+                    setChildren(newChildren);
+                  }}
+                  className="flex-1"
+                />
+                <Select 
+                  value={child.ageGroup} 
+                  onValueChange={(value) => {
+                    const newChildren = [...children];
+                    newChildren[index] = { ...newChildren[index], ageGroup: value };
+                    setChildren(newChildren);
+                  }}
+                  required
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Ηλικία" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CHILD_AGE_GROUPS.map(age => (
+                      <SelectItem key={age} value={age}>{age}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {children.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setChildren(children.filter((_, i) => i !== index))}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setChildren([...children, { ageGroup: "" }])}
+              className="w-full"
+            >
+              + Προσθήκη Παιδιού
+            </Button>
           </div>
 
           {/* Match Preference */}
