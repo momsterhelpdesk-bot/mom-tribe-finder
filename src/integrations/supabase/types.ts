@@ -54,10 +54,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "profile_reports_reported_profile_id_fkey"
+            columns: ["reported_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "profile_reports_reporter_id_fkey"
             columns: ["reporter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -179,11 +193,74 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "verification_requests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_safe: {
+        Row: {
+          area: string | null
+          child_age_group: string | null
+          child_names: string | null
+          city: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string | null
+          interests: string[] | null
+          is_blocked: boolean | null
+          match_preference: string | null
+          mom_badge: string | null
+          profile_completed: boolean | null
+          profile_photo_url: string | null
+          selfie_photo_url: string | null
+          updated_at: string | null
+          verified_status: boolean | null
+        }
+        Insert: {
+          area?: string | null
+          child_age_group?: string | null
+          child_names?: string | null
+          city?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          interests?: string[] | null
+          is_blocked?: boolean | null
+          match_preference?: string | null
+          mom_badge?: string | null
+          profile_completed?: boolean | null
+          profile_photo_url?: string | null
+          selfie_photo_url?: string | null
+          updated_at?: string | null
+          verified_status?: boolean | null
+        }
+        Update: {
+          area?: string | null
+          child_age_group?: string | null
+          child_names?: string | null
+          city?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          interests?: string[] | null
+          is_blocked?: boolean | null
+          match_preference?: string | null
+          mom_badge?: string | null
+          profile_completed?: boolean | null
+          profile_photo_url?: string | null
+          selfie_photo_url?: string | null
+          updated_at?: string | null
+          verified_status?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_user_area: { Args: { _user_id: string }; Returns: string }
