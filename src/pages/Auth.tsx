@@ -11,6 +11,18 @@ import mascot from "@/assets/mascot.jpg";
 import logoFull from "@/assets/logo-full.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
+import { z } from "zod";
+
+const signUpSchema = z.object({
+  email: z.string().trim().email({ message: "Μη έγκυρη διεύθυνση email" }).max(255, { message: "Το email πρέπει να είναι μικρότερο από 255 χαρακτήρες" }),
+  password: z.string().min(8, { message: "Ο κωδικός πρέπει να είναι τουλάχιστον 8 χαρακτήρες" }).max(100, { message: "Ο κωδικός πρέπει να είναι μικρότερος από 100 χαρακτήρες" }),
+  fullName: z.string().trim().min(1, { message: "Το ονοματεπώνυμο είναι υποχρεωτικό" }).max(100, { message: "Το ονοματεπώνυμο πρέπει να είναι μικρότερο από 100 χαρακτήρες" })
+});
+
+const signInSchema = z.object({
+  email: z.string().trim().email({ message: "Μη έγκυρη διεύθυνση email" }).max(255),
+  password: z.string().min(1, { message: "Ο κωδικός είναι υποχρεωτικός" })
+});
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -41,15 +53,24 @@ export default function Auth() {
       return;
     }
 
+    // Validate inputs
+    const validation = signUpSchema.safeParse({ email, password, fullName });
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     setLoading(true);
     try {
+      const validData = validation.data;
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: validData.email,
+        password: validData.password,
         options: {
           emailRedirectTo: `${window.location.origin}/profile-setup`,
           data: {
-            full_name: fullName,
+            full_name: validData.fullName,
           }
         }
       });
@@ -62,8 +83,8 @@ export default function Auth() {
           .from('profiles')
           .insert({
             id: data.user.id,
-            full_name: fullName,
-            email: email,
+            full_name: validData.fullName,
+            email: validData.email,
             city: '',
             area: '',
             child_age_group: '',
@@ -86,12 +107,22 @@ export default function Auth() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate inputs
+    const validation = signInSchema.safeParse({ email, password });
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     setLoading(true);
-    
+
     try {
+      const validData = validation.data;
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: validData.email,
+        password: validData.password,
       });
 
       if (error) throw error;

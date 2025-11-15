@@ -7,6 +7,11 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Camera, Upload } from "lucide-react";
+import { z } from "zod";
+
+const verificationSchema = z.object({
+  childNames: z.string().trim().min(1, { message: "Τα ονόματα των παιδιών είναι υποχρεωτικά" }).max(200, { message: "Τα ονόματα πρέπει να είναι μικρότερα από 200 χαρακτήρες" })
+});
 
 export default function PhotoVerification() {
   const navigate = useNavigate();
@@ -110,11 +115,15 @@ export default function PhotoVerification() {
       return;
     }
 
-    if (!childNames.trim()) {
-      toast.error("Παρακαλώ συμπληρώστε τα ονόματα των παιδιών σας");
+    // Validate inputs
+    const validation = verificationSchema.safeParse({ childNames });
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
       return;
     }
 
+    const validData = validation.data;
     setLoading(true);
 
     try {
@@ -144,7 +153,7 @@ export default function PhotoVerification() {
           .from('verification_requests')
           .update({
             selfie_photo_url: photoUrl,
-            child_names: childNames,
+            child_names: validData.childNames,
             status: 'pending'
           })
           .eq('profile_id', userId);
@@ -156,7 +165,7 @@ export default function PhotoVerification() {
           .insert({
             profile_id: userId,
             selfie_photo_url: photoUrl,
-            child_names: childNames,
+            child_names: validData.childNames,
             status: 'pending'
           });
 
@@ -168,7 +177,7 @@ export default function PhotoVerification() {
         .from('profiles')
         .update({
           selfie_photo_url: photoUrl,
-          child_names: childNames
+          child_names: validData.childNames
         })
         .eq('id', userId);
 

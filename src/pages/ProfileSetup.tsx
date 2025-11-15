@@ -8,6 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload } from "lucide-react";
+import { z } from "zod";
+
+const profileSetupSchema = z.object({
+  city: z.string().trim().min(1, { message: "Η πόλη είναι υποχρεωτική" }).max(100, { message: "Η πόλη πρέπει να είναι μικρότερη από 100 χαρακτήρες" }),
+  area: z.string().trim().min(1, { message: "Η περιοχή είναι υποχρεωτική" }).max(100, { message: "Η περιοχή πρέπει να είναι μικρότερη από 100 χαρακτήρες" }),
+  childAgeGroup: z.string().min(1, { message: "Η ηλικία του παιδιού είναι υποχρεωτική" }),
+  matchPreference: z.string().min(1, { message: "Η προτίμηση είναι υποχρεωτική" }),
+  interests: z.array(z.string()).min(1, { message: "Επέλεξε τουλάχιστον ένα ενδιαφέρον" }).max(20, { message: "Μέγιστο 20 ενδιαφέροντα" })
+});
 
 const INTERESTS_OPTIONS = [
   "Ύπνος", "Καφέ", "Βόλτες", "Σινεμά", "Γυμναστική", 
@@ -112,6 +121,21 @@ export default function ProfileSetup() {
       return;
     }
 
+    // Validate inputs
+    const validation = profileSetupSchema.safeParse({
+      city,
+      area,
+      childAgeGroup,
+      matchPreference,
+      interests
+    });
+
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -136,14 +160,15 @@ export default function ProfileSetup() {
       }
 
       // Update profile
+      const validData = validation.data;
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
-          city,
-          area,
-          child_age_group: childAgeGroup,
-          match_preference: matchPreference,
-          interests,
+          city: validData.city,
+          area: validData.area,
+          child_age_group: validData.childAgeGroup,
+          match_preference: validData.matchPreference,
+          interests: validData.interests,
           profile_photo_url: photoUrl,
           profile_completed: true
         })
