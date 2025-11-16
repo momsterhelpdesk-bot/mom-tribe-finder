@@ -8,57 +8,58 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 35 25% 96%;
-    --foreground: 330 40% 25%;
+    --background: 24 43% 97%;
+    --foreground: 349 24% 25%;
 
     --card: 0 0% 100%;
-    --card-foreground: 330 40% 25%;
+    --card-foreground: 349 24% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 330 40% 25%;
+    --popover-foreground: 349 24% 25%;
 
-    --primary: 340 65% 62%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 35% 75%;
+    --primary-foreground: 349 24% 25%;
 
-    --secondary: 15 45% 75%;
-    --secondary-foreground: 15 50% 25%;
+    --secondary: 343 47% 88%;
+    --secondary-foreground: 349 24% 30%;
 
-    --muted: 330 15% 94%;
-    --muted-foreground: 330 20% 50%;
+    --muted: 343 47% 92%;
+    --muted-foreground: 0 20% 55%;
 
-    --accent: 25 60% 72%;
-    --accent-foreground: 330 45% 25%;
+    --accent: 35 46% 68%;
+    --accent-foreground: 349 24% 25%;
 
-    --mint: 15 45% 75%;
-    --mint-foreground: 15 50% 25%;
+    --mint: 343 47% 88%;
+    --mint-foreground: 349 24% 30%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 330 20% 88%;
-    --input: 330 20% 88%;
-    --ring: 340 65% 62%;
+    --border: 343 30% 90%;
+    --input: 343 30% 90%;
+    --ring: 0 35% 75%;
 
     --radius: 1rem;
 
-    --shadow-soft: 0 2px 12px -2px hsl(340 65% 62% / 0.2);
-    --gradient-floral: linear-gradient(135deg, hsl(35 25% 96%), hsl(330 20% 94%));
+    --shadow-soft: 0 4px 20px -4px hsl(0 35% 75% / 0.15);
+    --shadow-gold: 0 2px 8px -2px hsl(35 46% 68% / 0.3);
+    --gradient-elegant: linear-gradient(135deg, hsl(24 43% 97%), hsl(343 47% 92%));
 
-    --sidebar-background: 35 25% 96%;
+    --sidebar-background: 24 43% 97%;
 
-    --sidebar-foreground: 330 40% 25%;
+    --sidebar-foreground: 349 24% 25%;
 
-    --sidebar-primary: 340 65% 62%;
+    --sidebar-primary: 0 35% 75%;
 
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary-foreground: 349 24% 25%;
 
-    --sidebar-accent: 15 45% 75%;
+    --sidebar-accent: 343 47% 88%;
 
-    --sidebar-accent-foreground: 15 50% 25%;
+    --sidebar-accent-foreground: 349 24% 30%;
 
-    --sidebar-border: 330 20% 88%;
+    --sidebar-border: 343 30% 90%;
 
-    --sidebar-ring: 340 65% 62%;
+    --sidebar-ring: 0 35% 75%;
   }
 
   .dark {
@@ -107,7 +108,7 @@ All colors MUST be HSL.
 
   body {
     @apply text-foreground;
-    background: linear-gradient(135deg, hsl(35 25% 96%), hsl(330 20% 94%));
+    background: linear-gradient(135deg, hsl(24 43% 97%), hsl(343 47% 92%));
     background-attachment: fixed;
     position: relative;
     min-height: 100vh;

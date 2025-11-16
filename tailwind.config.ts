@@ -43,6 +43,10 @@ export default {
           DEFAULT: "hsl(var(--mint))",
           foreground: "hsl(var(--mint-foreground))",
         },
+        gold: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
