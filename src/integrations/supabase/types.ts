@@ -208,18 +208,23 @@ export type Database = {
       profiles: {
         Row: {
           area: string
+          bio: string | null
           child_age_group: string
           child_names: string | null
           children: Json | null
           city: string
           created_at: string | null
+          date_of_birth: string | null
           email: string
           full_name: string
           id: string
           interests: string[] | null
           is_blocked: boolean | null
+          marital_status: string | null
           match_preference: string
           mom_badge: string | null
+          notification_settings: Json | null
+          privacy_settings: Json | null
           profile_completed: boolean | null
           profile_photo_url: string | null
           profile_photos_urls: string[] | null
@@ -230,18 +235,23 @@ export type Database = {
         }
         Insert: {
           area: string
+          bio?: string | null
           child_age_group: string
           child_names?: string | null
           children?: Json | null
           city: string
           created_at?: string | null
+          date_of_birth?: string | null
           email: string
           full_name: string
           id: string
           interests?: string[] | null
           is_blocked?: boolean | null
+          marital_status?: string | null
           match_preference: string
           mom_badge?: string | null
+          notification_settings?: Json | null
+          privacy_settings?: Json | null
           profile_completed?: boolean | null
           profile_photo_url?: string | null
           profile_photos_urls?: string[] | null
@@ -252,18 +262,23 @@ export type Database = {
         }
         Update: {
           area?: string
+          bio?: string | null
           child_age_group?: string
           child_names?: string | null
           children?: Json | null
           city?: string
           created_at?: string | null
+          date_of_birth?: string | null
           email?: string
           full_name?: string
           id?: string
           interests?: string[] | null
           is_blocked?: boolean | null
+          marital_status?: string | null
           match_preference?: string
           mom_badge?: string | null
+          notification_settings?: Json | null
+          privacy_settings?: Json | null
           profile_completed?: boolean | null
           profile_photo_url?: string | null
           profile_photos_urls?: string[] | null
