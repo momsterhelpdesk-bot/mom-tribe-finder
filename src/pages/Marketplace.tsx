@@ -87,23 +87,6 @@ export default function Marketplace() {
                 Λίγη υπομονή… φορτώνουμε με αγάπη! 💕
               </p>
             </div>
-          </div>
-
-            <div className="bg-secondary/30 rounded-2xl p-6 space-y-4">
-            <h2 className="text-xl font-bold text-foreground">Coming Soon 🌸</h2>
-            <div className="space-y-3 text-foreground/90">
-              <p className="leading-relaxed">
-                Ετοιμάζουμε τον πιο γλυκό & ασφαλή μαμαδο-χώρο<br />
-                αγοραπωλησίας, ανταλλαγών & δωρεών 🤍
-              </p>
-              <p className="leading-relaxed">
-                Μαζί θα δώσουμε δεύτερη ζωή<br />
-                σε ό,τι αγάπησαν τα μικρά μας 🧸
-              </p>
-              <p className="text-sm italic text-muted-foreground">
-                Λίγη υπομονή… φορτώνουμε με αγάπη! 💕
-              </p>
-            </div>
 
             {/* Categories preview - Products */}
             <div className="pt-4 border-t border-border/20">
