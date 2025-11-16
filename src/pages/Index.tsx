@@ -6,33 +6,36 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Heart, MessageCircle, Calendar, ShoppingBag, Users, MapPin } from "lucide-react";
 import logoFull from "@/assets/logo-full.jpg";
 import mascot from "@/assets/mascot.jpg";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
+  
   const features = [
     {
       icon: <Users className="h-8 w-8" />,
-      title: "Connect with Local Moms",
-      description: "Find and match with mothers in your area who share similar parenting journeys and interests."
+      title: t('connectLocalMoms'),
+      description: t('connectLocalMomsDesc')
     },
     {
       icon: <MessageCircle className="h-8 w-8" />,
-      title: "Secure Messaging",
-      description: "Chat safely with other moms to plan playdates, share advice, or just have a friendly conversation."
+      title: t('secureMessaging'),
+      description: t('secureMessagingDesc')
     },
     {
       icon: <ShoppingBag className="h-8 w-8" />,
-      title: "Marketplace",
-      description: "Exchange, sell, or donate kids' items with trusted moms in your local area."
+      title: t('marketplace'),
+      description: t('marketplaceDesc')
     },
     {
       icon: <Heart className="h-8 w-8" />,
-      title: "Ρώτα μια μαμά - Discussion Forums",
-      description: "Ask questions, share experiences and get support in our judgment-free community. No criticism, only love 💕"
+      title: t('askMoms'),
+      description: t('askMomsDesc')
     },
     {
       icon: <MapPin className="h-8 w-8" />,
-      title: "Location-Based Matching",
-      description: "Smart matching system finds moms nearby with kids of similar ages and shared interests."
+      title: t('locationMatching'),
+      description: t('locationMatchingDesc')
     }
   ];
 
@@ -52,18 +55,17 @@ const Index = () => {
           </h1>
           
           <p className="text-2xl text-foreground mb-8 font-medium">
-            Together, moms thrive!
+            {t('heroTagline')}
           </p>
           
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Connect with amazing moms in your area. Share experiences, plan playdates, 
-            and build lasting friendships in a supportive community.
+            {t('heroDescription')}
           </p>
           
           <div className="flex gap-4 justify-center">
             <Link to="/auth">
               <Button size="lg" className="text-lg px-8">
-                Join Momster
+                {t('joinMomster')}
               </Button>
             </Link>
             <Button 
@@ -72,7 +74,7 @@ const Index = () => {
               className="text-lg px-8"
               onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Learn More
+              {t('learnMore')}
             </Button>
           </div>
         </div>
@@ -83,11 +85,10 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>
-              Everything You Need to Connect
+              {t('featuresTitle')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Momster brings together all the tools you need to build meaningful 
-              connections with other moms in your community.
+              {t('featuresSubtitle')}
             </p>
           </div>
 
@@ -119,14 +120,14 @@ const Index = () => {
         </div>
         <div className="container mx-auto text-center max-w-3xl relative z-10">
           <h2 className="text-4xl font-bold mb-6 text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>
-            Ready to Find Your Village?
+            {t('ctaTitle')}
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of moms who have already found their community on Momster.
+            {t('ctaSubtitle')}
           </p>
           <Link to="/auth">
             <Button size="lg" className="text-lg px-8">
-              Get Started Free
+              {t('joinMomster')}
             </Button>
           </Link>
         </div>
@@ -139,9 +140,9 @@ const Index = () => {
             <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
             <span className="text-xl font-bold text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>Momster</span>
           </div>
-          <p className="text-muted-foreground mb-2">&copy; 2025 Momster. Built with love for moms everywhere.</p>
+          <p className="text-muted-foreground mb-2">{t('footerCopyright')}</p>
           <Link to="/privacy-terms" className="text-sm text-muted-foreground hover:text-primary underline">
-            Πολιτική Απορρήτου & Όροι Χρήσης
+            {t('privacyTerms')}
           </Link>
         </div>
       </footer>

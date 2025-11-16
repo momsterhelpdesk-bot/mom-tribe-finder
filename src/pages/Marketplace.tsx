@@ -89,6 +89,75 @@ export default function Marketplace() {
             </div>
           </div>
 
+            <div className="bg-secondary/30 rounded-2xl p-6 space-y-4">
+            <h2 className="text-xl font-bold text-foreground">Coming Soon 🌸</h2>
+            <div className="space-y-3 text-foreground/90">
+              <p className="leading-relaxed">
+                Ετοιμάζουμε τον πιο γλυκό & ασφαλή μαμαδο-χώρο<br />
+                αγοραπωλησίας, ανταλλαγών & δωρεών 🤍
+              </p>
+              <p className="leading-relaxed">
+                Μαζί θα δώσουμε δεύτερη ζωή<br />
+                σε ό,τι αγάπησαν τα μικρά μας 🧸
+              </p>
+              <p className="text-sm italic text-muted-foreground">
+                Λίγη υπομονή… φορτώνουμε με αγάπη! 💕
+              </p>
+            </div>
+
+            {/* Categories preview - Products */}
+            <div className="pt-4 border-t border-border/20">
+              <p className="text-sm font-medium text-muted-foreground mb-3">
+                Προϊόντα:
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  "👶 Βρεφικά",
+                  "👕 Ρούχα",
+                  "🧸 Παιχνίδια",
+                  "📚 Βιβλία",
+                  "👩 Μαμά Essentials",
+                  "🎨 DIY & Δημιουργίες",
+                  "🚼 Βόλτα & Ταξίδι",
+                  "🏠 Σπίτι & Δωμάτιο"
+                ].map((category) => (
+                  <span
+                    key={category}
+                    className="px-3 py-1.5 bg-background/60 rounded-full text-xs font-medium border border-primary/20 text-foreground"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Categories preview - Services */}
+            <div className="pt-4 border-t border-border/20">
+              <p className="text-sm font-medium text-muted-foreground mb-3">
+                Υπηρεσίες:
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  "👶 Babysitting",
+                  "🎉 Παιδικά Πάρτυ",
+                  "📸 Φωτογραφίες",
+                  "🎨 Face Painting",
+                  "🎪 Animation",
+                  "🎂 Τούρτες & Catering",
+                  "🎈 Διακόσμηση",
+                  "🎭 Παιδικό Θέατρο"
+                ].map((service) => (
+                  <span
+                    key={service}
+                    className="px-3 py-1.5 bg-accent/20 rounded-full text-xs font-medium border border-accent/30 text-foreground"
+                  >
+                    {service}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-3">
             <Button 
               onClick={handleNotifyMe}
@@ -106,21 +175,6 @@ export default function Marketplace() {
             >
               🌸 Δες τους κανόνες του Marketplace
             </Button>
-          </div>
-
-          {/* Categories preview */}
-          <div className="pt-6 border-t border-border/50">
-            <p className="text-sm font-semibold text-muted-foreground mb-3">Κατηγορίες που έρχονται:</p>
-            <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-              <div>👶 Βρεφικά είδη</div>
-              <div>🧸 Παιχνίδια</div>
-              <div>👗 Ρουχαλάκια</div>
-              <div>📚 Βιβλία</div>
-              <div>🍼 Θηλασμός</div>
-              <div>🛏️ Έπιπλα</div>
-              <div>🎁 Party items</div>
-              <div>🌿 Eco-friendly</div>
-            </div>
           </div>
         </div>
       </div>
