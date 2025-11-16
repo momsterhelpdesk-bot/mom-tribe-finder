@@ -12,12 +12,27 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const CATEGORIES = [
+  { value: 'breastfeeding', label: 'Θηλασμός' },
+  { value: 'sleep', label: 'Ύπνος' },
+  { value: 'nutrition', label: 'Διατροφή' },
+  { value: 'education', label: 'Εκπαίδευση / Montessori' },
+  { value: 'routines', label: 'Ρουτίνες' },
+  { value: 'mom_body', label: 'Μαμά & Σώμα' },
+  { value: 'psychology', label: 'Ψυχολογία / άγχη' },
+  { value: 'play_activities', label: 'Παιχνίδι & δραστηριότητες' },
+  { value: 'relationship', label: 'Σχέση & σύντροφος' },
+  { value: 'work_balance', label: 'Εργασία & ισορροπία' },
+];
 
 interface Question {
   id: string;
   content: string;
   display_mode: 'name' | 'pseudonym' | 'anonymous';
   pseudonym?: string;
+  category?: string;
   likes_count: number;
   answers_count: number;
   created_at: string;
@@ -44,6 +59,8 @@ export default function AskMoms() {
   const [newQuestion, setNewQuestion] = useState("");
   const [displayMode, setDisplayMode] = useState<'name' | 'pseudonym' | 'anonymous'>('name');
   const [pseudonym, setPseudonym] = useState("");
+  const [category, setCategory] = useState<string>("");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [newAnswer, setNewAnswer] = useState("");
@@ -138,6 +155,11 @@ export default function AskMoms() {
       return;
     }
 
+    if (!category) {
+      toast({ title: "Επίλεξε κατηγορία", description: "Παρακαλώ επίλεξε μια κατηγορία για την ερώτησή σου", variant: "destructive" });
+      return;
+    }
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast({ title: "Πρέπει να είσαι συνδεδεμένη", variant: "destructive" });
@@ -150,7 +172,8 @@ export default function AskMoms() {
         .update({
           content: newQuestion,
           display_mode: displayMode,
-          pseudonym: displayMode === 'pseudonym' ? pseudonym : null
+          pseudonym: displayMode === 'pseudonym' ? pseudonym : null,
+          category: category
         })
         .eq('id', editingQuestion.id);
 
@@ -168,6 +191,7 @@ export default function AskMoms() {
           content: newQuestion,
           display_mode: displayMode,
           pseudonym: displayMode === 'pseudonym' ? pseudonym : null,
+          category: category,
           user_id: user.id
         });
 
@@ -182,6 +206,7 @@ export default function AskMoms() {
     setNewQuestion("");
     setDisplayMode('name');
     setPseudonym("");
+    setCategory("");
     fetchQuestions();
   };
 
@@ -204,6 +229,7 @@ export default function AskMoms() {
     setNewQuestion(question.content);
     setDisplayMode(question.display_mode);
     setPseudonym(question.pseudonym || "");
+    setCategory(question.category || "");
     setEditingQuestion(question);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -449,6 +475,22 @@ export default function AskMoms() {
               </div>
             )}
             
+            <div className="space-y-2">
+              <Label htmlFor="category" className="text-xs">Κατηγορία:</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Επίλεξε κατηγορία..." />
+                </SelectTrigger>
+                <SelectContent className="bg-background">
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
             <Button onClick={handleSubmitQuestion} className="w-full">
               <Send className="w-4 h-4 mr-2" />
               {editingQuestion ? "Ενημέρωση" : "Δημοσίευση"}
@@ -461,6 +503,7 @@ export default function AskMoms() {
                   setEditingQuestion(null);
                   setNewQuestion("");
                   setPseudonym("");
+                  setCategory("");
                   setDisplayMode('name');
                 }} 
                 className="w-full"
@@ -471,17 +514,44 @@ export default function AskMoms() {
           </div>
         </Card>
 
+        {/* Category Filter */}
+        <Card className="p-4 mb-4">
+          <div className="flex items-center gap-3">
+            <Label className="text-sm font-medium whitespace-nowrap">Φίλτρο:</Label>
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-background">
+                <SelectItem value="all">Όλες οι κατηγορίες</SelectItem>
+                {CATEGORIES.map((cat) => (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </Card>
+
         {/* Questions List */}
         <div className="space-y-4">
-          {questions.map((question) => (
+          {questions
+            .filter(q => filterCategory === "all" || q.category === filterCategory)
+            .map((question) => (
             <Card key={question.id} className="p-4 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="font-semibold text-sm">{getDisplayName(question)}</span>
                     <span className="text-xs text-muted-foreground">
                       {new Date(question.created_at).toLocaleDateString('el-GR')}
                     </span>
+                    {question.category && (
+                      <Badge variant="secondary" className="text-xs">
+                        {CATEGORIES.find(c => c.value === question.category)?.label}
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-foreground">{question.content}</p>
                 </div>

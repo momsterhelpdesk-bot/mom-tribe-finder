@@ -306,6 +306,7 @@ export type Database = {
       questions: {
         Row: {
           answers_count: number
+          category: string | null
           content: string
           created_at: string
           display_mode: string
@@ -317,6 +318,7 @@ export type Database = {
         }
         Insert: {
           answers_count?: number
+          category?: string | null
           content: string
           created_at?: string
           display_mode?: string
@@ -328,6 +330,7 @@ export type Database = {
         }
         Update: {
           answers_count?: number
+          category?: string | null
           content?: string
           created_at?: string
           display_mode?: string
