@@ -47,9 +47,12 @@ export default function AskMoms() {
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [newAnswer, setNewAnswer] = useState("");
+  const [answerDisplayMode, setAnswerDisplayMode] = useState<'name' | 'pseudonym' | 'anonymous'>('name');
+  const [answerPseudonym, setAnswerPseudonym] = useState("");
   const [likedQuestions, setLikedQuestions] = useState<Set<string>>(new Set());
   const [likedAnswers, setLikedAnswers] = useState<Set<string>>(new Set());
   const [animatingHeart, setAnimatingHeart] = useState<string | null>(null);
+  const [animatingAnswerHeart, setAnimatingAnswerHeart] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
@@ -292,13 +295,21 @@ export default function AskMoms() {
       return;
     }
 
+    const answerData: any = {
+      content: newAnswer,
+      question_id: selectedQuestion.id,
+      user_id: user.id
+    };
+
+    if (answerDisplayMode === 'pseudonym' && answerPseudonym.trim()) {
+      answerData.pseudonym = answerPseudonym.trim();
+    } else if (answerDisplayMode === 'anonymous') {
+      answerData.pseudonym = 'Ανώνυμη Μαμά';
+    }
+
     const { error } = await supabase
       .from('answers')
-      .insert({
-        content: newAnswer,
-        question_id: selectedQuestion.id,
-        user_id: user.id
-      });
+      .insert(answerData);
 
     if (error) {
       toast({ title: "Σφάλμα", description: "Δεν μπόρεσε να δημοσιευτεί η απάντηση", variant: "destructive" });
@@ -307,6 +318,8 @@ export default function AskMoms() {
 
     toast({ title: "Επιτυχία! 💕", description: "Η απάντησή σου δημοσιεύτηκε!" });
     setNewAnswer("");
+    setAnswerDisplayMode('name');
+    setAnswerPseudonym("");
     fetchAnswers(selectedQuestion.id);
     fetchQuestions();
   };
@@ -335,8 +348,8 @@ export default function AskMoms() {
         .insert({ answer_id: answerId, user_id: user.id });
       
       setLikedAnswers(prev => new Set([...prev, answerId]));
-      setAnimatingHeart(`answer-${answerId}`);
-      setTimeout(() => setAnimatingHeart(null), 1000);
+      setAnimatingAnswerHeart(answerId);
+      setTimeout(() => setAnimatingAnswerHeart(null), 1000);
     }
 
     fetchAnswers(selectedQuestion!.id);
@@ -349,6 +362,9 @@ export default function AskMoms() {
   };
 
   const getAnswerDisplayName = (answer: Answer) => {
+    if (answer.pseudonym) {
+      return answer.pseudonym;
+    }
     return answer.profiles?.full_name || 'Μαμά';
   };
 
@@ -514,7 +530,7 @@ export default function AskMoms() {
                   variant="ghost"
                   size="sm"
                   onClick={() => handleLikeQuestion(question.id)}
-                  className="gap-2"
+                  className="gap-2 relative"
                 >
                   <Heart 
                     className={`w-4 h-4 transition-all ${
@@ -522,6 +538,9 @@ export default function AskMoms() {
                     }`}
                   />
                   <span>{question.likes_count}</span>
+                  {animatingHeart === question.id && (
+                    <Heart className="w-4 h-4 fill-primary text-primary absolute animate-ping" />
+                  )}
                 </Button>
                 
                 <Dialog>
@@ -595,7 +614,7 @@ export default function AskMoms() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleLikeAnswer(answer.id)}
-                              className="gap-2 h-7"
+                              className="gap-2 h-7 relative"
                             >
                               <Heart 
                                 className={`w-3 h-3 transition-all ${
@@ -603,13 +622,67 @@ export default function AskMoms() {
                                 }`}
                               />
                               <span className="text-xs">{answer.likes_count}</span>
+                              {animatingAnswerHeart === answer.id && (
+                                <Heart className="w-3 h-3 fill-primary text-primary absolute animate-ping" />
+                              )}
                             </Button>
                           </Card>
                         ))}
                       </div>
 
                       {/* Answer Form */}
-                      <div className="space-y-2 pt-3 border-t">
+                      <div className="space-y-3 pt-3 border-t">
+                        <div className="space-y-2">
+                          <Label className="text-sm">Θέλω να εμφανιστώ ως:</Label>
+                          <div className="flex gap-3">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="answerDisplayMode"
+                                value="name"
+                                checked={answerDisplayMode === 'name'}
+                                onChange={(e) => setAnswerDisplayMode(e.target.value as 'name' | 'pseudonym' | 'anonymous')}
+                                className="w-4 h-4 accent-primary"
+                              />
+                              <span className="text-sm">Όνομα</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="answerDisplayMode"
+                                value="pseudonym"
+                                checked={answerDisplayMode === 'pseudonym'}
+                                onChange={(e) => setAnswerDisplayMode(e.target.value as 'name' | 'pseudonym' | 'anonymous')}
+                                className="w-4 h-4 accent-primary"
+                              />
+                              <span className="text-sm">Ψευδώνυμο</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="answerDisplayMode"
+                                value="anonymous"
+                                checked={answerDisplayMode === 'anonymous'}
+                                onChange={(e) => setAnswerDisplayMode(e.target.value as 'name' | 'pseudonym' | 'anonymous')}
+                                className="w-4 h-4 accent-primary"
+                              />
+                              <span className="text-sm">Ανώνυμα</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {answerDisplayMode === 'pseudonym' && (
+                          <div className="space-y-1">
+                            <Label htmlFor="answerPseudonym" className="text-sm">Ψευδώνυμο</Label>
+                            <Input
+                              id="answerPseudonym"
+                              placeholder="π.χ. Μαμά του Κώστα"
+                              value={answerPseudonym}
+                              onChange={(e) => setAnswerPseudonym(e.target.value)}
+                            />
+                          </div>
+                        )}
+
                         <Textarea
                           placeholder="Γράψε την απάντησή σου με αγάπη..."
                           value={newAnswer}
