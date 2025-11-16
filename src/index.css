@@ -107,9 +107,10 @@ All colors MUST be HSL.
 
   body {
     @apply text-foreground;
-    background: linear-gradient(135deg, hsl(330 100% 95%), hsl(280 80% 92%));
+    background: linear-gradient(135deg, hsl(330 100% 92%), hsl(270 85% 90%));
     background-attachment: fixed;
     position: relative;
+    min-height: 100vh;
   }
 
   body::before {
