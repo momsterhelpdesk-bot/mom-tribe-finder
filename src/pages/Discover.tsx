@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, X, MapPin, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import mascot from "@/assets/mascot.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
@@ -39,21 +40,36 @@ export default function Discover() {
 
   const currentProfile = profiles[currentIndex];
 
-  const handleSwipe = (liked: boolean) => {
+  const handleSwipe = async (liked: boolean) => {
     console.log(liked ? "Liked!" : "Passed");
     
     const nextIndex = currentIndex + 1;
     
     if (liked) {
-      // Simulate mutual match (50% chance for demo)
-      const isMutualMatch = Math.random() > 0.5;
-      if (isMutualMatch) {
-        setShowMatchVideo(true);
-        // Video will auto-hide after playing and show mascot
-        setTimeout(() => {
-          setShowMatchVideo(false);
-          showMatch(() => navigate("/chats"));
-        }, 3000); // Adjust based on video length
+      // Create match in database
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && currentProfile) {
+        // In a real app, you'd check if other user also liked
+        // For demo, we'll simulate mutual match (50% chance)
+        const isMutualMatch = Math.random() > 0.5;
+        
+        if (isMutualMatch) {
+          // Create match record
+          const { error } = await supabase
+            .from("matches")
+            .insert([{
+              user1_id: user.id,
+              user2_id: currentProfile.id.toString()
+            }]);
+
+          if (!error) {
+            setShowMatchVideo(true);
+            setTimeout(() => {
+              setShowMatchVideo(false);
+              showMatch(() => navigate("/chats"));
+            }, 3000);
+          }
+        }
       }
     }
     
