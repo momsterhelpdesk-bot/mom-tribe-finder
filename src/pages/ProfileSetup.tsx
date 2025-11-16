@@ -7,8 +7,9 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, X } from "lucide-react";
+import { Upload, X, AlertCircle } from "lucide-react";
 import { z } from "zod";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const profileSetupSchema = z.object({
   username: z.string().trim().min(3, { message: "Το username πρέπει να είναι τουλάχιστον 3 χαρακτήρες" }).max(20, { message: "Το username πρέπει να είναι μικρότερο από 20 χαρακτήρες" }).regex(/^[a-zA-Z0-9_]+$/, { message: "Το username μπορεί να περιέχει μόνο γράμματα, αριθμούς και _" }),
@@ -49,6 +50,14 @@ const MATCH_PREFERENCES = [
   "Από όλη την Ελλάδα"
 ];
 
+const MAX_PHOTOS = 6;
+
+type PhotoItem = {
+  file?: File;
+  preview: string;
+  url?: string;
+};
+
 export default function ProfileSetup() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -60,8 +69,7 @@ export default function ProfileSetup() {
   const [children, setChildren] = useState<Array<{ name?: string; ageGroup: string }>>([{ ageGroup: "" }]);
   const [matchPreference, setMatchPreference] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
-  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string>("");
+  const [photos, setPhotos] = useState<PhotoItem[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -88,28 +96,48 @@ export default function ProfileSetup() {
         setUsername(profile.username || "");
         setCity(profile.city || "");
         setArea(profile.area || "");
-        const childrenData = profile.children as Array<{ name?: string; ageGroup: string }> || [];
-        if (Array.isArray(childrenData) && childrenData.length > 0) {
-          setChildren(childrenData);
-        }
+        setChildren((profile.children as Array<{ name?: string; ageGroup: string }>) || [{ ageGroup: "" }]);
         setMatchPreference(profile.match_preference || "");
         setInterests(profile.interests || []);
-        setProfilePhotoPreview(profile.profile_photo_url || "");
+        
+        // Load existing photos
+        if (profile.profile_photos_urls && profile.profile_photos_urls.length > 0) {
+          setPhotos(profile.profile_photos_urls.map((url: string) => ({
+            url,
+            preview: url
+          })));
+        }
       }
     };
     checkAuth();
   }, [navigate]);
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProfilePhoto(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePhotoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const handlePhotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    if (photos.length + files.length > MAX_PHOTOS) {
+      toast.error(`Μπορείς να ανεβάσεις μέχρι ${MAX_PHOTOS} φωτογραφίες`);
+      return;
     }
+
+    const newPhotos: PhotoItem[] = files.map(file => {
+      const preview = URL.createObjectURL(file);
+      return { file, preview };
+    });
+
+    setPhotos(prev => [...prev, ...newPhotos]);
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos(prev => {
+      const newPhotos = [...prev];
+      // Revoke object URL to prevent memory leaks
+      if (newPhotos[index].preview.startsWith('blob:')) {
+        URL.revokeObjectURL(newPhotos[index].preview);
+      }
+      newPhotos.splice(index, 1);
+      return newPhotos;
+    });
   };
 
   const toggleInterest = (interest: string) => {
@@ -125,8 +153,8 @@ export default function ProfileSetup() {
     
     if (!userId) return;
 
-    if (!profilePhoto && !profilePhotoPreview) {
-      toast.error("Παρακαλώ προσθέστε φωτογραφία προφίλ");
+    if (photos.length === 0) {
+      toast.error("Πρέπει να ανεβάσεις τουλάχιστον 1 φωτογραφία");
       return;
     }
 
@@ -149,25 +177,31 @@ export default function ProfileSetup() {
     setLoading(true);
 
     try {
-      let photoUrl = profilePhotoPreview;
+      const photoUrls: string[] = [];
 
-      // Upload photo if new one selected
-      if (profilePhoto) {
-        const fileExt = profilePhoto.name.split('.').pop();
-        const fileName = `${userId}-${Date.now()}.${fileExt}`;
-        const filePath = `${userId}/${fileName}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('profile-photos')
-          .upload(filePath, profilePhoto, { upsert: true });
+      // Upload new photos
+      for (const photo of photos) {
+        if (photo.url) {
+          // Existing photo, keep the URL
+          photoUrls.push(photo.url);
+        } else if (photo.file) {
+          // New photo, upload it
+          const fileExt = photo.file.name.split('.').pop();
+          const fileName = `${userId}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+          const filePath = `${userId}/${fileName}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('profile-photos')
+            .upload(filePath, photo.file, { upsert: true });
 
-        if (uploadError) throw uploadError;
+          if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('profile-photos')
-          .getPublicUrl(filePath);
+          const { data: { publicUrl } } = supabase.storage
+            .from('profile-photos')
+            .getPublicUrl(filePath);
 
-        photoUrl = publicUrl;
+          photoUrls.push(publicUrl);
+        }
       }
 
       // Update profile
@@ -182,7 +216,8 @@ export default function ProfileSetup() {
           child_age_group: validData.children[0]?.ageGroup || '',
           match_preference: validData.matchPreference,
           interests: validData.interests,
-          profile_photo_url: photoUrl,
+          profile_photo_url: photoUrls[0], // Keep first photo as main
+          profile_photos_urls: photoUrls,
           profile_completed: true
         })
         .eq('id', userId);
@@ -203,134 +238,163 @@ export default function ProfileSetup() {
       <Card className="max-w-2xl mx-auto p-8 animate-fade-in">
         <h1 className="text-3xl font-bold text-center mb-2 animate-scale-in">Συμπληρώστε το Προφίλ σας</h1>
         <p className="text-center text-muted-foreground mb-8">
-          Αυτά τα στοιχεία θα μας βοηθήσουν να σας συνδέσουμε με τις κατάλληλες μαμάδες
+          Ας γνωριστούμε καλύτερα! 💕
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Profile Photo */}
-          <div className="space-y-2">
-            <Label>Φωτογραφία Προφίλ *</Label>
-            <div className="flex items-center gap-4">
-              {profilePhotoPreview && (
-                <img 
-                  src={profilePhotoPreview} 
-                  alt="Preview" 
-                  className="w-24 h-24 rounded-full object-cover"
-                />
+          {/* Photos Section */}
+          <div className="space-y-3">
+            <Label>Φωτογραφίες Προφίλ *</Label>
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                📸 <strong>Σημαντικό:</strong> Ανέβασε 1-{MAX_PHOTOS} φωτογραφίες όπου φαίνεται το πρόσωπό σου. 
+                <br />❌ Όχι τοπία, όχι παιδιά στις φωτογραφίες.
+                <br />✅ Μόνο εσύ!
+              </AlertDescription>
+            </Alert>
+
+            <div className="grid grid-cols-3 gap-3">
+              {photos.map((photo, index) => (
+                <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-secondary/20">
+                  <img
+                    src={photo.preview}
+                    alt={`Photo ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(index)}
+                    className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 hover:bg-destructive/90"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  {index === 0 && (
+                    <div className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
+                      Κύρια
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {photos.length < MAX_PHOTOS && (
+                <label className="aspect-square rounded-lg border-2 border-dashed border-border hover:border-primary cursor-pointer flex flex-col items-center justify-center gap-2 transition-colors bg-secondary/10">
+                  <Upload className="w-8 h-8 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground text-center px-2">
+                    Προσθήκη<br />φωτογραφίας
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotosChange}
+                    className="hidden"
+                  />
+                </label>
               )}
-              <div className="flex-1">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                  className="hidden"
-                  id="photo-upload"
-                />
-                <Label 
-                  htmlFor="photo-upload"
-                  className="flex items-center justify-center gap-2 px-4 py-2 border rounded-md cursor-pointer hover:bg-accent"
-                >
-                  <Upload className="w-4 h-4" />
-                  Επιλέξτε Φωτογραφία
-                </Label>
-              </div>
             </div>
+
+            {photos.length === 0 && (
+              <p className="text-xs text-muted-foreground">
+                * Τουλάχιστον 1 φωτογραφία είναι υποχρεωτική
+              </p>
+            )}
           </div>
 
           {/* Username */}
-          <div className="space-y-2">
+          <div>
             <Label htmlFor="username">Username *</Label>
             <Input
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="π.χ. maria_mom"
-              required
+              maxLength={20}
             />
-            <p className="text-xs text-muted-foreground">
-              3-20 χαρακτήρες, μόνο γράμματα, αριθμοί και _
-            </p>
           </div>
 
-          {/* City */}
-          <div className="space-y-2">
-            <Label htmlFor="city">Πόλη *</Label>
-            <Select value={city} onValueChange={setCity} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Επιλέξτε πόλη" />
-              </SelectTrigger>
-              <SelectContent>
-                {GREEK_CITIES.map(c => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* City and Area */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="city">Πόλη *</Label>
+              <Select value={city} onValueChange={setCity}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Επέλεξε πόλη" />
+                </SelectTrigger>
+                <SelectContent>
+                  {GREEK_CITIES.map(cityName => (
+                    <SelectItem key={cityName} value={cityName}>
+                      {cityName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Area */}
-          <div className="space-y-2">
-            <Label htmlFor="area">Περιοχή *</Label>
-            <Input
-              id="area"
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-              placeholder="π.χ. Κολωνάκι, Καλαμαριά"
-              required
-            />
+            <div>
+              <Label htmlFor="area">Περιοχή *</Label>
+              <Input
+                id="area"
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                placeholder="π.χ. Κολωνάκι"
+                maxLength={100}
+              />
+            </div>
           </div>
 
           {/* Children */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label>Παιδιά *</Label>
-            <p className="text-sm text-muted-foreground mb-3">
-              Προσθέστε τα παιδιά σας (το όνομα είναι προαιρετικό)
-            </p>
             {children.map((child, index) => (
-              <div key={index} className="flex gap-2 mb-2">
+              <div key={index} className="flex gap-3">
                 <Input
                   placeholder="Όνομα (προαιρετικό)"
                   value={child.name || ""}
                   onChange={(e) => {
                     const newChildren = [...children];
-                    newChildren[index] = { ...newChildren[index], name: e.target.value };
+                    newChildren[index].name = e.target.value;
                     setChildren(newChildren);
                   }}
-                  className="flex-1"
+                  maxLength={50}
                 />
-                <Select 
-                  value={child.ageGroup} 
+                <Select
+                  value={child.ageGroup}
                   onValueChange={(value) => {
                     const newChildren = [...children];
-                    newChildren[index] = { ...newChildren[index], ageGroup: value };
+                    newChildren[index].ageGroup = value;
                     setChildren(newChildren);
                   }}
-                  required
                 >
-                  <SelectTrigger className="flex-1">
+                  <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Ηλικία" />
                   </SelectTrigger>
                   <SelectContent>
                     {CHILD_AGE_GROUPS.map(age => (
-                      <SelectItem key={age} value={age}>{age}</SelectItem>
+                      <SelectItem key={age} value={age}>
+                        {age}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 {children.length > 1 && (
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
-                    onClick={() => setChildren(children.filter((_, i) => i !== index))}
+                    onClick={() => {
+                      setChildren(children.filter((_, i) => i !== index));
+                    }}
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-4 w-4" />
                   </Button>
                 )}
               </div>
             ))}
+            
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={() => setChildren([...children, { ageGroup: "" }])}
               className="w-full"
             >
@@ -339,44 +403,46 @@ export default function ProfileSetup() {
           </div>
 
           {/* Match Preference */}
-          <div className="space-y-2">
-            <Label htmlFor="match-pref">Προτίμηση Σύνδεσης *</Label>
-            <Select value={matchPreference} onValueChange={setMatchPreference} required>
+          <div>
+            <Label>Προτίμηση Match *</Label>
+            <Select value={matchPreference} onValueChange={setMatchPreference}>
               <SelectTrigger>
-                <SelectValue placeholder="Επιλέξτε προτίμηση" />
+                <SelectValue placeholder="Επέλεξε προτίμηση" />
               </SelectTrigger>
               <SelectContent>
                 {MATCH_PREFERENCES.map(pref => (
-                  <SelectItem key={pref} value={pref}>{pref}</SelectItem>
+                  <SelectItem key={pref} value={pref}>
+                    {pref}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
           {/* Interests */}
-          <div className="space-y-2">
-            <Label>Ενδιαφέροντα</Label>
-            <p className="text-sm text-muted-foreground mb-3">
-              Επιλέξτε τα ενδιαφέροντά σας για καλύτερα matches
-            </p>
+          <div className="space-y-3">
+            <Label>Ενδιαφέροντα * (επέλεξε τουλάχιστον 1)</Label>
             <div className="flex flex-wrap gap-2">
               {INTERESTS_OPTIONS.map(interest => (
-                <Button
+                <button
                   key={interest}
                   type="button"
-                  variant={interests.includes(interest) ? "default" : "outline"}
-                  size="sm"
                   onClick={() => toggleInterest(interest)}
+                  className={`px-4 py-2 rounded-full text-sm transition-colors ${
+                    interests.includes(interest)
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  }`}
                 >
                   {interest}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full" 
+          <Button
+            type="submit"
+            className="w-full"
             size="lg"
             disabled={loading}
           >

@@ -219,6 +219,7 @@ export type Database = {
           mom_badge: string | null
           profile_completed: boolean | null
           profile_photo_url: string | null
+          profile_photos_urls: string[] | null
           selfie_photo_url: string | null
           updated_at: string | null
           username: string | null
@@ -240,6 +241,7 @@ export type Database = {
           mom_badge?: string | null
           profile_completed?: boolean | null
           profile_photo_url?: string | null
+          profile_photos_urls?: string[] | null
           selfie_photo_url?: string | null
           updated_at?: string | null
           username?: string | null
@@ -261,6 +263,7 @@ export type Database = {
           mom_badge?: string | null
           profile_completed?: boolean | null
           profile_photo_url?: string | null
+          profile_photos_urls?: string[] | null
           selfie_photo_url?: string | null
           updated_at?: string | null
           username?: string | null
