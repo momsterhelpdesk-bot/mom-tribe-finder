@@ -13,7 +13,7 @@ const Navigation = () => {
         
         <div className="flex items-center gap-4">
           <Link to="/auth">
-            <Button variant="ghost">Sign In</Button>
+            <Button variant="outline">Sign In</Button>
           </Link>
           <Link to="/auth">
             <Button>Get Started</Button>
