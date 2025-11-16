@@ -2,13 +2,26 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Settings, MapPin, User, Heart, Calendar, ShoppingBag } from "lucide-react";
+import { Settings, MapPin, User, Heart, Calendar, ShoppingBag, LogOut } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Profile() {
   const { mascotConfig, visible, hideMascot, showReportThanks } = useMascot();
+  const navigate = useNavigate();
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Αποσυνδέθηκες");
+      navigate("/auth");
+    } catch (error) {
+      toast.error("Αποτυχία αποσύνδεσης");
+    }
+  };
   
   const profile = {
     name: "Your Name",
@@ -117,6 +130,10 @@ export default function Profile() {
           <Button variant="outline" className="w-full justify-start" size="lg">
             <Settings className="w-5 h-5 mr-3" />
             Settings
+          </Button>
+          <Button variant="destructive" className="w-full justify-start" size="lg" onClick={handleSignOut}>
+            <LogOut className="w-5 h-5 mr-3" />
+            Αποσύνδεση
           </Button>
         </div>
       </div>
