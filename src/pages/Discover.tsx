@@ -212,6 +212,39 @@ export default function Discover() {
                 </div>
               </>
             )}
+            
+            {/* Mascot pushing effect */}
+            {isDragging && dragOffset.x < -50 && (
+              <div 
+                className="fixed top-1/2 -translate-y-1/2 transition-all duration-200 z-50"
+                style={{ 
+                  right: `${Math.min(80, Math.abs(dragOffset.x) / 2)}px`,
+                  opacity: Math.min(1, Math.abs(dragOffset.x) / 100)
+                }}
+              >
+                <img 
+                  src={mascot} 
+                  alt="Pushing left" 
+                  className="w-24 h-24 object-contain animate-[bounce_0.5s_ease-in-out_infinite] -scale-x-100"
+                />
+              </div>
+            )}
+            
+            {isDragging && dragOffset.x > 50 && (
+              <div 
+                className="fixed top-1/2 -translate-y-1/2 transition-all duration-200 z-50"
+                style={{ 
+                  left: `${Math.min(80, dragOffset.x / 2)}px`,
+                  opacity: Math.min(1, dragOffset.x / 100)
+                }}
+              >
+                <img 
+                  src={mascot} 
+                  alt="Pushing right" 
+                  className="w-24 h-24 object-contain animate-[bounce_0.5s_ease-in-out_infinite]"
+                />
+              </div>
+            )}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-white">
               <h2 className="text-2xl font-bold">{currentProfile.name}, {currentProfile.age}</h2>
               <div className="flex items-center gap-2 mt-1">
