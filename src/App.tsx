@@ -13,6 +13,7 @@ import Discover from "./pages/Discover";
 import Chats from "./pages/Chats";
 import ChatView from "./pages/ChatView";
 import AskMoms from "./pages/AskMoms";
+import DailyBoost from "./pages/DailyBoost";
 import Marketplace from "./pages/Marketplace";
 import Profile from "./pages/Profile";
 import PrivacyTerms from "./pages/PrivacyTerms";
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/chats" element={<AuthGuard><><Chats /><BottomNav /></></AuthGuard>} />
           <Route path="/chat/:matchId" element={<AuthGuard><ChatView /></AuthGuard>} />
           <Route path="/ask-moms" element={<AuthGuard><><AskMoms /><BottomNav /></></AuthGuard>} />
+          <Route path="/daily-boost" element={<AuthGuard><><DailyBoost /><BottomNav /></></AuthGuard>} />
           <Route path="/marketplace" element={<AuthGuard><><Marketplace /><BottomNav /></></AuthGuard>} />
           <Route path="/profile" element={<AuthGuard><><Profile /><BottomNav /></></AuthGuard>} />
           <Route path="/privacy-terms" element={<PrivacyTerms />} />
