@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Sparkles } from "lucide-react";
+import { useMascot } from "@/hooks/use-mascot";
+import MomsterMascot from "@/components/MomsterMascot";
 
 const MOODS = [
   { emoji: "😊", value: "positive", label: "Happy" },
@@ -135,6 +137,19 @@ export default function DailyBoost() {
   const { language } = useLanguage();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [moodQuote, setMoodQuote] = useState<string>("");
+  const { mascotConfig, visible, showMascot, hideMascot } = useMascot();
+  const [showHearts, setShowHearts] = useState(false);
+
+  useEffect(() => {
+    // Show welcome mascot when page loads
+    showMascot({
+      state: "happy",
+      message: language === 'el' 
+        ? "Γεια σου όμορφη! Πάρε τη δόση ενέργειας σου 💕" 
+        : "Hello beautiful! Get your energy boost 💕",
+      duration: 2500,
+    });
+  }, []);
 
   const dailyQuote = DAILY_QUOTES[language][Math.floor(Math.random() * DAILY_QUOTES[language].length)];
   const selfCareTip = SELF_CARE_TIPS[language][Math.floor(Math.random() * SELF_CARE_TIPS[language].length)];
@@ -144,10 +159,40 @@ export default function DailyBoost() {
     const quotes = MOOD_QUOTES[moodValue as keyof typeof MOOD_QUOTES][language];
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
     setMoodQuote(randomQuote);
+    
+    // Show mascot with hearts
+    setShowHearts(true);
+    showMascot({
+      state: "happy",
+      message: randomQuote,
+      duration: 3000,
+    });
+    
+    setTimeout(() => {
+      setShowHearts(false);
+    }, 3000);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pt-20 pb-24 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pt-20 pb-24 px-4 relative">
+      {showHearts && (
+        <div className="fixed inset-0 pointer-events-none z-40">
+          {[...Array(15)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-float-heart"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                fontSize: `${20 + Math.random() * 20}px`,
+              }}
+            >
+              💕
+            </div>
+          ))}
+        </div>
+      )}
+      
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -235,6 +280,19 @@ export default function DailyBoost() {
           </p>
         </Card>
       </div>
+
+      {mascotConfig && (
+        <MomsterMascot
+          state={mascotConfig.state}
+          message={mascotConfig.message}
+          visible={visible}
+          showButton={mascotConfig.showButton}
+          buttonText={mascotConfig.buttonText}
+          onButtonClick={mascotConfig.onButtonClick}
+          duration={mascotConfig.duration}
+          onHide={hideMascot}
+        />
+      )}
     </div>
   );
 }
