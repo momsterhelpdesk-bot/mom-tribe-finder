@@ -143,6 +143,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_reports: {
         Row: {
           created_at: string | null
@@ -208,6 +244,7 @@ export type Database = {
       profiles: {
         Row: {
           area: string
+          avatar_data: Json | null
           bio: string | null
           child_age_group: string
           child_names: string | null
@@ -235,6 +272,7 @@ export type Database = {
         }
         Insert: {
           area: string
+          avatar_data?: Json | null
           bio?: string | null
           child_age_group: string
           child_names?: string | null
@@ -262,6 +300,7 @@ export type Database = {
         }
         Update: {
           area?: string
+          avatar_data?: Json | null
           bio?: string | null
           child_age_group?: string
           child_names?: string | null

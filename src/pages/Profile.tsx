@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Settings, MapPin, Calendar, MessageCircle, LogOut, Edit, Mail, Heart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Settings, MapPin, Calendar, MessageCircle, LogOut, Edit, Mail, Heart, ChevronLeft, ChevronRight, Sparkles, Bell } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
@@ -19,6 +19,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { PhotoUpload } from "@/components/PhotoUpload";
+import { AvatarBuilder, AvatarConfig } from "@/components/AvatarBuilder";
+import { AvatarDisplay } from "@/components/AvatarDisplay";
 
 const INTERESTS = [
   { id: "cooking", label: { el: "🍳 Μαγειρική / Ζαχαροπλαστική", en: "🍳 Cooking / Baking" } },
@@ -46,6 +49,8 @@ export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
+  const [photoUploadOpen, setPhotoUploadOpen] = useState(false);
+  const [avatarBuilderOpen, setAvatarBuilderOpen] = useState(false);
   
   // Edit form states
   const [editForm, setEditForm] = useState({
@@ -240,6 +245,32 @@ export default function Profile() {
     );
   };
 
+  const handleSaveAvatar = async (config: AvatarConfig) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ 
+          avatar_data: config as any, // Cast to Json
+          profile_photo_url: null // Clear photo URL when using avatar
+        })
+        .eq("id", profile.id);
+
+      if (error) throw error;
+
+      toast.success("Avatar saved!");
+      setAvatarBuilderOpen(false);
+      fetchProfile();
+    } catch (error) {
+      console.error("Error saving avatar:", error);
+      toast.error("Failed to save avatar");
+    }
+  };
+
+  const handlePhotoUploaded = (url: string) => {
+    fetchProfile();
+    setPhotoUploadOpen(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -404,6 +435,40 @@ export default function Profile() {
                 {maritalStatus}
               </Badge>
             )}
+
+            {/* Photo/Avatar Management */}
+            <div className="flex gap-2 mt-4 justify-center">
+              <Dialog open={photoUploadOpen} onOpenChange={setPhotoUploadOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Change Photo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <PhotoUpload 
+                    onPhotoUploaded={handlePhotoUploaded}
+                    currentPhotoUrl={profile.profile_photo_url}
+                  />
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={avatarBuilderOpen} onOpenChange={setAvatarBuilderOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Create Avatar
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <AvatarBuilder 
+                    onSave={handleSaveAvatar}
+                    onCancel={() => setAvatarBuilderOpen(false)}
+                    initialConfig={profile.avatar_data as AvatarConfig}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
 
             {/* Badges Section */}
             <div className="mt-4 flex flex-wrap gap-2 justify-center">

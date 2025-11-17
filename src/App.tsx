@@ -16,6 +16,7 @@ import AskMoms from "./pages/AskMoms";
 import DailyBoost from "./pages/DailyBoost";
 import Marketplace from "./pages/Marketplace";
 import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
 import PrivacyTerms from "./pages/PrivacyTerms";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/chat/:matchId" element={<AuthGuard><ChatView /></AuthGuard>} />
           <Route path="/ask-moms" element={<AuthGuard><><AskMoms /><BottomNav /></></AuthGuard>} />
           <Route path="/daily-boost" element={<AuthGuard><><DailyBoost /><BottomNav /></></AuthGuard>} />
+          <Route path="/notifications" element={<AuthGuard><><Notifications /><BottomNav /></></AuthGuard>} />
           <Route path="/marketplace" element={<AuthGuard><><Marketplace /><BottomNav /></></AuthGuard>} />
           <Route path="/profile" element={<AuthGuard><><Profile /><BottomNav /></></AuthGuard>} />
           <Route path="/privacy-terms" element={<PrivacyTerms />} />
