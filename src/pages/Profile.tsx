@@ -224,7 +224,7 @@ export default function Profile() {
       <img 
         src={mascot} 
         alt="Momster Mascot" 
-        className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none"
+        className="fixed top-24 right-4 w-20 h-20 opacity-30 object-contain pointer-events-none animate-bounce"
       />
       
       <div className="max-w-2xl mx-auto pt-20 pb-24 px-4">
@@ -236,7 +236,7 @@ export default function Profile() {
 
         {/* Profile Header Card */}
         <Card className="p-6 mb-6">
-          {/* Photo Carousel */}
+          {/* Photo Carousel with Floral Frame */}
           <div className="flex flex-col items-center mb-6">
             {profilePhotos.length > 1 ? (
               <Carousel className="w-full max-w-xs mb-4">
@@ -244,10 +244,17 @@ export default function Profile() {
                   {profilePhotos.map((photo: string, index: number) => (
                     <CarouselItem key={index}>
                       <div className="flex justify-center">
-                        <Avatar className="w-32 h-32 border-4 border-primary/20">
-                          <AvatarImage src={photo} alt={`${profile.full_name} ${index + 1}`} />
-                          <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
-                        </Avatar>
+                        <div className="relative">
+                          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/40 via-purple-300/40 to-pink-300/40 blur-xl animate-pulse" />
+                          <Avatar className="w-32 h-32 border-4 border-primary/30 shadow-lg relative z-10" style={{
+                            boxShadow: '0 0 0 3px white, 0 0 0 6px rgba(219, 39, 119, 0.2), 0 0 20px rgba(219, 39, 119, 0.3)'
+                          }}>
+                            <AvatarImage src={photo} alt={`${profile.full_name} ${index + 1}`} />
+                            <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
+                          </Avatar>
+                          <div className="absolute -top-2 -right-2 text-3xl animate-bounce">🌸</div>
+                          <div className="absolute -bottom-2 -left-2 text-2xl animate-pulse">🌺</div>
+                        </div>
                       </div>
                     </CarouselItem>
                   ))}
@@ -256,10 +263,17 @@ export default function Profile() {
                 <CarouselNext className="right-2" />
               </Carousel>
             ) : (
-              <Avatar className="w-32 h-32 mb-4 border-4 border-primary/20">
-                <AvatarImage src={profilePhotos[0]} alt={profile.full_name} />
-                <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
-              </Avatar>
+              <div className="relative mb-4">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/40 via-purple-300/40 to-pink-300/40 blur-xl animate-pulse" />
+                <Avatar className="w-32 h-32 border-4 border-primary/30 shadow-lg relative z-10" style={{
+                  boxShadow: '0 0 0 3px white, 0 0 0 6px rgba(219, 39, 119, 0.2), 0 0 20px rgba(219, 39, 119, 0.3)'
+                }}>
+                  <AvatarImage src={profilePhotos[0]} alt={profile.full_name} />
+                  <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
+                </Avatar>
+                <div className="absolute -top-2 -right-2 text-3xl animate-bounce">🌸</div>
+                <div className="absolute -bottom-2 -left-2 text-2xl animate-pulse">🌺</div>
+              </div>
             )}
 
             <h2 className="text-2xl font-bold text-foreground text-center">
@@ -277,6 +291,13 @@ export default function Profile() {
                 {maritalStatus}
               </Badge>
             )}
+
+            {/* Badges Section */}
+            <div className="mt-4 flex flex-wrap gap-2 justify-center">
+              <Badge variant="default" className="bg-gradient-to-r from-pink-500 to-purple-500 text-white border-0 shadow-md">
+                ✨ Newbie
+              </Badge>
+            </div>
 
             <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
               <DialogTrigger asChild>
@@ -569,7 +590,7 @@ export default function Profile() {
       {/* Footer with quick actions */}
       <footer className="fixed bottom-20 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
         <div className="max-w-2xl mx-auto flex items-center justify-center gap-2">
-          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
+          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain animate-bounce" />
           <span className="text-sm text-muted-foreground">
             {language === "el" ? "Μαζί, οι μαμάδες ανθίζουν!" : "Together, moms thrive!"}
           </span>
