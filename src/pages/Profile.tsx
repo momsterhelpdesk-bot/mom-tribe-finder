@@ -139,6 +139,7 @@ export default function Profile() {
           city: editForm.city,
           area: editForm.area,
           interests: selectedInterests,
+          children: profile.children || [],
         })
         .eq("id", profile.id);
 
@@ -352,6 +353,23 @@ export default function Profile() {
                     />
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="children_ages">{language === "el" ? "Ηλικίες Παιδιών" : "Children's Ages"}</Label>
+                    <Input
+                      id="children_ages"
+                      placeholder={language === "el" ? "π.χ. 5, 8" : "e.g. 5, 8"}
+                      value={childrenArray.map((c: any) => c.age).join(", ")}
+                      onChange={(e) => {
+                        const ages = e.target.value.split(',').map(age => age.trim()).filter(age => age);
+                        const children = ages.map(age => ({ age: parseInt(age) || 0 }));
+                        setProfile({ ...profile, children: children });
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {language === "el" ? "Γράψτε τις ηλικίες χωρισμένες με κόμμα" : "Enter ages separated by commas"}
+                    </p>
+                  </div>
+
                   <div className="space-y-3">
                     <Label>{language === "el" ? "Ενδιαφέροντα" : "Interests"}</Label>
                     <div className="grid grid-cols-1 gap-3">
@@ -380,13 +398,6 @@ export default function Profile() {
 
           {/* Basic Info */}
           <div className="space-y-3 border-t border-border pt-4">
-            {profile.email && (
-              <div className="flex items-center gap-3 text-sm">
-                <Mail className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{profile.email}</span>
-              </div>
-            )}
-            
             {(profile.city || profile.area) && (
               <div className="flex items-center gap-3 text-sm">
                 <MapPin className="w-4 h-4 text-primary" />
