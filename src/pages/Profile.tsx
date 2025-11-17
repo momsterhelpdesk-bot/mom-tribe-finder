@@ -110,6 +110,10 @@ export default function Profile() {
         ? data.privacy_settings as any
         : { discovery_visible: true, show_last_active: true };
       setPrivacySettings(privSettings);
+
+      const childrenInit = Array.isArray(data.children) ? data.children : [];
+      setChildrenInput(childrenInit.map((c: any) => String(c.age)).join(", "));
+
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error(language === "el" ? "Σφάλμα φόρτωσης προφίλ" : "Error loading profile");
@@ -128,19 +132,71 @@ export default function Profile() {
     }
   };
 
+  // Helpers
+  const toISODate = (input: string): string | null => {
+    if (!input) return null;
+    const s = input.trim();
+    // Normalize separators
+    const norm = s.replace(/[.]/g, '/').replace(/\s+/g, '/');
+    // Patterns: DD/MM/YYYY or DD-MM-YYYY or YYYY-MM-DD
+    const ddmmyyyy = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
+    const yyyymmdd = /^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/;
+    let y = 0, m = 0, d = 0;
+    if (ddmmyyyy.test(norm)) {
+      const [, dd, mm, yyyy] = norm.match(ddmmyyyy)!;
+      d = parseInt(dd, 10); m = parseInt(mm, 10); y = parseInt(yyyy, 10);
+    } else if (yyyymmdd.test(norm)) {
+      const [, yyyy, mm, dd] = norm.match(yyyymmdd)!;
+      y = parseInt(yyyy, 10); m = parseInt(mm, 10); d = parseInt(dd, 10);
+    } else {
+      return null;
+    }
+    // Basic validation
+    if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+    const iso = `${y.toString().padStart(4,'0')}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+    return iso;
+  };
+
+  const parseChildrenAges = (text: string) => {
+    if (!text) return [] as any[];
+    const parts = text.split(/[;,·]/).map(t => t.trim()).filter(Boolean).slice(0, 10);
+    return parts.map((token) => {
+      const cleaned = token.replace(/[<>]/g, '').slice(0, 20);
+      const lower = cleaned.toLowerCase();
+      const numMatch = lower.match(/\d{1,3}/);
+      if (lower.includes('μην')) {
+        // months in Greek
+        return { age: `${numMatch ? parseInt(numMatch[0], 10) : cleaned} μηνών` };
+      }
+      if (/\b(m|mo|month|months)\b/.test(lower)) {
+        return { age: `${numMatch ? parseInt(numMatch[0], 10) : cleaned} months` };
+      }
+      // years (number only or text)
+      return { age: numMatch ? parseInt(numMatch[0], 10) : cleaned };
+    });
+  };
+
   const handleSaveProfile = async () => {
     try {
+      const dobISO = editForm.date_of_birth ? toISODate(editForm.date_of_birth) : null;
+      if (editForm.date_of_birth && !dobISO) {
+        toast.error(language === "el" ? "Μη έγκυρη ημερομηνία. Παράδειγμα: 23/05/1987" : "Invalid date. Example: 1987-05-23");
+        return;
+      }
+
+      const childrenParsed = parseChildrenAges(childrenInput);
+
       const { error } = await supabase
         .from("profiles")
         .update({
           full_name: editForm.full_name,
           bio: editForm.bio,
-          date_of_birth: editForm.date_of_birth || null,
+          date_of_birth: dobISO,
           marital_status: editForm.marital_status || null,
           city: editForm.city,
           area: editForm.area,
           interests: selectedInterests,
-          children: profile.children || [],
+          children: childrenParsed,
         })
         .eq("id", profile.id);
 
@@ -282,7 +338,7 @@ export default function Profile() {
             
             {childAges && (
               <p className="text-muted-foreground text-sm mt-1">
-                {language === "el" ? "Παιδιά: " : "Kids: "}{childAges} {language === "el" ? "ετών" : "years old"}
+                {language === "el" ? "Παιδιά: " : "Kids: "}{childAges}
               </p>
             )}
             
@@ -334,10 +390,14 @@ export default function Profile() {
                     <Label htmlFor="date_of_birth">{language === "el" ? "Ημερομηνία Γέννησης" : "Date of Birth"}</Label>
                     <Input
                       id="date_of_birth"
-                      type="date"
+                      type="text"
+                      placeholder={language === "el" ? "π.χ. 23/05/1987 ή 1987-05-23" : "e.g. 23/05/1987 or 1987-05-23"}
                       value={editForm.date_of_birth}
                       onChange={(e) => setEditForm({ ...editForm, date_of_birth: e.target.value })}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      {language === "el" ? "Μπορείς να γράψεις την ημερομηνία ελεύθερα (DD/MM/YYYY)." : "You can type the date freely (DD/MM/YYYY)."}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -379,16 +439,12 @@ export default function Profile() {
                     <Label htmlFor="children_ages">{language === "el" ? "Ηλικίες Παιδιών" : "Children's Ages"}</Label>
                     <Input
                       id="children_ages"
-                      placeholder={language === "el" ? "π.χ. 5, 8" : "e.g. 5, 8"}
-                      value={childrenArray.map((c: any) => c.age).join(", ")}
-                      onChange={(e) => {
-                        const ages = e.target.value.split(',').map(age => age.trim()).filter(age => age);
-                        const children = ages.map(age => ({ age: parseInt(age) || 0 }));
-                        setProfile({ ...profile, children: children });
-                      }}
+                      placeholder={language === "el" ? "π.χ. 6 μηνών, 3, 8" : "e.g. 6 months, 3, 8"}
+                      value={childrenInput}
+                      onChange={(e) => setChildrenInput(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {language === "el" ? "Γράψτε τις ηλικίες χωρισμένες με κόμμα" : "Enter ages separated by commas"}
+                      {language === "el" ? "Χώρισε με κόμματα. Δεκτό και 'μηνών' (π.χ. 6 μηνών)." : "Separate with commas. 'months' also accepted (e.g. 6 months)."}
                     </p>
                   </div>
 
