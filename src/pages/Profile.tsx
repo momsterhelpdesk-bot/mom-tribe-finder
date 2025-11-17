@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Settings, MapPin, Calendar, MessageCircle, LogOut, Edit, Mail, Heart, ChevronLeft, ChevronRight, Sparkles, Bell } from "lucide-react";
+import { Settings, MapPin, Calendar, MessageCircle, LogOut, Edit, Mail, Heart, ChevronLeft, ChevronRight, Sparkles, Bell, Eye, EyeOff } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
@@ -24,6 +24,10 @@ import { AvatarBuilder, AvatarConfig } from "@/components/AvatarBuilder";
 import { AvatarDisplay } from "@/components/AvatarDisplay";
 
 const INTERESTS = [
+  { id: "stay_at_home", label: { el: "🏡 Stay-at-home Mom", en: "🏡 Stay-at-home Mom" } },
+  { id: "working_mom", label: { el: "💼 Working Mom", en: "💼 Working Mom" } },
+  { id: "twin_mom", label: { el: "👯 Twin Mom", en: "👯 Twin Mom" } },
+  { id: "special_needs", label: { el: "💪 Special Needs Mom Warrior", en: "💪 Special Needs Mom Warrior" } },
   { id: "cooking", label: { el: "🍳 Μαγειρική / Ζαχαροπλαστική", en: "🍳 Cooking / Baking" } },
   { id: "healthy_eating", label: { el: "🥗 Υγιεινή Διατροφή / Vegan / Organic", en: "🥗 Healthy Eating / Vegan / Organic" } },
   { id: "yoga", label: { el: "🧘 Yoga / Pilates / Fitness", en: "🧘 Yoga / Pilates / Fitness" } },
@@ -51,6 +55,7 @@ export default function Profile() {
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const [photoUploadOpen, setPhotoUploadOpen] = useState(false);
   const [avatarBuilderOpen, setAvatarBuilderOpen] = useState(false);
+  const [viewAsPublic, setViewAsPublic] = useState(false);
   
   // Edit form states
   const [editForm, setEditForm] = useState({
@@ -165,19 +170,24 @@ export default function Profile() {
   const parseChildrenAges = (text: string) => {
     if (!text) return [] as any[];
     const parts = text.split(/[;,·]/).map(t => t.trim()).filter(Boolean).slice(0, 10);
-    return parts.map((token) => {
+    const existingChildren = profile?.children || [];
+    return parts.map((token, idx) => {
       const cleaned = token.replace(/[<>]/g, '').slice(0, 20);
       const lower = cleaned.toLowerCase();
       const numMatch = lower.match(/\d{1,3}/);
+      let age;
       if (lower.includes('μην')) {
         // months in Greek
-        return { age: `${numMatch ? parseInt(numMatch[0], 10) : cleaned} μηνών` };
+        age = `${numMatch ? parseInt(numMatch[0], 10) : cleaned} μηνών`;
+      } else if (/\b(m|mo|month|months)\b/.test(lower)) {
+        age = `${numMatch ? parseInt(numMatch[0], 10) : cleaned} months`;
+      } else {
+        // years (number only or text)
+        age = numMatch ? parseInt(numMatch[0], 10) : cleaned;
       }
-      if (/\b(m|mo|month|months)\b/.test(lower)) {
-        return { age: `${numMatch ? parseInt(numMatch[0], 10) : cleaned} months` };
-      }
-      // years (number only or text)
-      return { age: numMatch ? parseInt(numMatch[0], 10) : cleaned };
+      // Preserve gender from existing data if available
+      const existingGender = existingChildren[idx]?.gender || 'baby';
+      return { age, gender: existingGender };
     });
   };
 
@@ -343,6 +353,20 @@ export default function Profile() {
           <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
             {language === "el" ? "Προφίλ" : "Profile"}
           </h1>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewAsPublic(!viewAsPublic)}
+            className="flex items-center gap-2"
+          >
+            {viewAsPublic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            <span className="text-xs">
+              {viewAsPublic 
+                ? (language === "el" ? "Προσωπική Προβολή" : "Personal View")
+                : (language === "el" ? "Δημόσια Προβολή" : "View as Public")
+              }
+            </span>
+          </Button>
         </div>
 
         {/* Profile Header Card */}
@@ -419,21 +443,52 @@ export default function Profile() {
               </div>
             )}
 
-            <h2 className="text-2xl font-bold text-foreground text-center">
+            <h2 className="text-3xl font-bold text-foreground text-center mt-4">
               {profile.full_name}
-              {userAge && <span className="text-muted-foreground ml-2">{userAge}</span>}
+              {userAge && <span className="text-lg text-muted-foreground ml-2">{userAge}</span>}
             </h2>
             
-            {childAges && (
-              <p className="text-muted-foreground text-sm mt-1">
-                {language === "el" ? "Παιδιά: " : "Kids: "}{childAges}
-              </p>
+            {/* Location Pill */}
+            <div className="mt-3 flex justify-center">
+              <div className="bg-secondary/40 backdrop-blur-sm border border-primary/20 rounded-full px-4 py-2 flex items-center gap-2 shadow-sm">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span className="text-sm text-foreground">{profile.city}, {profile.area}</span>
+              </div>
+            </div>
+
+            {/* Bio Pill */}
+            {profile.bio && !viewAsPublic && (
+              <div className="mt-3 max-w-md mx-auto">
+                <div className="bg-secondary/40 backdrop-blur-sm border border-primary/20 rounded-2xl px-4 py-3 flex gap-2 shadow-sm">
+                  <MessageCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-foreground leading-relaxed">{profile.bio}</p>
+                </div>
+              </div>
             )}
-            
-            {maritalStatus && (
-              <Badge variant="secondary" className="mt-2">
-                {maritalStatus}
-              </Badge>
+
+            {/* Kid Info Bubbles */}
+            {profile.children && Array.isArray(profile.children) && profile.children.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs text-muted-foreground text-center mb-2 font-medium">
+                  {language === "el" ? "🎈 Μαμά σε:" : "🎈 Mom to:"}
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {profile.children.map((child: any, idx: number) => (
+                    <div 
+                      key={idx}
+                      className="bg-gradient-to-br from-pink-100 to-purple-100 border-2 border-pink-200 rounded-full px-4 py-2 flex items-center gap-2 shadow-md transform hover:scale-105 transition-transform"
+                    >
+                      <span className="text-lg">{child.gender === 'girl' ? '👧' : child.gender === 'boy' ? '👦' : '👶'}</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {child.gender === 'girl' ? (language === "el" ? 'Κορίτσι' : 'Girl') 
+                          : child.gender === 'boy' ? (language === "el" ? 'Αγόρι' : 'Boy')
+                          : (language === "el" ? 'Μωρό' : 'Baby')}
+                        {child.age && ` — ${child.age}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Photo/Avatar Management */}
@@ -499,13 +554,15 @@ export default function Profile() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="bio">{language === "el" ? "Βιογραφικό" : "Bio"}</Label>
+                    <Label htmlFor="bio">{language === "el" ? "Βιογραφικό" : "Bio"} ({language === "el" ? "μέχρι 120 χαρακτήρες" : "max 120 characters"})</Label>
                     <Textarea
                       id="bio"
                       value={editForm.bio}
-                      onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                      onChange={(e) => setEditForm({ ...editForm, bio: e.target.value.slice(0, 120) })}
+                      maxLength={120}
                       placeholder={language === "el" ? "Πες μας λίγα λόγια για εσένα..." : "Tell us a bit about yourself..."}
                     />
+                    <p className="text-xs text-muted-foreground">{editForm.bio.length}/120</p>
                   </div>
 
                   <div className="space-y-2">
@@ -571,7 +628,7 @@ export default function Profile() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label>{language === "el" ? "Ενδιαφέροντα" : "Interests"}</Label>
+                    <Label>{language === "el" ? "Σχετικά με μένα / Ενδιαφέροντα" : "About Me / Interests"}</Label>
                     <div className="grid grid-cols-1 gap-3">
                       {INTERESTS.map((interest) => (
                         <div key={interest.id} className="flex items-center space-x-2">
@@ -621,7 +678,7 @@ export default function Profile() {
             <div className="flex items-center gap-2 mb-4">
               <Heart className="w-5 h-5 text-primary" />
               <h3 className="font-semibold text-foreground">
-                {language === "el" ? "Ενδιαφέροντα" : "Interests"}
+                {language === "el" ? "Σχετικά με μένα / Ενδιαφέροντα" : "About Me / Interests"}
               </h3>
             </div>
             <div className="flex flex-wrap gap-2">

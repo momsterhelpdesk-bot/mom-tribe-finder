@@ -17,7 +17,8 @@ const profileSetupSchema = z.object({
   area: z.string().trim().min(1, { message: "Η περιοχή είναι υποχρεωτική" }).max(100, { message: "Η περιοχή πρέπει να είναι μικρότερη από 100 χαρακτήρες" }),
   children: z.array(z.object({
     name: z.string().max(50).optional(),
-    ageGroup: z.string().min(1, { message: "Η ηλικία είναι υποχρεωτική" })
+    ageGroup: z.string().min(1, { message: "Η ηλικία είναι υποχρεωτική" }),
+    gender: z.enum(['boy', 'girl', 'baby']).optional()
   })).min(1, { message: "Προσθέστε τουλάχιστον ένα παιδί" }),
   matchPreference: z.string().min(1, { message: "Η προτίμηση είναι υποχρεωτική" }),
   interests: z.array(z.string()).min(1, { message: "Επέλεξε τουλάχιστον ένα ενδιαφέρον" }).max(20, { message: "Μέγιστο 20 ενδιαφέροντα" })
@@ -66,7 +67,7 @@ export default function ProfileSetup() {
   const [username, setUsername] = useState("");
   const [city, setCity] = useState("");
   const [area, setArea] = useState("");
-  const [children, setChildren] = useState<Array<{ name?: string; ageGroup: string }>>([{ ageGroup: "" }]);
+  const [children, setChildren] = useState<Array<{ name?: string; ageGroup: string; gender?: 'boy' | 'girl' | 'baby' }>>([{ ageGroup: "", gender: 'baby' }]);
   const [matchPreference, setMatchPreference] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
@@ -347,55 +348,98 @@ export default function ProfileSetup() {
           <div className="space-y-3">
             <Label>Παιδιά *</Label>
             {children.map((child, index) => (
-              <div key={index} className="flex gap-3">
-                <Input
-                  placeholder="Όνομα (προαιρετικό)"
-                  value={child.name || ""}
-                  onChange={(e) => {
-                    const newChildren = [...children];
-                    newChildren[index].name = e.target.value;
-                    setChildren(newChildren);
-                  }}
-                  maxLength={50}
-                />
-                <Select
-                  value={child.ageGroup}
-                  onValueChange={(value) => {
-                    const newChildren = [...children];
-                    newChildren[index].ageGroup = value;
-                    setChildren(newChildren);
-                  }}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Ηλικία" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CHILD_AGE_GROUPS.map(age => (
-                      <SelectItem key={age} value={age}>
-                        {age}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {children.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setChildren(children.filter((_, i) => i !== index));
+              <div key={index} className="space-y-2 p-4 border border-border rounded-lg bg-secondary/10">
+                <div className="flex gap-3">
+                  <Input
+                    placeholder="Όνομα (προαιρετικό)"
+                    value={child.name || ""}
+                    onChange={(e) => {
+                      const newChildren = [...children];
+                      newChildren[index].name = e.target.value;
+                      setChildren(newChildren);
+                    }}
+                    maxLength={50}
+                  />
+                  <Select
+                    value={child.ageGroup}
+                    onValueChange={(value) => {
+                      const newChildren = [...children];
+                      newChildren[index].ageGroup = value;
+                      setChildren(newChildren);
                     }}
                   >
-                    <X className="w-4 w-4" />
-                  </Button>
-                )}
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Ηλικία" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CHILD_AGE_GROUPS.map(age => (
+                        <SelectItem key={age} value={age}>
+                          {age}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {children.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setChildren(children.filter((_, i) => i !== index));
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Label className="text-xs text-muted-foreground">Φύλο:</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={child.gender === 'boy' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        const newChildren = [...children];
+                        newChildren[index].gender = 'boy';
+                        setChildren(newChildren);
+                      }}
+                    >
+                      👦 Αγόρι
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={child.gender === 'girl' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        const newChildren = [...children];
+                        newChildren[index].gender = 'girl';
+                        setChildren(newChildren);
+                      }}
+                    >
+                      👧 Κορίτσι
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={child.gender === 'baby' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => {
+                        const newChildren = [...children];
+                        newChildren[index].gender = 'baby';
+                        setChildren(newChildren);
+                      }}
+                    >
+                      👶 Μωρό
+                    </Button>
+                  </div>
+                </div>
               </div>
             ))}
             
             <Button
               type="button"
               variant="outline"
-              onClick={() => setChildren([...children, { ageGroup: "" }])}
+              onClick={() => setChildren([...children, { ageGroup: "", gender: 'baby' }])}
               className="w-full"
             >
               + Προσθήκη Παιδιού
