@@ -9,7 +9,7 @@ export default function BottomNav() {
   const { unreadCount } = useNotifications();
 
   const navItems = [
-    { path: "/discover", icon: Heart, label: "Discover" },
+    { path: "/discover", icon: Heart, label: "Find a New Friend 🌸" },
     { path: "/ask-moms", icon: MessageCircle, label: "Ρώτα μαμά" },
     { path: "/notifications", icon: Bell, label: "Notifications", badge: unreadCount },
     { path: "/marketplace", icon: ShoppingBag, label: "Marketplace" },

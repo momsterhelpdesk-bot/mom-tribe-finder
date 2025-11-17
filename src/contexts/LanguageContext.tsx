@@ -41,7 +41,7 @@ const translations = {
     
     // CTA Section
     ctaTitle: 'Είστε έτοιμη να συνδεθείτε;',
-    ctaSubtitle: 'Μαμάδες μαζί, ποτέ μόνες! 🌸 Η μαμάδικη κοινότητα που ονειρευόσουν σε περιμένει 🌷 Γίνε μέλος σήμερα!',
+    ctaSubtitle: 'Μαμάδες μαζί, ποτέ μόνες! 🌸 Η μαμαδίστικη κοινότητα που ονειρευόσουν σε περιμένει 🌷 Γίνε μέλος σήμερα!',
     
     // Footer
     footerCopyright: '© 2025 Momster. Made with love for every mom.',

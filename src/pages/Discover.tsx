@@ -272,21 +272,33 @@ export default function Discover() {
           </div>
         </Card>
 
-        <div className="flex justify-center gap-6 mt-6">
+        <div className="flex justify-center gap-8 mt-6">
           <Button
             size="lg"
             variant="outline"
-            className="rounded-full w-16 h-16 border-2"
+            className="rounded-full h-20 px-8 border-4 border-muted hover:border-muted-foreground transition-all hover:scale-105 active:scale-95 bg-background/80 backdrop-blur-sm shadow-lg hover:shadow-xl"
             onClick={() => handleSwipe(false)}
           >
-            <X className="w-8 h-8 text-destructive" />
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-2xl">
+                🙅‍♀️
+              </div>
+              <span className="text-sm font-semibold text-muted-foreground">Not my vibe</span>
+            </div>
           </Button>
           <Button
             size="lg"
-            className="rounded-full w-16 h-16"
+            className="rounded-full h-20 px-8 bg-gradient-to-br from-pink-300 via-rose-300 to-pink-400 hover:from-pink-400 hover:via-rose-400 hover:to-pink-500 border-4 border-pink-200 transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl relative overflow-hidden group"
             onClick={() => handleSwipe(true)}
           >
-            <Heart className="w-8 h-8 fill-white" />
+            <div className="flex flex-col items-center gap-1 relative z-10">
+              <div className="text-4xl group-hover:animate-bounce">🌸</div>
+              <span className="text-sm font-bold text-white drop-shadow-md">Yes</span>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl opacity-0 group-active:opacity-100 group-active:scale-150 transition-all pointer-events-none">
+              ✨
+            </div>
           </Button>
         </div>
       </div>
