@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Settings, MapPin, Calendar, MessageCircle, LogOut, Edit, Mail, Heart, ChevronLeft, ChevronRight, Sparkles, Bell, Eye, EyeOff } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
+import floralBg from "@/assets/floral-profile-bg.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
 import { supabase } from "@/integrations/supabase/client";
@@ -341,14 +342,25 @@ export default function Profile() {
     : "";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative">
+    <div className="min-h-screen relative">
+      {/* Floral Background */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: `url(${floralBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.4
+        }}
+      />
       <img 
         src={mascot} 
         alt="Momster Mascot" 
-        className="fixed top-24 right-4 w-20 h-20 opacity-30 object-contain pointer-events-none animate-bounce"
+        className="fixed top-24 right-4 w-20 h-20 opacity-30 object-contain pointer-events-none animate-bounce z-10"
       />
       
-      <div className="max-w-2xl mx-auto pt-20 pb-24 px-4">
+      <div className="max-w-2xl mx-auto pt-20 pb-24 px-4 relative z-10">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
             {language === "el" ? "Προφίλ" : "Profile"}
@@ -378,15 +390,15 @@ export default function Profile() {
                 <CarouselContent>
                   {profilePhotos.map((photo: string, index: number) => (
                     <CarouselItem key={index}>
-                      <div className="flex justify-center">
-                        <div className="relative">
-                          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/40 via-purple-300/40 to-pink-300/40 blur-xl animate-pulse" />
-                          <Avatar className="w-32 h-32 border-4 border-primary/30 shadow-lg relative z-10" style={{
-                            boxShadow: '0 0 0 3px white, 0 0 0 6px rgba(219, 39, 119, 0.2), 0 0 20px rgba(219, 39, 119, 0.3)'
-                          }}>
-                            <AvatarImage src={photo} alt={`${profile.full_name} ${index + 1}`} />
-                            <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
-                          </Avatar>
+                        <div className="flex justify-center">
+                          <div className="relative">
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/50 via-purple-300/50 to-pink-300/50 blur-2xl animate-pulse" />
+                            <Avatar className="w-48 h-48 border-[6px] border-white/80 shadow-2xl relative z-10" style={{
+                              boxShadow: '0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 0 8px rgba(219, 39, 119, 0.3), 0 0 30px rgba(219, 39, 119, 0.4)'
+                            }}>
+                              <AvatarImage src={photo} alt={`${profile.full_name} ${index + 1}`} className="object-cover" />
+                              <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
+                            </Avatar>
                           {frameStyle === 'flowers' && (
                             <>
                               <div className="absolute -top-2 -right-2 text-3xl animate-bounce">🌸</div>
@@ -415,11 +427,11 @@ export default function Profile() {
               </Carousel>
             ) : (
               <div className="relative mb-4">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/40 via-purple-300/40 to-pink-300/40 blur-xl animate-pulse" />
-                <Avatar className="w-32 h-32 border-4 border-primary/30 shadow-lg relative z-10" style={{
-                  boxShadow: '0 0 0 3px white, 0 0 0 6px rgba(219, 39, 119, 0.2), 0 0 20px rgba(219, 39, 119, 0.3)'
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/50 via-purple-300/50 to-pink-300/50 blur-2xl animate-pulse" />
+                <Avatar className="w-48 h-48 border-[6px] border-white/80 shadow-2xl relative z-10" style={{
+                  boxShadow: '0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 0 8px rgba(219, 39, 119, 0.3), 0 0 30px rgba(219, 39, 119, 0.4)'
                 }}>
-                  <AvatarImage src={profilePhotos[0]} alt={profile.full_name} />
+                  <AvatarImage src={profilePhotos[0]} alt={profile.full_name} className="object-cover" />
                   <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
                 </Avatar>
                 {frameStyle === 'flowers' && (
@@ -444,8 +456,7 @@ export default function Profile() {
             )}
 
             <h2 className="text-3xl font-bold text-foreground text-center mt-4">
-              {profile.full_name}
-              {userAge && <span className="text-lg text-muted-foreground ml-2">{userAge}</span>}
+              {profile.full_name}{userAge && <span className="text-3xl font-bold text-foreground">, {userAge}</span>}
             </h2>
             
             {/* Location Pill */}
@@ -653,34 +664,71 @@ export default function Profile() {
             </Dialog>
           </div>
 
-          {/* Basic Info */}
-          <div className="space-y-3 border-t border-border pt-4">
-            {(profile.city || profile.area) && (
-              <div className="flex items-center gap-3 text-sm">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">
-                  {[profile.city, profile.area].filter(Boolean).join(", ")}
-                </span>
-              </div>
-            )}
-
-            {profile.bio && (
-              <div className="pt-2">
-                <p className="text-sm text-muted-foreground italic">"{profile.bio}"</p>
-              </div>
-            )}
-          </div>
         </Card>
 
         {/* Interests Card */}
-        {profile.interests && profile.interests.length > 0 && (
-          <Card className="p-6 mb-6">
-            <div className="flex items-center gap-2 mb-4">
+        <Card className="p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
               <Heart className="w-5 h-5 text-primary" />
               <h3 className="font-semibold text-foreground">
                 {language === "el" ? "Σχετικά με μένα / Ενδιαφέροντα" : "About Me / Interests"}
               </h3>
             </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Edit className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {language === "el" ? "Επεξεργασία Ενδιαφερόντων" : "Edit Interests"}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="py-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {INTERESTS.map((interest) => (
+                      <div key={interest.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`interest-${interest.id}`}
+                          checked={selectedInterests.includes(interest.id)}
+                          onCheckedChange={() => toggleInterest(interest.id)}
+                        />
+                        <Label 
+                          htmlFor={`interest-${interest.id}`}
+                          className="text-sm cursor-pointer"
+                        >
+                          {interest.label[language as 'el' | 'en']}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        const { error } = await supabase
+                          .from("profiles")
+                          .update({ interests: selectedInterests })
+                          .eq("id", profile.id);
+                        if (error) throw error;
+                        toast.success(language === "el" ? "Τα ενδιαφέροντα ενημερώθηκαν" : "Interests updated");
+                        fetchProfile();
+                      } catch (error) {
+                        console.error("Error updating interests:", error);
+                        toast.error(language === "el" ? "Σφάλμα ενημέρωσης" : "Update error");
+                      }
+                    }}
+                    className="w-full mt-4"
+                  >
+                    {language === "el" ? "Αποθήκευση" : "Save"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          {profile.interests && profile.interests.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {profile.interests.map((interestId: string) => {
                 const interest = INTERESTS.find(i => i.id === interestId);
@@ -691,8 +739,12 @@ export default function Profile() {
                 ) : null;
               })}
             </div>
-          </Card>
-        )}
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {language === "el" ? "Δεν έχετε προσθέσει ενδιαφέροντα ακόμα" : "No interests added yet"}
+            </p>
+          )}
+        </Card>
 
         {/* Settings Card */}
         <Card className="p-6 mb-6">
