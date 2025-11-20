@@ -1,180 +1,360 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function PrivacyTerms() {
+  const { language } = useLanguage();
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Link to="/">
           <Button variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Πίσω
+            {language === "el" ? "Πίσω" : "Back"}
           </Button>
         </Link>
 
-        <section className="prose prose-sm max-w-none">
-          <h1 className="text-4xl font-bold text-primary mb-2">
-            Momster — Together Women Thrive
-          </h1>
-          <p className="text-muted-foreground italic mb-8">
-            Τελευταία ενημέρωση: 7 Νοεμβρίου 2025
-          </p>
+        {language === "el" ? (
+          // Greek Content
+          <section className="prose prose-sm max-w-none space-y-8">
+            <div>
+              <h1 className="text-4xl font-bold text-primary mb-2">
+                Πολιτική Απορρήτου, GDPR, Cookies & Όροι Χρήσης
+              </h1>
+              <p className="text-muted-foreground italic mb-8">
+                Τελευταία ενημέρωση: Νοέμβριος 2025
+              </p>
+            </div>
 
-          <hr className="my-8 border-border" />
+            <hr className="my-8 border-border" />
 
-          <h2 className="text-3xl font-bold text-primary mb-4">
-            Πολιτική Απορρήτου (Privacy Policy)
-          </h2>
-          <p className="mb-4">
-            Η εφαρμογή <strong>Momster</strong> δημιουργήθηκε με σκοπό να συνδέει μαμάδες μεταξύ τους, προσφέροντας έναν ασφαλή και ζεστό χώρο γνωριμίας, επικοινωνίας και ανταλλαγής εμπειριών. Η προστασία των προσωπικών σας δεδομένων είναι ύψιστης σημασίας για εμάς.
-          </p>
+            {/* Section 1 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">1. Εισαγωγή</h2>
+              <p className="mb-4">
+                Η εφαρμογή Momster ("Εφαρμογή") δεσμεύεται για την προστασία των προσωπικών δεδομένων των χρηστών σύμφωνα με τον Γενικό Κανονισμό Προστασίας Δεδομένων (GDPR 2016/679), την ελληνική νομοθεσία και τις διεθνείς βέλτιστες πρακτικές. Με τη χρήση της Εφαρμογής αποδέχεστε την παρούσα Πολιτική.
+              </p>
+            </div>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            1. Ποια δεδομένα συλλέγουμε
-          </h3>
-          <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Όνομα ή ψευδώνυμο</li>
-            <li>Email</li>
-            <li>Τοποθεσία (πόλη ή περιοχή)</li>
-            <li>Ηλικία παιδιού (εύρος)</li>
-            <li>Ενδιαφέροντα</li>
-            <li>Φωτογραφία προφίλ</li>
-            <li>Μηνύματα, αναρτήσεις, προϊόντα που ανεβάζετε στην εφαρμογή</li>
-          </ul>
+            <hr className="my-6 border-border" />
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            2. Πώς χρησιμοποιούμε τα δεδομένα σας
-          </h3>
-          <p className="mb-2">Τα δεδομένα χρησιμοποιούνται για:</p>
-          <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Δημιουργία και προβολή προφίλ</li>
-            <li>Εύρεση χρηστριών με κοινά ενδιαφέροντα ή κοντινή τοποθεσία</li>
-            <li>Αποστολή/λήψη μηνυμάτων και συμμετοχή στο community</li>
-            <li>Υποστήριξη χρηστών (support)</li>
-          </ul>
+            {/* Section 2 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">2. Επεξεργασία Προσωπικών Δεδομένων (GDPR Compliance)</h2>
+              
+              <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">2.1 Ποια δεδομένα συλλέγουμε</h3>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Στοιχεία λογαριασμού (email, όνομα/ψευδώνυμο, κωδικός – κρυπτογραφημένος)</li>
+                <li>Προφίλ χρήστη (ηλικία, περιοχή, φωτογραφία προφίλ)</li>
+                <li>Περιεχόμενο που ανεβάζετε (posts, φωτογραφίες, μηνύματα)</li>
+                <li>Δεδομένα συσκευής (IP, τύπος συσκευής, logs)</li>
+                <li>Cookies για λειτουργικούς και αναλυτικούς σκοπούς</li>
+              </ul>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            3. Πού αποθηκεύονται και πώς προστατεύονται
-          </h3>
-          <p className="mb-2">
-            Τα δεδομένα αποθηκεύονται στη βάση δεδομένων της πλατφόρμας <strong>Lovable</strong>. Λαμβάνουμε τεχνικά και οργανωτικά μέτρα για την ασφάλεια των δεδομένων:
-          </p>
-          <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Κρυπτογράφηση passwords</li>
-            <li>Περιορισμένη πρόσβαση (μόνο διαχειριστές / moderators)</li>
-            <li>Μη κοινοποίηση προσωπικών δεδομένων σε τρίτους χωρίς συγκατάθεση</li>
-          </ul>
+              <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">2.2 Νομικές βάσεις επεξεργασίας</h3>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Συναίνεση χρήστη</li>
+                <li>Εκτέλεση σύμβασης (λειτουργία λογαριασμού)</li>
+                <li>Έννομο συμφέρον (ασφάλεια, βελτιστοποίηση)</li>
+                <li>Συμμόρφωση με νομικές υποχρεώσεις</li>
+              </ul>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            4. Δικαιώματα χρηστριών
-          </h3>
-          <p className="mb-2">Κάθε χρήστρια έχει το δικαίωμα να:</p>
-          <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Ζητήσει πρόσβαση στα προσωπικά της δεδομένα</li>
-            <li>Διόρθωση ή ενημέρωση των στοιχείων της</li>
-            <li>Ζητήσει διαγραφή του λογαριασμού της («Delete My Account»)</li>
-            <li>Ανακαλέσει τη συγκατάθεσή της για ειδοποιήσεις / emails</li>
-          </ul>
-          <p className="mb-4">
-            Για αιτήματα σχετικά με τα δεδομένα σας, επικοινωνήστε στο{" "}
-            <a href="mailto:support@momster.app" className="text-primary hover:underline">
-              support@momster.app
-            </a>
-            .
-          </p>
+              <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">2.3 Σκοπός επεξεργασίας</h3>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Λειτουργία προφίλ & συνομιλιών</li>
+                <li>Εμφάνιση προτάσεων συνδέσεων</li>
+                <li>Διαχείριση events & marketplace</li>
+                <li>Ασφάλεια συστήματος & αποτροπή απάτης</li>
+                <li>Εξυπηρέτηση χρηστών</li>
+              </ul>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            5. Cookies & Analytics
-          </h3>
-          <p className="mb-4">
-            Αυτή τη στιγμή η εφαρμογή δεν χρησιμοποιεί cookies ή analytics. Αν προστεθούν, θα ενημερωθείτε και θα ζητηθεί εκ νέου συγκατάθεση.
-          </p>
+              <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">2.4 Δικαιώματα χρήστη (GDPR)</h3>
+              <p className="mb-2">Ο χρήστης δικαιούται:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>πρόσβαση στα δεδομένα του</li>
+                <li>διόρθωση/διαγραφή δεδομένων</li>
+                <li>φορητότητα δεδομένων</li>
+                <li>περιορισμό επεξεργασίας</li>
+                <li>ανάκληση συναίνεσης ανά πάσα στιγμή</li>
+              </ul>
+              <p className="mb-4">
+                Αιτήματα αποστέλλονται στο{" "}
+                <a href="mailto:momster.helpdesk@gmail.com" className="text-primary hover:underline">
+                  momster.helpdesk@gmail.com
+                </a>
+              </p>
+            </div>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            6. Διάρκεια διατήρησης δεδομένων
-          </h3>
-          <p className="mb-2">Τα προσωπικά δεδομένα διαγράφονται οριστικά όταν:</p>
-          <ul className="list-disc pl-6 mb-4 space-y-1">
-            <li>Η χρήστρια ζητήσει τη διαγραφή του λογαριασμού της</li>
-            <li>Ο λογαριασμός παραμείνει ανενεργός για 12 μήνες (ή όσο έχει οριστεί από την πολιτική)</li>
-          </ul>
+            <hr className="my-6 border-border" />
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            7. Αναφορές και ασφάλεια κοινότητας
-          </h3>
-          <p className="mb-4">
-            Η εφαρμογή διαθέτει μηχανισμό <strong>Report Profile</strong> για αναφορές ύποπτων προφίλ. Προφίλ με πολλαπλές αναφορές μπορούν να απενεργοποιηθούν προσωρινά ή να μπουν σε επανεξέταση από moderators.
-          </p>
+            {/* Section 3 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">3. Cookies Policy</h2>
+              <p className="mb-2">Χρησιμοποιούμε:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Απολύτως απαραίτητα cookies (authentication)</li>
+                <li>Λειτουργικά cookies (ρυθμίσεις χρήστη)</li>
+                <li>Analytics cookies (στατιστικά χρήσης)</li>
+              </ul>
+              <p className="mb-4">
+                Με τη συνέχιση της χρήσης της Εφαρμογής αποδέχεστε τη χρήση cookies.
+              </p>
+            </div>
 
-          <hr className="my-8 border-border" />
+            <hr className="my-6 border-border" />
 
-          <h2 className="text-3xl font-bold text-primary mb-4">
-            Όροι Χρήσης (Terms of Service)
-          </h2>
-          <p className="mb-4">
-            Με τη δημιουργία λογαριασμού στην εφαρμογή <strong>Momster</strong>, συμφωνείτε με τους παρακάτω όρους:
-          </p>
+            {/* Section 4 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">4. Διαγραφή Λογαριασμού & Δεδομένων</h2>
+              <p className="mb-2">Ο χρήστης μπορεί να διαγράψει τον λογαριασμό του μέσα από το προφίλ. Με τη διαγραφή:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Το προφίλ και το περιεχόμενο του χρήστη διαγράφονται</li>
+                <li>Τα δεδομένα logs διατηρούνται για λόγους ασφαλείας έως 12 μήνες</li>
+              </ul>
+            </div>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            1. Περιγραφή υπηρεσίας
-          </h3>
-          <p className="mb-4">
-            Η Momster είναι μια κοινωνική πλατφόρμα για μαμάδες που επιτρέπει τη δημιουργία προφίλ, την επικοινωνία μεταξύ χρηστριών, τη συμμετοχή σε community posts, την οργάνωση events και τη συναλλαγή σε marketplace.
-          </p>
+            <hr className="my-6 border-border" />
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            2. Καταλληλότητα χρήσης
-          </h3>
-          <p className="mb-4">
-            Η εφαρμογή προορίζεται για μαμάδες ή γυναίκες σε φάση μητρότητας. Απαγορεύεται η δημιουργία ψεύτικων προφίλ ή η υποδύση άλλων προσώπων. Η Momster διατηρεί το δικαίωμα να απενεργοποιεί προφίλ που θεωρούνται ύποπτα.
-          </p>
+            {/* Section 5 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">5. Marketplace & Αποποίηση Ευθύνης</h2>
+              <p className="mb-2">Το Momster δεν είναι μέρος καμίας συναλλαγής. Δεν εγγυάται:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>ποιότητα προϊόντων</li>
+                <li>γνησιότητα αγγελιών</li>
+                <li>πληρωμές ή επιστροφές</li>
+                <li>συναντήσεις μεταξύ χρηστών</li>
+              </ul>
+              <p className="mb-4">
+                Οι συναλλαγές γίνονται αποκλειστικά με ευθύνη των χρηστών.
+              </p>
+            </div>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            3. Συμπεριφορά χρηστριών
-          </h3>
-          <p className="mb-4">
-            Οι χρήστριες οφείλουν να συμπεριφέρονται με σεβασμό και ευγένεια. Απαγορεύεται η δημοσίευση παράνομου, προσβλητικού ή ρατσιστικού περιεχομένου. Η παραβίαση μπορεί να οδηγήσει σε προσωρινή ή οριστική απενεργοποίηση λογαριασμού.
-          </p>
+            <hr className="my-6 border-border" />
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            4. Περιεχόμενο χρηστριών
-          </h3>
-          <p className="mb-4">
-            Κάθε χρήστρια παραμένει υπεύθυνη για το περιεχόμενο που δημοσιεύει. Η Momster μπορεί να αφαιρέσει περιεχόμενο που κρίνεται ακατάλληλο.
-          </p>
+            {/* Section 6 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">6. Συναντήσεις & Ασφάλεια</h2>
+              <p className="mb-2">Το Momster δεν φέρει ευθύνη για:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>offline συναντήσεις χρηστών</li>
+                <li>περιστατικά, ζημιές, διαφορές</li>
+              </ul>
+              <p className="mb-4">
+                Ο χρήστης οφείλει να ακολουθεί βασικές πρακτικές ασφάλειας.
+              </p>
+            </div>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            5. Διακοπή υπηρεσίας
-          </h3>
-          <p className="mb-4">
-            Η Momster μπορεί να τροποποιήσει ή να διακόψει προσωρινά τη λειτουργία της εφαρμογής για τεχνικούς ή λειτουργικούς λόγους, με ή χωρίς προειδοποίηση.
-          </p>
+            <hr className="my-6 border-border" />
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            6. Περιορισμός ευθύνης
-          </h3>
-          <p className="mb-4">
-            Η εφαρμογή παρέχεται «ως έχει». Η Momster δεν φέρει ευθύνη για ζημίες που προκύπτουν από χρήση ή μη διαθεσιμότητα της υπηρεσίας, ούτε για την ακρίβεια πληροφοριών που παρέχουν άλλες χρήστριες.
-          </p>
+            {/* Section 7 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">7. Απαγορευμένο Περιεχόμενο</h2>
+              <p className="mb-2">Απαγορεύονται:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>παρενόχληση, απειλές, προσβλητικό περιεχόμενο</li>
+                <li>ψεύτικα προφίλ</li>
+                <li>spam, διαφημίσεις, απάτες</li>
+                <li>πορνογραφικό, ακατάλληλο ή παράνομο υλικό</li>
+              </ul>
+              <p className="mb-4">
+                Λογαριασμοί που παραβιάζουν τους όρους διαγράφονται άμεσα.
+              </p>
+            </div>
 
-          <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">
-            7. Επικοινωνία
-          </h3>
-          <p className="mb-4">
-            Για ερωτήσεις, αναφορές ή παράπονα σχετικά με τους Όρους Χρήσης, επικοινωνήστε στο{" "}
-            <a href="mailto:support@momster.app" className="text-primary hover:underline">
-              support@momster.app
-            </a>
-            .
-          </p>
+            <hr className="my-6 border-border" />
 
-          <hr className="my-8 border-border" />
+            {/* Section 8 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">8. Αποποίηση Ευθύνης (Full Disclaimer)</h2>
+              <p className="mb-2">Η Εφαρμογή παρέχεται "ως έχει". Δεν εγγυάται:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>συνεχή ή απρόσκοπτη λειτουργία</li>
+                <li>ακρίβεια περιεχομένου χρηστών</li>
+                <li>ασφάλεια συναντήσεων</li>
+                <li>μηδενικό ρίσκο παραβίασης δεδομένων (αν και λαμβάνονται όλα τα μέτρα)</li>
+              </ul>
+              <p className="mb-4">
+                Ο χρήστης αποδέχεται ότι χρησιμοποιεί την Εφαρμογή με αποκλειστική δική του ευθύνη.
+              </p>
+            </div>
 
-          <footer className="text-sm text-muted-foreground mt-8">
-            <p>© Momster — Together Women Thrive. Όλα τα δικαιώματα διατηρούνται.</p>
-          </footer>
-        </section>
+            <hr className="my-6 border-border" />
+
+            {/* Section 9 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">9. Αλλαγές στην Πολιτική</h2>
+              <p className="mb-4">
+                Η εφαρμογή διατηρεί το δικαίωμα ενημέρωσης των πολιτικών οποτεδήποτε.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 10 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">10. Επικοινωνία</h2>
+              <p className="mb-4">
+                <a href="mailto:momster.helpdesk@gmail.com" className="text-primary hover:underline">
+                  momster.helpdesk@gmail.com
+                </a>
+              </p>
+            </div>
+
+            <hr className="my-8 border-border" />
+
+            <footer className="text-sm text-muted-foreground mt-8">
+              <p>© Momster — Together Women Thrive. Όλα τα δικαιώματα διατηρούνται.</p>
+            </footer>
+          </section>
+        ) : (
+          // English Content
+          <section className="prose prose-sm max-w-none space-y-8">
+            <div>
+              <h1 className="text-4xl font-bold text-primary mb-2">
+                Privacy Policy, GDPR Compliance, Cookies & Terms
+              </h1>
+              <p className="text-muted-foreground italic mb-8">
+                Last updated: November 2025
+              </p>
+            </div>
+
+            <hr className="my-8 border-border" />
+
+            {/* Section 1 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">1. Introduction</h2>
+              <p className="mb-4">
+                Momster is committed to protecting your personal data under GDPR (2016/679) and applicable laws.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 2 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">2. Data We Collect</h2>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Account data (email, username, encrypted password)</li>
+                <li>Profile information (age, region, profile photo)</li>
+                <li>User-generated content (posts, messages)</li>
+                <li>Device data (IP, logs)</li>
+                <li>Cookies</li>
+              </ul>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">Legal Basis</h3>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Consent</li>
+                <li>Contract performance</li>
+                <li>Legitimate interest</li>
+                <li>Legal obligation</li>
+              </ul>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">User Rights (GDPR)</h3>
+              <p className="mb-2">You may request:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>access, correction, deletion</li>
+                <li>data portability</li>
+                <li>restriction of processing</li>
+                <li>withdrawal of consent</li>
+              </ul>
+              <p className="mb-4">
+                Contact:{" "}
+                <a href="mailto:momster.helpdesk@gmail.com" className="text-primary hover:underline">
+                  momster.helpdesk@gmail.com
+                </a>
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 3 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">3. Cookies</h2>
+              <p className="mb-4">We use essential, functional and analytics cookies.</p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 4 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">4. Account & Data Deletion</h2>
+              <p className="mb-4">
+                Users may delete their account at any time. Log data may remain for 12 months for security purposes.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 5 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">5. Marketplace Disclaimer</h2>
+              <p className="mb-4">
+                Momster is not responsible for transactions, product quality, payments or meetings. All interactions occur at users' own risk.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 6 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">6. Safety Notice</h2>
+              <p className="mb-4">
+                Momster is not liable for incidents related to offline meetings.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 7 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">7. Prohibited Content</h2>
+              <p className="mb-4">
+                Includes harassment, scams, illegal content, explicit material.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 8 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">8. Full Disclaimer</h2>
+              <p className="mb-4">
+                Momster is provided "as is" with no guarantees of uninterrupted operation, content accuracy or user behavior.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 9 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">9. Changes</h2>
+              <p className="mb-4">
+                Policies may be updated anytime.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 10 */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">10. Contact</h2>
+              <p className="mb-4">
+                <a href="mailto:momster.helpdesk@gmail.com" className="text-primary hover:underline">
+                  momster.helpdesk@gmail.com
+                </a>
+              </p>
+            </div>
+
+            <hr className="my-8 border-border" />
+
+            <footer className="text-sm text-muted-foreground mt-8">
+              <p>© Momster — Together Women Thrive. All rights reserved.</p>
+            </footer>
+          </section>
+        )}
       </div>
     </div>
   );
