@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles } from "lucide-react";
+import { Sparkles, X, Lightbulb } from "lucide-react";
 import { useMascot } from "@/hooks/use-mascot";
 import MomsterMascot from "@/components/MomsterMascot";
+import mascot from "@/assets/mascot.jpg";
 
 const MOODS = [
   { emoji: "😊", value: "positive", label: "Happy" },
@@ -133,6 +134,27 @@ const SELF_CARE_TIPS = {
   ],
 };
 
+const DID_YOU_KNOW_FACTS = {
+  en: [
+    "A baby's sense of smell is fully developed at birth and can recognize their mother's scent within days.",
+    "Babies are born with 300 bones, but adults have only 206 — some bones fuse together as they grow.",
+    "Newborns can only see about 8-12 inches away — just the distance to their parent's face while feeding.",
+    "A mother's voice has been shown to reduce pain in newborns during medical procedures.",
+    "Children laugh about 300 times a day, while adults only laugh about 20 times.",
+    "Babies' first smiles (around 6-8 weeks) are genuine social responses, not just reflexes.",
+    "The bond between mother and baby releases oxytocin — the 'love hormone' — in both.",
+  ],
+  el: [
+    "Η όσφρηση του μωρού είναι πλήρως ανεπτυγμένη από τη γέννηση και αναγνωρίζει τη μυρωδιά της μητέρας του σε λίγες μέρες.",
+    "Τα μωρά γεννιούνται με 300 οστά, ενώ οι ενήλικες έχουν μόνο 206 — κάποια οστά συγχωνεύονται καθώς μεγαλώνουν.",
+    "Τα νεογέννητα βλέπουν μόνο σε απόσταση 8-12 ίντσες — ακριβώς όσο το πρόσωπο της μητέρας όταν τρώνε.",
+    "Η φωνή της μητέρας μειώνει τον πόνο στα νεογέννητα κατά τη διάρκεια ιατρικών διαδικασιών.",
+    "Τα παιδιά γελούν περίπου 300 φορές τη μέρα, ενώ οι ενήλικες μόνο 20.",
+    "Τα πρώτα γνήσια χαμόγελα των μωρών (γύρω στις 6-8 εβδομάδες) είναι κοινωνικές αντιδράσεις, όχι απλά αντανακλαστικά.",
+    "Ο δεσμός μητέρας-μωρού απελευθερώνει οξυτοκίνη — την 'ορμόνη της αγάπης' — και στους δύο.",
+  ],
+};
+
 export default function DailyBoost() {
   const { language } = useLanguage();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
@@ -153,6 +175,7 @@ export default function DailyBoost() {
 
   const dailyQuote = DAILY_QUOTES[language][Math.floor(Math.random() * DAILY_QUOTES[language].length)];
   const selfCareTip = SELF_CARE_TIPS[language][Math.floor(Math.random() * SELF_CARE_TIPS[language].length)];
+  const didYouKnowFact = DID_YOU_KNOW_FACTS[language][Math.floor(Math.random() * DID_YOU_KNOW_FACTS[language].length)];
 
   const handleMoodSelect = (moodValue: string) => {
     setSelectedMood(moodValue);
@@ -175,6 +198,10 @@ export default function DailyBoost() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pt-20 pb-24 px-4 relative">
+      {/* Animated Mascot at top */}
+      <div className="fixed top-20 right-4 z-30 animate-bounce">
+        <img src={mascot} alt="Momster Mascot" className="w-20 h-20 object-contain" />
+      </div>
       {showHearts && (
         <div className="fixed inset-0 pointer-events-none z-40">
           {[...Array(15)].map((_, i) => (
@@ -193,7 +220,9 @@ export default function DailyBoost() {
         </div>
       )}
       
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="flex gap-6 max-w-7xl mx-auto">
+        {/* Main Content */}
+        <div className="flex-1 space-y-6 max-w-2xl">
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2" style={{ fontFamily: "'Pacifico', cursive" }}>
@@ -229,6 +258,19 @@ export default function DailyBoost() {
             </p>
             <p className="text-xs text-muted-foreground italic">
               {language === 'el' ? '(10-30 δευτερόλεπτα — πρακτικό & εφικτό)' : '(10-30 seconds — practical & doable)'}
+            </p>
+          </div>
+        </Card>
+
+        {/* Did You Know? */}
+        <Card className="p-5 bg-gradient-to-br from-accent/20 to-mint/20 border-accent/30">
+          <div className="space-y-2">
+            <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-accent" />
+              {language === 'el' ? 'Το ήξερες;' : 'Did you know?'}
+            </h2>
+            <p className="text-sm text-foreground/90 leading-relaxed">
+              {didYouKnowFact}
             </p>
           </div>
         </Card>
@@ -279,19 +321,75 @@ export default function DailyBoost() {
               : '💕 Remember: Every day is a new opportunity. You are strong, loved, and doing amazing.'}
           </p>
         </Card>
+        </div>
+
+        {/* Sidebar - Mompreneur of the Week */}
+        <div className="hidden lg:block w-80 space-y-4">
+          <Card className="p-6 bg-gradient-to-br from-accent/10 to-primary/10 border-accent/30 sticky top-24">
+            <div className="space-y-3 text-center">
+              <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
+                {language === 'el' ? 'Mompreneur της Εβδομάδας' : 'Mompreneur of the Week'}
+              </h2>
+              <div className="text-6xl">👑</div>
+              <p className="text-sm text-muted-foreground italic">
+                {language === 'el' ? 'Σύντομα εδώ... 🌸' : 'Coming soon... 🌸'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {language === 'el' 
+                  ? 'Κάθε εβδομάδα θα παρουσιάζουμε μια boss lady από την κοινότητά μας!' 
+                  : 'Every week we\'ll feature a boss lady from our community!'}
+              </p>
+            </div>
+          </Card>
+        </div>
       </div>
 
-      {mascotConfig && (
-        <MomsterMascot
-          state={mascotConfig.state}
-          message={mascotConfig.message}
-          visible={visible}
-          showButton={mascotConfig.showButton}
-          buttonText={mascotConfig.buttonText}
-          onButtonClick={mascotConfig.onButtonClick}
-          duration={mascotConfig.duration}
-          onHide={hideMascot}
-        />
+      {mascotConfig && visible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/20 backdrop-blur-sm animate-fade-in">
+          <Card className="max-w-md w-full p-6 bg-gradient-to-br from-primary/10 via-background to-secondary/20 border-2 border-primary/30 shadow-xl animate-scale-in relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 h-8 w-8 rounded-full"
+              onClick={hideMascot}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="relative">
+                <img
+                  src={mascot}
+                  alt="Momster Mascot"
+                  className={`w-24 h-24 object-contain ${
+                    mascotConfig.state === 'happy' ? 'animate-bounce' : 
+                    mascotConfig.state === 'searching' ? 'animate-pulse' : ''
+                  }`}
+                />
+                <span className="absolute -top-2 -right-2 text-3xl animate-bounce">
+                  {mascotConfig.state === 'happy' ? '💖' : 
+                   mascotConfig.state === 'searching' ? '🔍' : '☕'}
+                </span>
+              </div>
+              
+              <p className="text-lg font-medium text-foreground leading-relaxed">
+                {mascotConfig.message}
+              </p>
+
+              {mascotConfig.showButton && mascotConfig.buttonText && (
+                <Button
+                  onClick={() => {
+                    hideMascot();
+                    mascotConfig.onButtonClick?.();
+                  }}
+                  className="w-full"
+                  size="lg"
+                >
+                  {mascotConfig.buttonText}
+                </Button>
+              )}
+            </div>
+          </Card>
+        </div>
       )}
     </div>
   );
