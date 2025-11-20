@@ -27,6 +27,7 @@ const signInSchema = z.object({
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [acceptedAge, setAcceptedAge] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -47,6 +48,11 @@ export default function Auth() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!acceptedAge) {
+      toast.error("Πρέπει να είστε άνω των 18 ετών");
+      return;
+    }
     
     if (!acceptedTerms) {
       toast.error("Πρέπει να αποδεχτείτε τους όρους χρήσης");
@@ -208,19 +214,38 @@ export default function Auth() {
           </div>
 
           {!isLogin && (
-            <div className="flex items-start gap-2 py-2">
-              <Checkbox
-                id="terms"
-                checked={acceptedTerms}
-                onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
-                required
-              />
-              <Label htmlFor="terms" className="text-sm leading-tight cursor-pointer">
-                Αποδέχομαι τους{" "}
-                <Link to="/privacy-terms" className="text-primary hover:underline" target="_blank">
-                  Όρους Χρήσης και την Πολιτική Απορρήτου
-                </Link>
-              </Label>
+            <div className="space-y-3 py-2">
+              <p className="text-sm font-medium text-foreground">
+                Με τη δημιουργία λογαριασμού δηλώνω υπεύθυνα ότι:
+              </p>
+              
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="age"
+                  checked={acceptedAge}
+                  onCheckedChange={(checked) => setAcceptedAge(checked as boolean)}
+                  required
+                />
+                <Label htmlFor="age" className="text-sm leading-tight cursor-pointer">
+                  Είμαι άνω των 18 ετών
+                </Label>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <Checkbox
+                  id="terms"
+                  checked={acceptedTerms}
+                  onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                  required
+                />
+                <Label htmlFor="terms" className="text-sm leading-tight cursor-pointer">
+                  Έχω διαβάσει και αποδέχομαι τους{" "}
+                  <Link to="/privacy-terms" className="text-primary hover:underline" target="_blank">
+                    Όρους Χρήσης, την Πολιτική Απορρήτου και την Πολιτική Cookies
+                  </Link>
+                  {" "}και συμφωνώ με την επεξεργασία των προσωπικών μου δεδομένων σύμφωνα με το GDPR
+                </Label>
+              </div>
             </div>
           )}
 
@@ -228,9 +253,9 @@ export default function Auth() {
             type="submit" 
             className="w-full" 
             size="lg" 
-            disabled={loading || (!isLogin && !acceptedTerms)}
+            disabled={loading || (!isLogin && (!acceptedTerms || !acceptedAge))}
           >
-            {loading ? "Παρακαλώ περιμένετε..." : (isLogin ? "Σύνδεση" : "Εγγραφή")}
+            {loading ? "Παρακαλώ περιμένετε..." : (isLogin ? "Σύνδεση" : "Δημιουργία Λογαριασμού")}
           </Button>
 
           <div className="relative my-6">
