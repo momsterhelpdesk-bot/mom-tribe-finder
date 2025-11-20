@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import mascot from "@/assets/mascot.jpg";
@@ -32,6 +33,9 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showForgotUsername, setShowForgotUsername] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
   const navigate = useNavigate();
   const { mascotConfig, visible, hideMascot, showWelcome } = useMascot();
 
@@ -171,6 +175,66 @@ export default function Auth() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!forgotEmail) {
+      toast.error("Παρακαλώ εισάγετε το email σας");
+      return;
+    }
+
+    const emailValidation = z.string().email();
+    if (!emailValidation.safeParse(forgotEmail).success) {
+      toast.error("Μη έγκυρη διεύθυνση email");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+
+      toast.success("Σου στείλαμε email με οδηγίες επαναφοράς! 🌸");
+      setShowForgotPassword(false);
+      setForgotEmail("");
+    } catch (error: any) {
+      toast.error(error.message || "Σφάλμα κατά την αποστολή email");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotUsername = async () => {
+    if (!forgotEmail) {
+      toast.error("Παρακαλώ εισάγετε το email σας");
+      return;
+    }
+
+    const emailValidation = z.string().email();
+    if (!emailValidation.safeParse(forgotEmail).success) {
+      toast.error("Μη έγκυρη διεύθυνση email");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-username-reminder', {
+        body: { email: forgotEmail, language: 'el' }
+      });
+
+      if (error) throw error;
+
+      toast.success("Σου στείλαμε υπενθύμιση email! 🌷");
+      setShowForgotUsername(false);
+      setForgotEmail("");
+    } catch (error: any) {
+      toast.error(error.message || "Σφάλμα κατά την αποστολή email");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-8 shadow-lg relative overflow-hidden bg-background/95 backdrop-blur-sm">
@@ -299,6 +363,25 @@ export default function Auth() {
             Google
           </Button>
 
+          {isLogin && (
+            <div className="flex flex-col gap-2 text-center text-sm">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-primary hover:underline"
+              >
+                Ξέχασες τον κωδικό;
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowForgotUsername(true)}
+                className="text-primary hover:underline"
+              >
+                Ξέχασες το email σου;
+              </button>
+            </div>
+          )}
+
           <p className="text-center text-sm text-muted-foreground">
             {isLogin ? "Δεν έχετε λογαριασμό; " : "Έχετε ήδη λογαριασμό; "}
             <button
@@ -330,6 +413,66 @@ export default function Auth() {
           onHide={hideMascot}
         />
       )}
+
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Επαναφορά Κωδικού 🌸</DialogTitle>
+            <DialogDescription>
+              Εισάγετε το email σας και θα σας στείλουμε οδηγίες για επαναφορά του κωδικού σας.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="forgot-email">Email</Label>
+              <Input
+                id="forgot-email"
+                type="email"
+                placeholder="you@example.com"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+              />
+            </div>
+            <Button
+              onClick={handleForgotPassword}
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? "Αποστολή..." : "Αποστολή Email Επαναφοράς"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showForgotUsername} onOpenChange={setShowForgotUsername}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Υπενθύμιση Email 🌷</DialogTitle>
+            <DialogDescription>
+              Εισάγετε το email σας και θα σας το υπενθυμίσουμε.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="reminder-email">Email</Label>
+              <Input
+                id="reminder-email"
+                type="email"
+                placeholder="you@example.com"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+              />
+            </div>
+            <Button
+              onClick={handleForgotUsername}
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? "Αποστολή..." : "Υπενθύμιση Email"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

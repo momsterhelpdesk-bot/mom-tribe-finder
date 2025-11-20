@@ -7,6 +7,7 @@ import { useActivityTracker } from "./hooks/use-activity-tracker";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
+import ResetPassword from "./pages/ResetPassword";
 import ProfileSetup from "./pages/ProfileSetup";
 import PhotoVerification from "./pages/PhotoVerification";
 import Admin from "./pages/Admin";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth-callback" element={<AuthCallback />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/profile-setup" element={<AuthGuard><ProfileSetup /></AuthGuard>} />
           <Route path="/photo-verification" element={<AuthGuard><PhotoVerification /></AuthGuard>} />
           <Route path="/admin" element={<AuthGuard><Admin /></AuthGuard>} />
