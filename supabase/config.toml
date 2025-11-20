@@ -1,1 +1,10 @@
 project_id = "unjmflimsliqjnstmtrg"
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.send-reengagement-email]
+verify_jwt = false
+
+[functions.send-goodbye-email]
+verify_jwt = false

@@ -84,6 +84,22 @@ export default function Auth() {
       if (error) throw error;
 
       if (data.user) {
+        // Send welcome email
+        try {
+          await supabase.functions.invoke('send-welcome-email', {
+            body: {
+              userId: data.user.id,
+              email: validData.email,
+              fullName: validData.fullName,
+              language: 'el'
+            }
+          });
+          console.log("Welcome email sent");
+        } catch (emailError) {
+          console.error("Failed to send welcome email:", emailError);
+          // Don't block signup if email fails
+        }
+
         toast.success("Λογαριασμός δημιουργήθηκε! Συμπληρώστε το προφίλ σας.");
         showWelcome();
         setTimeout(() => navigate("/profile-setup"), 2000);

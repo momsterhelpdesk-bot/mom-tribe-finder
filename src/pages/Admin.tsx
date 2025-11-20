@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, Mail } from "lucide-react";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -14,6 +17,8 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [verificationRequests, setVerificationRequests] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
+  const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
+  const [editingTemplate, setEditingTemplate] = useState<any | null>(null);
 
   useEffect(() => {
     checkAdminStatus();
@@ -45,6 +50,16 @@ export default function Admin() {
   };
 
   const loadData = async () => {
+    // Load email templates
+    const { data: templates } = await supabase
+      .from('email_templates')
+      .select('*')
+      .order('template_key', { ascending: true });
+    
+    if (templates) {
+      setEmailTemplates(templates);
+    }
+
     // Load verification requests - use profiles instead of profiles_safe for admin
     const { data: requests } = await supabase
       .from('verification_requests')
@@ -103,6 +118,29 @@ export default function Admin() {
     }
 
     setReports(reportData || []);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!editingTemplate) return;
+
+    const { error } = await supabase
+      .from('email_templates')
+      .update({
+        subject_el: editingTemplate.subject_el,
+        subject_en: editingTemplate.subject_en,
+        body_el: editingTemplate.body_el,
+        body_en: editingTemplate.body_en,
+      })
+      .eq('id', editingTemplate.id);
+
+    if (error) {
+      toast.error("Σφάλμα κατά την αποθήκευση");
+      return;
+    }
+
+    toast.success("Το template ενημερώθηκε!");
+    setEditingTemplate(null);
+    loadData();
   };
 
   const handleVerificationDecision = async (requestId: string, status: 'approved' | 'rejected') => {
@@ -317,6 +355,99 @@ export default function Admin() {
             {reports.length === 0 && (
               <Card className="p-8 text-center text-muted-foreground">
                 Δεν υπάρχουν αναφορές
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="emails" className="space-y-4">
+            {emailTemplates.map(template => (
+              <Card key={template.id} className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg capitalize">{template.template_key}</h3>
+                      <p className="text-sm text-muted-foreground">{template.description}</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => setEditingTemplate(template)}
+                    >
+                      Επεξεργασία
+                    </Button>
+                  </div>
+
+                  {editingTemplate?.id === template.id && (
+                    <div className="space-y-4 border-t pt-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Subject (Ελληνικά)</Label>
+                          <Input
+                            value={editingTemplate.subject_el}
+                            onChange={(e) => setEditingTemplate({
+                              ...editingTemplate,
+                              subject_el: e.target.value
+                            })}
+                          />
+                        </div>
+                        <div>
+                          <Label>Subject (English)</Label>
+                          <Input
+                            value={editingTemplate.subject_en}
+                            onChange={(e) => setEditingTemplate({
+                              ...editingTemplate,
+                              subject_en: e.target.value
+                            })}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label>Body (Ελληνικά)</Label>
+                          <Textarea
+                            value={editingTemplate.body_el}
+                            onChange={(e) => setEditingTemplate({
+                              ...editingTemplate,
+                              body_el: e.target.value
+                            })}
+                            rows={12}
+                            className="font-mono text-sm"
+                          />
+                        </div>
+                        <div>
+                          <Label>Body (English)</Label>
+                          <Textarea
+                            value={editingTemplate.body_en}
+                            onChange={(e) => setEditingTemplate({
+                              ...editingTemplate,
+                              body_en: e.target.value
+                            })}
+                            rows={12}
+                            className="font-mono text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button onClick={handleSaveTemplate}>
+                          Αποθήκευση
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setEditingTemplate(null)}
+                        >
+                          Ακύρωση
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
+
+            {emailTemplates.length === 0 && (
+              <Card className="p-8 text-center text-muted-foreground">
+                Δεν υπάρχουν email templates
               </Card>
             )}
           </TabsContent>

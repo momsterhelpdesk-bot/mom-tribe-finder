@@ -119,6 +119,42 @@ export type Database = {
           },
         ]
       }
+      email_templates: {
+        Row: {
+          body_el: string
+          body_en: string
+          created_at: string
+          description: string | null
+          id: string
+          subject_el: string
+          subject_en: string
+          template_key: string
+          updated_at: string
+        }
+        Insert: {
+          body_el: string
+          body_en: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          subject_el: string
+          subject_en: string
+          template_key: string
+          updated_at?: string
+        }
+        Update: {
+          body_el?: string
+          body_en?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          subject_el?: string
+          subject_en?: string
+          template_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           created_at: string
@@ -392,6 +428,30 @@ export type Database = {
           likes_count?: number
           pseudonym?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_activity: {
+        Row: {
+          created_at: string
+          email_sent_at: string | null
+          id: string
+          last_activity_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_sent_at?: string | null
+          id?: string
+          last_activity_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_sent_at?: string | null
+          id?: string
+          last_activity_at?: string
           user_id?: string
         }
         Relationships: []
