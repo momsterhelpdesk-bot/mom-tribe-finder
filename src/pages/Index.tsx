@@ -44,7 +44,11 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
+      <section className="pt-32 pb-20 px-4 relative">
+        {/* Large animated mascot */}
+        <div className="absolute top-10 right-10 animate-bounce opacity-80 hidden lg:block">
+          <img src={mascot} alt="Momster Mascot" className="w-48 h-48 object-contain" />
+        </div>
         <div className="container mx-auto text-center max-w-4xl">
           <div className="mb-8 flex justify-center">
             <img src={logoFull} alt="Momster Logo" className="w-80 h-80 object-contain animate-scale-in" />

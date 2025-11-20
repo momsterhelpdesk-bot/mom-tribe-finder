@@ -57,6 +57,7 @@ export default function Profile() {
   const [photoUploadOpen, setPhotoUploadOpen] = useState(false);
   const [avatarBuilderOpen, setAvatarBuilderOpen] = useState(false);
   const [viewAsPublic, setViewAsPublic] = useState(false);
+  const [childrenArray, setChildrenArray] = useState<any[]>([]);
   
   // Edit form states
   const [editForm, setEditForm] = useState({
@@ -123,6 +124,7 @@ export default function Profile() {
       setPrivacySettings(privSettings);
 
       const childrenInit = Array.isArray(data.children) ? data.children : [];
+      setChildrenArray(childrenInit);
       setChildrenInput(childrenInit.map((c: any) => String(c.age)).join(", "));
 
     } catch (error) {
@@ -200,8 +202,7 @@ export default function Profile() {
         return;
       }
 
-      const childrenParsed = parseChildrenAges(childrenInput);
-
+      // Use the updated childrenArray state directly
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -212,7 +213,7 @@ export default function Profile() {
           city: editForm.city,
           area: editForm.area,
           interests: selectedInterests,
-          children: childrenParsed,
+          children: childrenArray,
         })
         .eq("id", profile.id);
 
@@ -304,8 +305,8 @@ export default function Profile() {
     ? [profile.profile_photo_url]
     : [];
 
-  const childrenArray = Array.isArray(profile.children) ? profile.children : [];
-  const childAges = childrenArray.map((child: any) => child.age).join(", ");
+  const displayChildrenArray = Array.isArray(profile.children) ? profile.children : [];
+  const childAges = displayChildrenArray.map((child: any) => child.age).join(", ");
 
   // Calculate age from date_of_birth
   const calculateAge = (dateOfBirth: string) => {
@@ -354,10 +355,11 @@ export default function Profile() {
           opacity: 0.4
         }}
       />
+      {/* Animated Mascot */}
       <img 
         src={mascot} 
         alt="Momster Mascot" 
-        className="fixed top-24 right-4 w-20 h-20 opacity-30 object-contain pointer-events-none animate-bounce z-10"
+        className="fixed top-24 right-4 w-24 h-24 opacity-70 object-contain pointer-events-none animate-bounce z-10 drop-shadow-lg"
       />
       
       <div className="max-w-2xl mx-auto pt-20 pb-24 px-4 relative z-10">
@@ -392,6 +394,12 @@ export default function Profile() {
                     <CarouselItem key={index}>
                         <div className="flex justify-center">
                           <div className="relative">
+                            {/* Floral decorative elements */}
+                            <div className="absolute -top-4 -left-4 text-4xl animate-pulse opacity-80">🌸</div>
+                            <div className="absolute -top-4 -right-4 text-4xl animate-pulse opacity-80" style={{animationDelay: '0.5s'}}>💕</div>
+                            <div className="absolute -bottom-4 -left-4 text-4xl animate-pulse opacity-80" style={{animationDelay: '1s'}}>🌺</div>
+                            <div className="absolute -bottom-4 -right-4 text-4xl animate-pulse opacity-80" style={{animationDelay: '1.5s'}}>💗</div>
+                            
                             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/60 via-purple-300/60 to-pink-300/60 blur-3xl animate-pulse" />
                             <Avatar className="w-48 h-48 border-[8px] border-white shadow-2xl relative z-10" style={{
                               boxShadow: '0 0 0 3px rgba(255, 255, 255, 1), 0 0 0 6px rgba(236, 72, 153, 0.5), 0 0 0 10px rgba(219, 39, 119, 0.3), 0 0 40px rgba(219, 39, 119, 0.6)'
@@ -663,8 +671,7 @@ export default function Profile() {
                               onClick={() => {
                                 const newChildren = [...childrenArray];
                                 newChildren[index] = { ...newChildren[index], gender: 'boy' };
-                                const childrenParsed = newChildren;
-                                setEditForm({ ...editForm });
+                                setChildrenArray(newChildren);
                               }}
                             >
                               👦 {language === "el" ? "Αγόρι" : "Boy"}
@@ -676,8 +683,7 @@ export default function Profile() {
                               onClick={() => {
                                 const newChildren = [...childrenArray];
                                 newChildren[index] = { ...newChildren[index], gender: 'girl' };
-                                const childrenParsed = newChildren;
-                                setEditForm({ ...editForm });
+                                setChildrenArray(newChildren);
                               }}
                             >
                               👧 {language === "el" ? "Κορίτσι" : "Girl"}
@@ -689,8 +695,7 @@ export default function Profile() {
                               onClick={() => {
                                 const newChildren = [...childrenArray];
                                 newChildren[index] = { ...newChildren[index], gender: 'baby' };
-                                const childrenParsed = newChildren;
-                                setEditForm({ ...editForm });
+                                setChildrenArray(newChildren);
                               }}
                             >
                               👶 {language === "el" ? "Μωρό" : "Baby"}

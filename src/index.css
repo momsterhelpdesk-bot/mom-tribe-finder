@@ -8,58 +8,52 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 24 43% 97%;
-    --foreground: 349 24% 25%;
+    /* Cath Kidston-inspired pastel colors */
+    --background: 343 50% 96%;  /* soft cream/blush */
+    --foreground: 340 30% 30%;   /* dusty rose text */
 
     --card: 0 0% 100%;
-    --card-foreground: 349 24% 25%;
+    --card-foreground: 340 30% 30%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 349 24% 25%;
+    --popover-foreground: 340 30% 30%;
 
-    --primary: 0 35% 75%;
-    --primary-foreground: 349 24% 25%;
+    --primary: 340 60% 80%;      /* baby pink */
+    --primary-foreground: 340 30% 30%;
 
-    --secondary: 343 47% 88%;
-    --secondary-foreground: 349 24% 30%;
+    --secondary: 150 30% 85%;    /* pastel mint */
+    --secondary-foreground: 340 30% 30%;
 
-    --muted: 343 47% 92%;
-    --muted-foreground: 0 20% 55%;
+    --muted: 340 40% 92%;
+    --muted-foreground: 340 25% 55%;
 
-    --accent: 35 46% 68%;
-    --accent-foreground: 349 24% 25%;
+    --accent: 280 50% 85%;       /* soft lavender */
+    --accent-foreground: 340 30% 30%;
 
-    --mint: 343 47% 88%;
-    --mint-foreground: 349 24% 30%;
+    --mint: 150 30% 85%;         /* pastel mint */
+    --mint-foreground: 340 30% 30%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 70% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 343 30% 90%;
-    --input: 343 30% 90%;
-    --ring: 0 35% 75%;
+    --border: 340 35% 88%;
+    --input: 340 35% 88%;
+    --ring: 340 60% 80%;
 
     --radius: 1rem;
 
-    --shadow-soft: 0 4px 20px -4px hsl(0 35% 75% / 0.15);
-    --shadow-gold: 0 2px 8px -2px hsl(35 46% 68% / 0.3);
-    --gradient-elegant: linear-gradient(135deg, hsl(24 43% 97%), hsl(343 47% 92%));
+    --shadow-soft: 0 4px 20px -4px hsl(340 60% 80% / 0.2);
+    --shadow-gold: 0 2px 8px -2px hsl(280 50% 85% / 0.3);
+    --gradient-elegant: linear-gradient(135deg, hsl(343 50% 96%), hsl(340 40% 92%));
 
-    --sidebar-background: 24 43% 97%;
-
-    --sidebar-foreground: 349 24% 25%;
-
-    --sidebar-primary: 0 35% 75%;
-
-    --sidebar-primary-foreground: 349 24% 25%;
-
-    --sidebar-accent: 343 47% 88%;
-
-    --sidebar-accent-foreground: 349 24% 30%;
-
-    --sidebar-border: 343 30% 90%;
-
-    --sidebar-ring: 0 35% 75%;
+    --sidebar-background: 343 50% 96%;
+    --sidebar-foreground: 340 30% 30%;
+    --sidebar-primary: 340 60% 80%;
+    --sidebar-primary-foreground: 340 30% 30%;
+    --sidebar-accent: 150 30% 85%;
+    --sidebar-accent-foreground: 340 30% 30%;
+    --sidebar-border: 340 35% 88%;
+    --sidebar-ring: 340 60% 80%;
   }
 
   .dark {
@@ -108,7 +102,7 @@ All colors MUST be HSL.
 
   body {
     @apply text-foreground;
-    background: linear-gradient(135deg, hsl(24 43% 97%), hsl(343 47% 92%));
+    background: linear-gradient(135deg, hsl(343 50% 96%), hsl(340 40% 92%), hsl(150 30% 90%));
     background-attachment: fixed;
     position: relative;
     min-height: 100vh;
