@@ -392,29 +392,35 @@ export default function Profile() {
                     <CarouselItem key={index}>
                         <div className="flex justify-center">
                           <div className="relative">
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/50 via-purple-300/50 to-pink-300/50 blur-2xl animate-pulse" />
-                            <Avatar className="w-48 h-48 border-[6px] border-white/80 shadow-2xl relative z-10" style={{
-                              boxShadow: '0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 0 8px rgba(219, 39, 119, 0.3), 0 0 30px rgba(219, 39, 119, 0.4)'
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/60 via-purple-300/60 to-pink-300/60 blur-3xl animate-pulse" />
+                            <Avatar className="w-48 h-48 border-[8px] border-white shadow-2xl relative z-10" style={{
+                              boxShadow: '0 0 0 3px rgba(255, 255, 255, 1), 0 0 0 6px rgba(236, 72, 153, 0.5), 0 0 0 10px rgba(219, 39, 119, 0.3), 0 0 40px rgba(219, 39, 119, 0.6)'
                             }}>
                               <AvatarImage src={photo} alt={`${profile.full_name} ${index + 1}`} className="object-cover" />
                               <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
                             </Avatar>
                           {frameStyle === 'flowers' && (
                             <>
-                              <div className="absolute -top-2 -right-2 text-3xl animate-bounce">🌸</div>
-                              <div className="absolute -bottom-2 -left-2 text-2xl animate-pulse">🌺</div>
+                              <div className="absolute -top-4 -right-4 text-5xl animate-bounce drop-shadow-lg">🌸</div>
+                              <div className="absolute -bottom-4 -left-4 text-4xl animate-pulse drop-shadow-lg">🌺</div>
+                              <div className="absolute top-0 -left-4 text-3xl animate-bounce delay-100 drop-shadow-lg">🌼</div>
+                              <div className="absolute -bottom-4 -right-4 text-3xl animate-pulse delay-200 drop-shadow-lg">🌷</div>
                             </>
                           )}
                           {frameStyle === 'hearts' && (
                             <>
-                              <div className="absolute -top-2 -right-2 text-3xl animate-bounce">💖</div>
-                              <div className="absolute -bottom-2 -left-2 text-2xl animate-pulse">💕</div>
+                              <div className="absolute -top-4 -right-4 text-5xl animate-bounce drop-shadow-lg">💖</div>
+                              <div className="absolute -bottom-4 -left-4 text-4xl animate-pulse drop-shadow-lg">💕</div>
+                              <div className="absolute top-0 -left-4 text-3xl animate-bounce delay-100 drop-shadow-lg">💗</div>
+                              <div className="absolute -bottom-4 -right-4 text-3xl animate-pulse delay-200 drop-shadow-lg">💝</div>
                             </>
                           )}
                           {frameStyle === 'momster' && (
                             <>
-                              <div className="absolute -top-2 -right-2 text-2xl animate-bounce">👶</div>
-                              <div className="absolute -bottom-2 -left-2 text-2xl animate-pulse">🤱</div>
+                              <div className="absolute -top-4 -right-4 text-4xl animate-bounce drop-shadow-lg">👶</div>
+                              <div className="absolute -bottom-4 -left-4 text-4xl animate-pulse drop-shadow-lg">🤱</div>
+                              <div className="absolute top-0 -left-4 text-3xl animate-bounce delay-100 drop-shadow-lg">🍼</div>
+                              <div className="absolute -bottom-4 -right-4 text-3xl animate-pulse delay-200 drop-shadow-lg">👪</div>
                             </>
                           )}
                         </div>
@@ -427,52 +433,58 @@ export default function Profile() {
               </Carousel>
             ) : (
               <div className="relative mb-4">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/50 via-purple-300/50 to-pink-300/50 blur-2xl animate-pulse" />
-                <Avatar className="w-48 h-48 border-[6px] border-white/80 shadow-2xl relative z-10" style={{
-                  boxShadow: '0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 0 8px rgba(219, 39, 119, 0.3), 0 0 30px rgba(219, 39, 119, 0.4)'
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-300/60 via-purple-300/60 to-pink-300/60 blur-3xl animate-pulse" />
+                <Avatar className="w-48 h-48 border-[8px] border-white shadow-2xl relative z-10" style={{
+                  boxShadow: '0 0 0 3px rgba(255, 255, 255, 1), 0 0 0 6px rgba(236, 72, 153, 0.5), 0 0 0 10px rgba(219, 39, 119, 0.3), 0 0 40px rgba(219, 39, 119, 0.6)'
                 }}>
                   <AvatarImage src={profilePhotos[0]} alt={profile.full_name} className="object-cover" />
                   <AvatarFallback>{profile.full_name?.[0]}</AvatarFallback>
                 </Avatar>
                 {frameStyle === 'flowers' && (
                   <>
-                    <div className="absolute -top-2 -right-2 text-3xl animate-bounce">🌸</div>
-                    <div className="absolute -bottom-2 -left-2 text-2xl animate-pulse">🌺</div>
+                    <div className="absolute -top-4 -right-4 text-5xl animate-bounce drop-shadow-lg">🌸</div>
+                    <div className="absolute -bottom-4 -left-4 text-4xl animate-pulse drop-shadow-lg">🌺</div>
+                    <div className="absolute top-0 -left-4 text-3xl animate-bounce delay-100 drop-shadow-lg">🌼</div>
+                    <div className="absolute -bottom-4 -right-4 text-3xl animate-pulse delay-200 drop-shadow-lg">🌷</div>
                   </>
                 )}
                 {frameStyle === 'hearts' && (
                   <>
-                    <div className="absolute -top-2 -right-2 text-3xl animate-bounce">💖</div>
-                    <div className="absolute -bottom-2 -left-2 text-2xl animate-pulse">💕</div>
+                    <div className="absolute -top-4 -right-4 text-5xl animate-bounce drop-shadow-lg">💖</div>
+                    <div className="absolute -bottom-4 -left-4 text-4xl animate-pulse drop-shadow-lg">💕</div>
+                    <div className="absolute top-0 -left-4 text-3xl animate-bounce delay-100 drop-shadow-lg">💗</div>
+                    <div className="absolute -bottom-4 -right-4 text-3xl animate-pulse delay-200 drop-shadow-lg">💝</div>
                   </>
                 )}
                 {frameStyle === 'momster' && (
                   <>
-                    <div className="absolute -top-2 -right-2 text-2xl animate-bounce">👶</div>
-                    <div className="absolute -bottom-2 -left-2 text-2xl animate-pulse">🤱</div>
+                    <div className="absolute -top-4 -right-4 text-4xl animate-bounce drop-shadow-lg">👶</div>
+                    <div className="absolute -bottom-4 -left-4 text-4xl animate-pulse drop-shadow-lg">🤱</div>
+                    <div className="absolute top-0 -left-4 text-3xl animate-bounce delay-100 drop-shadow-lg">🍼</div>
+                    <div className="absolute -bottom-4 -right-4 text-3xl animate-pulse delay-200 drop-shadow-lg">👪</div>
                   </>
                 )}
               </div>
             )}
 
-            <h2 className="text-3xl font-bold text-foreground text-center mt-4">
-              {profile.full_name}{userAge && <span className="text-3xl font-bold text-foreground">, {userAge}</span>}
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-pink-600 to-purple-600 bg-clip-text text-transparent text-center mt-4">
+              {profile.full_name}{userAge && <span className="text-3xl font-bold bg-gradient-to-r from-primary via-pink-600 to-purple-600 bg-clip-text text-transparent">, {userAge}</span>}
             </h2>
             
             {/* Location Pill */}
             <div className="mt-3 flex justify-center">
-              <div className="bg-secondary/40 backdrop-blur-sm border border-primary/20 rounded-full px-4 py-2 flex items-center gap-2 shadow-sm">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-sm text-foreground">{profile.city}, {profile.area}</span>
+              <div className="bg-gradient-to-r from-pink-100 to-purple-100 border-2 border-primary rounded-full px-4 py-2 flex items-center gap-2 shadow-md">
+                <MapPin className="w-5 h-5 text-primary" />
+                <span className="text-sm font-semibold text-primary">{profile.city}, {profile.area}</span>
               </div>
             </div>
 
             {/* Bio Pill */}
             {profile.bio && !viewAsPublic && (
               <div className="mt-3 max-w-md mx-auto">
-                <div className="bg-secondary/40 backdrop-blur-sm border border-primary/20 rounded-2xl px-4 py-3 flex gap-2 shadow-sm">
-                  <MessageCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-foreground leading-relaxed">{profile.bio}</p>
+                <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-primary/30 rounded-2xl px-4 py-3 flex gap-2 shadow-md">
+                  <MessageCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <p className="text-sm font-medium text-primary leading-relaxed">{profile.bio}</p>
                 </div>
               </div>
             )}
@@ -480,17 +492,17 @@ export default function Profile() {
             {/* Kid Info Bubbles */}
             {profile.children && Array.isArray(profile.children) && profile.children.length > 0 && (
               <div className="mt-4">
-                <p className="text-xs text-muted-foreground text-center mb-2 font-medium">
+                <p className="text-sm text-primary text-center mb-2 font-bold">
                   {language === "el" ? "🎈 Μαμά σε:" : "🎈 Mom to:"}
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {profile.children.map((child: any, idx: number) => (
                   <div 
                     key={idx}
-                    className="bg-gradient-to-br from-pink-100 to-purple-100 border-2 border-pink-200 rounded-full px-2 py-1 flex items-center gap-1 shadow-sm transform hover:scale-105 transition-transform"
+                    className="bg-gradient-to-br from-pink-200 to-purple-200 border-2 border-pink-300 rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-md transform hover:scale-105 transition-transform"
                   >
-                    <span className="text-sm">{child.gender === 'girl' ? '👧' : child.gender === 'boy' ? '👦' : '👶'}</span>
-                    <span className="text-xs font-medium text-foreground">
+                    <span className="text-base">{child.gender === 'girl' ? '👧' : child.gender === 'boy' ? '👦' : '👶'}</span>
+                    <span className="text-xs font-bold text-primary">
                         {child.gender === 'girl' ? (language === "el" ? 'Κορίτσι' : 'Girl') 
                           : child.gender === 'boy' ? (language === "el" ? 'Αγόρι' : 'Boy')
                           : (language === "el" ? 'Μωρό' : 'Baby')}
@@ -626,16 +638,67 @@ export default function Profile() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="children_ages">{language === "el" ? "Ηλικίες Παιδιών" : "Children's Ages"}</Label>
-                    <Input
-                      id="children_ages"
-                      placeholder={language === "el" ? "π.χ. 6 μηνών, 3, 8" : "e.g. 6 months, 3, 8"}
-                      value={childrenInput}
-                      onChange={(e) => setChildrenInput(e.target.value)}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      {language === "el" ? "Χώρισε με κόμματα. Δεκτό και 'μηνών' (π.χ. 6 μηνών)." : "Separate with commas. 'months' also accepted (e.g. 6 months)."}
-                    </p>
+                    <Label>{language === "el" ? "Πληροφορίες Παιδιών" : "Children Information"}</Label>
+                    {childrenArray.map((child: any, index: number) => (
+                      <div key={index} className="space-y-2 p-4 border border-border rounded-lg bg-secondary/10">
+                        <div className="space-y-2">
+                          <Label className="text-xs">{language === "el" ? "Ηλικία" : "Age"}</Label>
+                          <Input
+                            placeholder={language === "el" ? "π.χ. 3, 6 μηνών" : "e.g. 3, 6 months"}
+                            value={child.age || ""}
+                            onChange={(e) => {
+                              const newChildren = [...childrenArray];
+                              newChildren[index] = { ...newChildren[index], age: e.target.value };
+                              setChildrenInput(newChildren.map(c => c.age).join(", "));
+                            }}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs">{language === "el" ? "Φύλο" : "Gender"}</Label>
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant={child.gender === 'boy' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => {
+                                const newChildren = [...childrenArray];
+                                newChildren[index] = { ...newChildren[index], gender: 'boy' };
+                                const childrenParsed = newChildren;
+                                setEditForm({ ...editForm });
+                              }}
+                            >
+                              👦 {language === "el" ? "Αγόρι" : "Boy"}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant={child.gender === 'girl' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => {
+                                const newChildren = [...childrenArray];
+                                newChildren[index] = { ...newChildren[index], gender: 'girl' };
+                                const childrenParsed = newChildren;
+                                setEditForm({ ...editForm });
+                              }}
+                            >
+                              👧 {language === "el" ? "Κορίτσι" : "Girl"}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant={child.gender === 'baby' ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => {
+                                const newChildren = [...childrenArray];
+                                newChildren[index] = { ...newChildren[index], gender: 'baby' };
+                                const childrenParsed = newChildren;
+                                setEditForm({ ...editForm });
+                              }}
+                            >
+                              👶 {language === "el" ? "Μωρό" : "Baby"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="space-y-3">
