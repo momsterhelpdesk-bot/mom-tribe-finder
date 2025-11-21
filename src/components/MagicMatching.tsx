@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sparkles, MessageCircle } from "lucide-react";
+import { MessageCircle, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -158,9 +158,7 @@ export default function MagicMatching() {
       <CardContent className="p-6">
         <div className="text-center">
           <h3 className="text-xl font-bold text-foreground mb-4 flex items-center justify-center gap-2" style={{ fontFamily: "'Pacifico', cursive" }}>
-            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
-            Μαγικό Matching
-            <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+            💕 Μαγικό Matching 💕
           </h3>
 
           {!matchedProfile && !loading && (
@@ -169,16 +167,17 @@ export default function MagicMatching() {
               size="lg"
               className="w-full rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-semibold py-6 transition-all hover:scale-105"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
-              Βρες το Match σου ✨
+              <span className="text-xl mr-2">🌸</span>
+              Βρες το Match σου
+              <span className="text-xl ml-2">✨</span>
             </Button>
           )}
 
           {loading && (
             <div className="flex flex-col items-center gap-4 py-8">
-              <div className="relative">
-                <Sparkles className="w-16 h-16 text-primary animate-spin" />
-                <Sparkles className="w-8 h-8 text-pink-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+              <div className="relative animate-bounce">
+                <span className="text-5xl">💕</span>
+                <span className="text-2xl absolute top-0 right-0 animate-ping">✨</span>
               </div>
               <p className="text-muted-foreground animate-pulse">
                 {language === "el" ? "Μαγεύουμε το matching..." : "Finding your match..."}
@@ -224,7 +223,7 @@ export default function MagicMatching() {
                   variant="outline"
                   className="rounded-full"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <span className="text-lg">🌸</span>
                 </Button>
               </div>
             </div>

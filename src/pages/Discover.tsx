@@ -10,6 +10,20 @@ import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
 import { useMatching } from "@/hooks/use-matching";
 
+// Demo profile for testing UI
+const demoProfile = {
+  id: 'demo-123',
+  full_name: 'Maria Papadopoulou',
+  profile_photo_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+  profile_photos_urls: ['https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400'],
+  city: 'Αθήνα',
+  area: 'Κολωνάκι',
+  bio: 'Μαμά ενός υπέροχου αγοριού 2 ετών! Λατρεύω τις βόλτες στο πάρκο και τις playdates. Ψάχνω για άλλες μαμάδες να μοιραστούμε εμπειρίες! 🌸',
+  interests: ['Παιδική Ψυχολογία', 'Μαγείρεμα', 'Yoga', 'Ανάγνωση'],
+  children: [{ name: 'Νίκος', ageGroup: '2-3 χρονών', gender: 'boy' }],
+  distance: 3.5,
+};
+
 export default function Discover() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMatchVideo, setShowMatchVideo] = useState(false);
@@ -21,7 +35,9 @@ export default function Discover() {
   const { mascotConfig, visible, hideMascot, showMatch, showEmptyDiscover } = useMascot();
   const { profiles, loading } = useMatching();
 
-  const currentProfile = profiles[currentIndex];
+  // Add demo profile to the beginning of the list
+  const allProfiles = [demoProfile, ...profiles];
+  const currentProfile = allProfiles[currentIndex];
 
   const handleSwipe = async (liked: boolean) => {
     console.log(liked ? "Liked!" : "Passed");
@@ -56,7 +72,7 @@ export default function Discover() {
       }
     }
     
-    if (nextIndex >= profiles.length) {
+    if (nextIndex >= allProfiles.length) {
       // Show empty state
       showEmptyDiscover();
       setTimeout(() => {
@@ -134,10 +150,10 @@ export default function Discover() {
   };
 
   useEffect(() => {
-    if (!loading && profiles.length === 0) {
+    if (!loading && allProfiles.length === 1) { // Only demo profile
       showEmptyDiscover();
     }
-  }, [profiles.length, loading, showEmptyDiscover]);
+  }, [allProfiles.length, loading, showEmptyDiscover]);
 
   if (loading) {
     return (

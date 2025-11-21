@@ -280,27 +280,28 @@ export default function DailyBoost() {
         </div>
 
         {/* Events Banner */}
-        <Link to="/events">
-          <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:shadow-xl transition-all cursor-pointer group overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
-            <div className="relative flex items-center justify-between">
-              <div className="space-y-2">
-                <h2 className="text-xl font-bold text-purple-700 flex items-center gap-2">
-                  <Calendar className="w-6 h-6" />
-                  {language === 'el' ? 'Εκδηλώσεις' : 'Events'}
-                </h2>
-                <p className="text-sm text-purple-600">
-                  {language === 'el' 
-                    ? 'Βρες τα καλύτερα events για μαμάδες' 
-                    : 'Find the best events for moms'}
-                </p>
-              </div>
-              <div className="text-4xl group-hover:scale-110 transition-transform">
-                🎉
-              </div>
+        <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 overflow-hidden relative">
+          <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold shadow-md">
+            Coming Soon
+          </div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+          <div className="relative flex items-center justify-between opacity-75">
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-purple-700 flex items-center gap-2">
+                <Calendar className="w-6 h-6" />
+                {language === 'el' ? 'Εκδηλώσεις' : 'Events'}
+              </h2>
+              <p className="text-sm text-purple-600">
+                {language === 'el' 
+                  ? 'Βρες τα καλύτερα events για μαμάδες' 
+                  : 'Find the best events for moms'}
+              </p>
             </div>
-          </Card>
-        </Link>
+            <div className="text-4xl">
+              🎉
+            </div>
+          </div>
+        </Card>
 
         {/* Magic Matching */}
         <MagicMatching />
