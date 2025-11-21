@@ -9,6 +9,7 @@ import { MapPin, Baby, Heart, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import mascot from "@/assets/mascot.jpg";
+import { INTERESTS } from "@/lib/interests";
 
 export default function MatchingFilters() {
   const navigate = useNavigate();

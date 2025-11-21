@@ -23,28 +23,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { PhotoUpload } from "@/components/PhotoUpload";
 import { AvatarBuilder, AvatarConfig } from "@/components/AvatarBuilder";
 import { AvatarDisplay } from "@/components/AvatarDisplay";
-
-const INTERESTS = [
-  { id: "stay_at_home", label: { el: "🏡 Stay-at-home Mom", en: "🏡 Stay-at-home Mom" } },
-  { id: "working_mom", label: { el: "💼 Working Mom", en: "💼 Working Mom" } },
-  { id: "twin_mom", label: { el: "👯 Twin Mom", en: "👯 Twin Mom" } },
-  { id: "special_needs", label: { el: "💪 Special Needs Mom Warrior", en: "💪 Special Needs Mom Warrior" } },
-  { id: "cooking", label: { el: "🍳 Μαγειρική / Ζαχαροπλαστική", en: "🍳 Cooking / Baking" } },
-  { id: "healthy_eating", label: { el: "🥗 Υγιεινή Διατροφή / Vegan / Organic", en: "🥗 Healthy Eating / Vegan / Organic" } },
-  { id: "yoga", label: { el: "🧘 Yoga / Pilates / Fitness", en: "🧘 Yoga / Pilates / Fitness" } },
-  { id: "books", label: { el: "📖 Βιβλία / Ανάγνωση", en: "📖 Books / Reading" } },
-  { id: "movies", label: { el: "🎬 Ταινίες / Σειρές", en: "🎬 Movies / Series" } },
-  { id: "coffee", label: { el: "☕ Καφέ / Brunch", en: "☕ Coffee / Brunch" } },
-  { id: "diy", label: { el: "✂️ DIY / Χειροτεχνίες", en: "✂️ DIY / Crafts" } },
-  { id: "photography", label: { el: "📸 Φωτογραφία", en: "📸 Photography" } },
-  { id: "eco", label: { el: "🌱 Οικολογία / Sustainability", en: "🌱 Eco / Sustainability" } },
-  { id: "travel", label: { el: "🏞️ Εκδρομές / Ταξίδια", en: "🏞️ Travel / Trips" } },
-  { id: "wine", label: { el: "🍷 Wine Lover", en: "🍷 Wine Lover" } },
-  { id: "music", label: { el: "🎶 Μουσική", en: "🎶 Music" } },
-  { id: "couch", label: { el: "😅 Coach Potato", en: "😅 Coach Potato" } },
-  { id: "party", label: { el: "🎉 Party Animal", en: "🎉 Party Animal" } },
-  { id: "social", label: { el: "🦋 Social Butterfly", en: "🦋 Social Butterfly" } },
-];
+import { INTERESTS } from "@/lib/interests";
 
 export default function Profile() {
   const { mascotConfig, visible, hideMascot } = useMascot();
