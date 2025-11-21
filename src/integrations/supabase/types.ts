@@ -456,6 +456,142 @@ export type Database = {
         }
         Relationships: []
       }
+      recipe_photos: {
+        Row: {
+          created_at: string
+          id: string
+          photo_url: string
+          recipe_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photo_url: string
+          recipe_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photo_url?: string
+          recipe_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_photos_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          recipe_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          recipe_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          recipe_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_reviews_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipes: {
+        Row: {
+          average_rating: number | null
+          base_servings: number
+          cook_time_minutes: number | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          ingredients: Json
+          instructions: string[]
+          mom_tip: string | null
+          photo_url: string | null
+          prep_time_minutes: number
+          reheating_instructions: string | null
+          reviews_count: number | null
+          storage_freezer_months: number | null
+          storage_fridge_days: number | null
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          average_rating?: number | null
+          base_servings?: number
+          cook_time_minutes?: number | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          ingredients?: Json
+          instructions?: string[]
+          mom_tip?: string | null
+          photo_url?: string | null
+          prep_time_minutes: number
+          reheating_instructions?: string | null
+          reviews_count?: number | null
+          storage_freezer_months?: number | null
+          storage_fridge_days?: number | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          average_rating?: number | null
+          base_servings?: number
+          cook_time_minutes?: number | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          ingredients?: Json
+          instructions?: string[]
+          mom_tip?: string | null
+          photo_url?: string | null
+          prep_time_minutes?: number
+          reheating_instructions?: string | null
+          reviews_count?: number | null
+          storage_freezer_months?: number | null
+          storage_fridge_days?: number | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_activity: {
         Row: {
           created_at: string

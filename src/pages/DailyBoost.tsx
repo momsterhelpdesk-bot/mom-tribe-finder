@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, X, Lightbulb } from "lucide-react";
+import { Sparkles, X, Lightbulb, ChefHat } from "lucide-react";
 import { useMascot } from "@/hooks/use-mascot";
 import MomsterMascot from "@/components/MomsterMascot";
+import { Link } from "react-router-dom";
 import mascot from "@/assets/mascot.jpg";
 
 const MOODS = [
@@ -234,6 +235,25 @@ export default function DailyBoost() {
             {language === 'el' ? 'Η καθημερινή σου δόση ενέργειας 🌸' : 'Your daily dose of energy 🌸'}
           </p>
         </div>
+
+        {/* Momster Ταπεράκι */}
+        <Link to="/recipes">
+          <Card className="p-6 bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200 hover:shadow-xl transition-all cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-orange-700 flex items-center gap-2">
+                  🧀 Momster Ταπεράκι
+                </h2>
+                <p className="text-sm text-orange-600">
+                  {language === 'el' 
+                    ? 'Υγιεινές συνταγές για μικρά χεράκια' 
+                    : 'Healthy recipes for little hands'}
+                </p>
+              </div>
+              <ChefHat className="w-12 h-12 text-orange-400 group-hover:scale-110 transition-transform" />
+            </div>
+          </Card>
+        </Link>
 
         {/* Quote of the Day */}
         <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
