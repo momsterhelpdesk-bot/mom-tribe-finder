@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Upload, X, AlertCircle } from "lucide-react";
 import { z } from "zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LocationPermissionDialog } from "@/components/LocationPermissionDialog";
 
 const profileSetupSchema = z.object({
   username: z.string().trim().min(3, { message: "Το username πρέπει να είναι τουλάχιστον 3 χαρακτήρες" }).max(20, { message: "Το username πρέπει να είναι μικρότερο από 20 χαρακτήρες" }).regex(/^[a-zA-Z0-9_]+$/, { message: "Το username μπορεί να περιέχει μόνο γράμματα, αριθμούς και _" }),
@@ -71,6 +72,9 @@ export default function ProfileSetup() {
   const [matchPreference, setMatchPreference] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -175,6 +179,54 @@ export default function ProfileSetup() {
       return;
     }
 
+    // Request location permission before final submission
+    setShowLocationDialog(true);
+  };
+
+  const handleLocationAllow = () => {
+    setShowLocationDialog(false);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLatitude(position.coords.latitude);
+          setLongitude(position.coords.longitude);
+          submitProfile(position.coords.latitude, position.coords.longitude);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          toast.error("Δεν μπορέσαμε να λάβουμε την τοποθεσία σας");
+          submitProfile(null, null);
+        }
+      );
+    } else {
+      toast.error("Ο browser σας δεν υποστηρίζει geolocation");
+      submitProfile(null, null);
+    }
+  };
+
+  const handleLocationDeny = () => {
+    setShowLocationDialog(false);
+    submitProfile(null, null);
+  };
+
+  const submitProfile = async (lat: number | null, lng: number | null) => {
+    if (!userId) return;
+
+    // Re-validate before submission
+    const validation = profileSetupSchema.safeParse({
+      username,
+      city,
+      area,
+      children,
+      matchPreference,
+      interests
+    });
+
+    if (!validation.success) {
+      toast.error("Σφάλμα επικύρωσης δεδομένων");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -219,7 +271,9 @@ export default function ProfileSetup() {
           interests: validData.interests,
           profile_photo_url: photoUrls[0], // Keep first photo as main
           profile_photos_urls: photoUrls,
-          profile_completed: true
+          profile_completed: true,
+          latitude: lat,
+          longitude: lng
         })
         .eq('id', userId);
 
@@ -494,6 +548,12 @@ export default function ProfileSetup() {
           </Button>
         </form>
       </Card>
+
+      <LocationPermissionDialog 
+        open={showLocationDialog}
+        onAllow={handleLocationAllow}
+        onDeny={handleLocationDeny}
+      />
     </div>
   );
 }
