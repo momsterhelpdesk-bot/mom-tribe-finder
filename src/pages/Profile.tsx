@@ -454,15 +454,16 @@ export default function Profile() {
               </div>
             )}
 
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-pink-600 to-purple-600 bg-clip-text text-transparent text-center mt-4">
-              {profile.full_name}{userAge && <span className="text-3xl font-bold bg-gradient-to-r from-primary via-pink-600 to-purple-600 bg-clip-text text-transparent">, {userAge}</span>}
+            <h2 className="text-3xl font-bold text-foreground text-center mt-4 drop-shadow-sm" style={{ fontFamily: "'Pacifico', cursive" }}>
+              {profile.full_name}
+              {userAge && <span className="text-2xl text-foreground"> · {userAge} χρονών</span>}
             </h2>
             
             {/* Location Pill */}
             <div className="mt-3 flex justify-center">
               <div className="bg-gradient-to-r from-pink-100 to-purple-100 border-2 border-primary rounded-full px-4 py-2 flex items-center gap-2 shadow-md">
                 <MapPin className="w-5 h-5 text-primary" />
-                <span className="text-sm font-semibold text-primary">{profile.city}, {profile.area}</span>
+                <span className="text-base font-bold text-foreground">{profile.city}, {profile.area}</span>
               </div>
             </div>
 
@@ -471,7 +472,7 @@ export default function Profile() {
               <div className="mt-3 max-w-md mx-auto">
                 <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-primary/30 rounded-2xl px-4 py-3 flex gap-2 shadow-md">
                   <MessageCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-sm font-medium text-primary leading-relaxed">{profile.bio}</p>
+                  <p className="text-base font-semibold text-foreground leading-relaxed">{profile.bio}</p>
                 </div>
               </div>
             )}
