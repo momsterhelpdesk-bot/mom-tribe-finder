@@ -6,6 +6,8 @@ import { Heart, MessageCircle, Calendar, ShoppingBag, Users, MapPin, UtensilsCro
 import logoFull from "@/assets/logo-full.jpg";
 import mascot from "@/assets/mascot.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ThisOrThat from "@/components/ThisOrThat";
+import MagicMatching from "@/components/MagicMatching";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -54,10 +56,14 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 relative">
-        {/* Large animated mascot */}
-        <div className="absolute top-10 right-10 animate-bounce opacity-80 hidden lg:block">
-          <img src={mascot} alt="Momster Mascot" className="w-48 h-48 object-contain drop-shadow-2xl" />
+      <section className="pt-32 pb-16 px-4 relative overflow-hidden">
+        {/* Large animated mascot with more dynamic animation */}
+        <div className="absolute top-10 right-10 hidden lg:block animate-float opacity-90">
+          <img 
+            src={mascot} 
+            alt="Momster Mascot" 
+            className="w-56 h-56 object-contain drop-shadow-2xl transition-transform hover:scale-110 hover:rotate-6 duration-300" 
+          />
         </div>
         <div className="container mx-auto text-center max-w-5xl">
           <div className="mb-6 flex justify-center">
@@ -120,7 +126,7 @@ const Index = () => {
 
           {/* Grid with varied sizes */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Large feature card - spans 2 columns */}
+            {/* Large feature card - Recipes spans 2 columns */}
             <Link to="/recipes" className="md:col-span-2">
               <Card className={`${features[5].bg} border-none hover:shadow-xl transition-all hover:scale-[1.02] h-full`}>
                 <CardContent className="p-8 relative overflow-hidden">
@@ -137,6 +143,16 @@ const Index = () => {
                 </CardContent>
               </Card>
             </Link>
+
+            {/* Magic Matching Button - circular style */}
+            <div className="md:col-span-1">
+              <MagicMatching />
+            </div>
+
+            {/* This or That - spans 2 columns */}
+            <div className="md:col-span-2">
+              <ThisOrThat />
+            </div>
 
             {/* Regular feature card */}
             <Card className={`${features[0].bg} border-none hover:shadow-lg transition-all hover:scale-[1.02]`}>
@@ -200,7 +216,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {/* Third row - location spans 2 */}
+            {/* Location feature spans 2 */}
             <Card className={`${features[4].bg} border-none hover:shadow-lg transition-all hover:scale-[1.02] md:col-span-2`}>
               <CardContent className="p-6 relative overflow-hidden">
                 <div className="absolute top-2 right-2 opacity-10">

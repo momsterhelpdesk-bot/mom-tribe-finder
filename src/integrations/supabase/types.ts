@@ -215,6 +215,68 @@ export type Database = {
         }
         Relationships: []
       }
+      poll_votes: {
+        Row: {
+          choice: string
+          created_at: string
+          id: string
+          poll_id: string
+          user_id: string
+        }
+        Insert: {
+          choice: string
+          created_at?: string
+          id?: string
+          poll_id: string
+          user_id: string
+        }
+        Update: {
+          choice?: string
+          created_at?: string
+          id?: string
+          poll_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      polls: {
+        Row: {
+          category: string
+          created_at: string
+          emoji_a: string
+          emoji_b: string
+          id: string
+          question_a: string
+          question_b: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          emoji_a?: string
+          emoji_b?: string
+          id?: string
+          question_a: string
+          question_b: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          emoji_a?: string
+          emoji_b?: string
+          id?: string
+          question_a?: string
+          question_b?: string
+        }
+        Relationships: []
+      }
       profile_reports: {
         Row: {
           created_at: string | null

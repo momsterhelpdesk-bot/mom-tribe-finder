@@ -51,6 +51,8 @@ export function RecipeDetail({ recipeId, open, onOpenChange }: RecipeDetailProps
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [desiredServings, setDesiredServings] = useState(2);
   const [loading, setLoading] = useState(true);
+  const [showTip, setShowTip] = useState(false);
+  const [portionMode, setPortionMode] = useState<'baby' | 'toddler' | 'family'>('toddler');
 
   useEffect(() => {
     if (recipeId && open) {
@@ -90,7 +92,21 @@ export function RecipeDetail({ recipeId, open, onOpenChange }: RecipeDetailProps
     );
   }
 
-  const multiplier = desiredServings / recipe.base_servings;
+  // Calculate multiplier based on portion mode
+  const getServingsForMode = () => {
+    switch (portionMode) {
+      case 'baby':
+        return 1;
+      case 'toddler':
+        return 2;
+      case 'family':
+        return 4;
+      default:
+        return desiredServings;
+    }
+  };
+
+  const multiplier = getServingsForMode() / recipe.base_servings;
 
   const calculateAmount = (amount: number) => {
     const calculated = amount * multiplier;
@@ -120,6 +136,51 @@ export function RecipeDetail({ recipeId, open, onOpenChange }: RecipeDetailProps
             </Badge>
           ))}
         </div>
+
+        {/* Smart Buttons */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <Button
+            variant="outline"
+            onClick={() => setShowTip(!showTip)}
+            className="rounded-full bg-orange-50/80 hover:bg-orange-100/80 border-orange-200 h-auto py-3"
+          >
+            <span className="mr-2">🍪</span>
+            <span className="text-xs font-semibold">Κλέψε μια μπουκίτσα</span>
+          </Button>
+          
+          <div className="relative">
+            <Button
+              variant="outline"
+              className="w-full rounded-full bg-pink-50/80 hover:bg-pink-100/80 border-pink-200 h-auto py-3"
+              onClick={() => {
+                const modes: Array<'baby' | 'toddler' | 'family'> = ['baby', 'toddler', 'family'];
+                const currentIndex = modes.indexOf(portionMode);
+                const nextIndex = (currentIndex + 1) % modes.length;
+                setPortionMode(modes[nextIndex]);
+              }}
+            >
+              <span className="mr-2">🔄</span>
+              <span className="text-xs font-semibold">
+                {portionMode === 'baby' && '👶 Baby'}
+                {portionMode === 'toddler' && '🧒 Toddler'}
+                {portionMode === 'family' && '👨‍👩‍👧‍👦 Family'}
+              </span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Mom's Tip (shown when clicked) */}
+        {showTip && recipe.mom_tip && (
+          <div className="mb-4 p-4 bg-yellow-50/80 border-2 border-yellow-200 rounded-2xl animate-scale-in">
+            <div className="flex items-start gap-2">
+              <span className="text-2xl">💡</span>
+              <div>
+                <p className="font-semibold text-sm text-foreground mb-1">Mom's Tip:</p>
+                <p className="text-sm text-muted-foreground">{recipe.mom_tip}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Time & Servings Info */}
         <Card>
