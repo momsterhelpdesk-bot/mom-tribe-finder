@@ -286,6 +286,7 @@ export type Database = {
           child_names: string | null
           children: Json | null
           city: string
+          cookies_accepted: boolean | null
           created_at: string | null
           date_of_birth: string | null
           email: string
@@ -314,6 +315,7 @@ export type Database = {
           child_names?: string | null
           children?: Json | null
           city: string
+          cookies_accepted?: boolean | null
           created_at?: string | null
           date_of_birth?: string | null
           email: string
@@ -342,6 +344,7 @@ export type Database = {
           child_names?: string | null
           children?: Json | null
           city?: string
+          cookies_accepted?: boolean | null
           created_at?: string | null
           date_of_birth?: string | null
           email?: string
