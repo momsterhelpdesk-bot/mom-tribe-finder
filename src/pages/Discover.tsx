@@ -149,21 +149,24 @@ export default function Discover() {
 
   if (!currentProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative">
-        <img 
-          src={mascot} 
-          alt="Momster Mascot" 
-          className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none animate-[bounce_3s_ease-in-out_infinite]"
-        />
-        <div className="max-w-md mx-auto pt-20 pb-24 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative flex items-center justify-center">
+        <div className="max-w-md w-full text-center">
           <h1 className="text-2xl font-bold mb-6 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
             Ανακάλυψε Μαμάδες
           </h1>
-          <Card className="p-8">
-            <div className="text-6xl mb-4">🌸</div>
-            <h2 className="text-xl font-semibold mb-2">Δεν υπάρχουν άλλες μαμάδες</h2>
+          <Card className="p-6 bg-gradient-to-br from-primary/10 via-background to-secondary/20 border-2 border-primary/30">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full max-w-xs mx-auto mb-4 rounded-lg"
+            >
+              <source src="/videos/mascot-empty-state.mp4" type="video/mp4" />
+            </video>
+            <h2 className="text-xl font-semibold mb-2 text-foreground">Δεν υπάρχουν άλλες μαμάδες</h2>
             <p className="text-muted-foreground mb-4">Δοκίμασε να προσαρμόσεις τα φίλτρα σου</p>
-            <Button onClick={() => navigate("/matching-filters")}>
+            <Button onClick={() => navigate("/matching-filters")} size="lg" className="w-full">
               <Settings className="w-4 h-4 mr-2" />
               Ρυθμίσεις Φίλτρων
             </Button>
