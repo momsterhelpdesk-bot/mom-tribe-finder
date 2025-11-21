@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sparkles, X, Lightbulb, ChefHat } from "lucide-react";
+import { Sparkles, X, Lightbulb, ChefHat, Calendar } from "lucide-react";
 import { useMascot } from "@/hooks/use-mascot";
 import MomsterMascot from "@/components/MomsterMascot";
 import { Link } from "react-router-dom";
 import mascot from "@/assets/mascot.jpg";
+import ThisOrThat from "@/components/ThisOrThat";
+import MagicMatching from "@/components/MagicMatching";
 
 const MOODS = [
   { emoji: "😊", value: "positive", label: "Happy" },
@@ -276,6 +278,35 @@ export default function DailyBoost() {
             {language === 'el' ? 'Η καθημερινή σου δόση ενέργειας 🌸' : 'Your daily dose of energy 🌸'}
           </p>
         </div>
+
+        {/* Events Banner */}
+        <Link to="/events">
+          <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:shadow-xl transition-all cursor-pointer group overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+            <div className="relative flex items-center justify-between">
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-purple-700 flex items-center gap-2">
+                  <Calendar className="w-6 h-6" />
+                  {language === 'el' ? 'Εκδηλώσεις' : 'Events'}
+                </h2>
+                <p className="text-sm text-purple-600">
+                  {language === 'el' 
+                    ? 'Βρες τα καλύτερα events για μαμάδες' 
+                    : 'Find the best events for moms'}
+                </p>
+              </div>
+              <div className="text-4xl group-hover:scale-110 transition-transform">
+                🎉
+              </div>
+            </div>
+          </Card>
+        </Link>
+
+        {/* Magic Matching */}
+        <MagicMatching />
+
+        {/* This or That Polls */}
+        <ThisOrThat />
 
         {/* Momster Ταπεράκι */}
         <Link to="/recipes">
