@@ -155,7 +155,20 @@ export function RecipeDetail({ recipeId, open, onOpenChange }: RecipeDetailProps
               type="number"
               min="1"
               value={desiredServings}
-              onChange={(e) => setDesiredServings(Number(e.target.value) || 1)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '') {
+                  setDesiredServings(1);
+                } else {
+                  const num = Number(value);
+                  if (num > 0) setDesiredServings(num);
+                }
+              }}
+              onBlur={(e) => {
+                if (e.target.value === '' || Number(e.target.value) < 1) {
+                  setDesiredServings(1);
+                }
+              }}
               className="w-24"
             />
           </CardContent>
