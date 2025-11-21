@@ -211,7 +211,7 @@ export default function Discover() {
         <Settings className="w-4 h-4" />
       </Button>
 
-      <div className="max-w-md mx-auto pt-20 pb-24">
+      <div className="max-w-md mx-auto pt-20 pb-32">
         <h1 className="text-2xl font-bold text-center mb-6 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
           Ανακάλυψε Μαμάδες
         </h1>
@@ -320,7 +320,7 @@ export default function Discover() {
           </div>
         </Card>
 
-        <div className="flex justify-center gap-8 mt-6">
+        <div className="flex justify-center gap-8 mt-8 mb-6">
           <Button
             size="lg"
             variant="outline"
