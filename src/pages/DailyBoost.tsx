@@ -321,9 +321,65 @@ export default function DailyBoost() {
               : '💕 Remember: Every day is a new opportunity. You are strong, loved, and doing amazing.'}
           </p>
         </Card>
+
+        {/* Mompreneur of the Week */}
+        <Card className="border-2 border-primary/20 shadow-xl rounded-3xl overflow-hidden bg-card/95 backdrop-blur-sm relative">
+          {/* Floral background pattern */}
+          <div className="absolute inset-0 opacity-5 pointer-events-none">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e91e63' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '30px 30px'
+            }}></div>
+          </div>
+
+          <div className="p-8 relative">
+            {/* Animated mascot in corner */}
+            <div className="absolute top-4 right-4 animate-bounce">
+              <img src={mascot} alt="Momster Mascot" className="w-12 h-12 object-contain opacity-80" />
+            </div>
+
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold mb-2 text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>
+                🌸 Mompreneur of the Week
+              </h2>
+              <div className="inline-block px-4 py-2 bg-primary/10 rounded-full border-2 border-primary/30 shadow-sm">
+                <p className="text-lg font-semibold text-primary">
+                  Coming Soon 🌸
+                </p>
+              </div>
+            </div>
+
+            {/* Placeholder image with floral border */}
+            <div className="my-6 flex justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-xl"></div>
+                <div className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg bg-gradient-to-br from-secondary/50 to-accent/30 flex items-center justify-center">
+                  <img src={mascot} alt="Mompreneur Placeholder" className="w-24 h-24 object-contain opacity-60" />
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                {language === 'el'
+                  ? 'Κάθε εβδομάδα θα παρουσιάζουμε μια μανούλα από την κοινότητά μας που είναι boss lady, δημιουργική, career-driven ή έχει το δικό της project. Μείνε συντονισμένη!'
+                  : 'Every week we will feature a mama from our community who is a boss lady, creative, career-driven or has her own project. Stay tuned!'}
+              </p>
+
+              {/* Decorative icons */}
+              <div className="flex justify-center gap-2 text-2xl">
+                <span className="animate-bounce" style={{ animationDelay: '0s' }}>💼</span>
+                <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>✨</span>
+                <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>👑</span>
+                <span className="animate-bounce" style={{ animationDelay: '0.3s' }}>💕</span>
+              </div>
+            </div>
+          </div>
+        </Card>
         </div>
 
-        {/* Sidebar - Mompreneur of the Week */}
+        {/* Sidebar - Empty placeholder for larger screens */}
         <div className="hidden lg:block w-96 space-y-4">
           <Card className="border-2 border-primary/20 shadow-xl rounded-3xl overflow-hidden bg-card/95 backdrop-blur-sm sticky top-24 relative">
             {/* Floral background pattern */}

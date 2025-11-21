@@ -249,7 +249,7 @@ export default function Discover() {
               <h2 className="text-2xl font-bold">{currentProfile.name}, {currentProfile.age}</h2>
               <div className="flex items-center gap-2 mt-1">
                 <MapPin className="w-4 h-4" />
-                <span className="text-sm">{currentProfile.location}</span>
+                <span className="text-sm font-semibold">{currentProfile.location}</span>
               </div>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function Discover() {
               <span className="font-medium">{currentProfile.children}</span>
             </div>
 
-            <p className="text-sm text-muted-foreground">{currentProfile.bio}</p>
+            <p className="text-sm text-foreground/90 font-medium">{currentProfile.bio}</p>
 
             <div className="flex flex-wrap gap-2">
               {currentProfile.interests.map((interest) => (

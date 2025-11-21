@@ -12,7 +12,7 @@ export default function BottomNav() {
 
   const navItems = [
     { path: "/discover", icon: Heart, label: "Find a New Friend" },
-    { path: "/ask-moms", icon: MessageCircle, label: "Ρώτα μαμά" },
+    { path: "/ask-moms", icon: MessageCircle, label: "Ρώτα μία μαμά" },
     { path: "/daily-boost", icon: Sparkles, label: "Momster Home" },
     { path: "/marketplace", icon: ShoppingBag, label: "Marketplace" },
     { path: "/profile", icon: User, label: "Profile" },
