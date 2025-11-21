@@ -100,6 +100,7 @@ const Index = () => {
         </div>
       </section>
 
+
       {/* Events Banner */}
       <section className="py-3 px-4 bg-gradient-to-r from-pink-200 via-purple-200 to-pink-200">
         <div className="container mx-auto text-center">

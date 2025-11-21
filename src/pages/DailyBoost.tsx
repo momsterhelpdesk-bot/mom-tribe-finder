@@ -10,12 +10,10 @@ import mascot from "@/assets/mascot.jpg";
 
 const MOODS = [
   { emoji: "😊", value: "positive", label: "Happy" },
-  { emoji: "😀", value: "positive", label: "Joyful" },
   { emoji: "😐", value: "neutral", label: "Neutral" },
   { emoji: "😔", value: "sad", label: "Sad" },
   { emoji: "😫", value: "overwhelmed", label: "Overwhelmed" },
   { emoji: "😴", value: "tired", label: "Tired" },
-  { emoji: "😵‍💫", value: "overwhelmed", label: "Stressed" },
 ];
 
 const MOOD_QUOTES = {
@@ -160,6 +158,7 @@ export default function DailyBoost() {
   const { language } = useLanguage();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [moodQuote, setMoodQuote] = useState<string>("");
+  const [currentMoodQuoteIndex, setCurrentMoodQuoteIndex] = useState(0);
   const { mascotConfig, visible, showMascot, hideMascot } = useMascot();
   const [showHearts, setShowHearts] = useState(false);
 
@@ -181,7 +180,9 @@ export default function DailyBoost() {
   const handleMoodSelect = (moodValue: string) => {
     setSelectedMood(moodValue);
     const quotes = MOOD_QUOTES[moodValue as keyof typeof MOOD_QUOTES][language];
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    const randomQuote = quotes[randomIndex];
+    setCurrentMoodQuoteIndex(randomIndex);
     setMoodQuote(randomQuote);
     
     // Show mascot with hearts
@@ -195,6 +196,46 @@ export default function DailyBoost() {
     setTimeout(() => {
       setShowHearts(false);
     }, 3000);
+  };
+
+  const handleNextQuote = () => {
+    if (!selectedMood) return;
+    const quotes = MOOD_QUOTES[selectedMood as keyof typeof MOOD_QUOTES][language];
+    let newIndex = Math.floor(Math.random() * quotes.length);
+    while (newIndex === currentMoodQuoteIndex && quotes.length > 1) {
+      newIndex = Math.floor(Math.random() * quotes.length);
+    }
+    setCurrentMoodQuoteIndex(newIndex);
+    setMoodQuote(quotes[newIndex]);
+    
+    // Show mascot with new quote
+    showMascot({
+      state: "happy",
+      message: quotes[newIndex],
+      duration: 3000,
+    });
+  };
+
+  const handleShareQuote = () => {
+    if (!moodQuote) return;
+    
+    // Check if Web Share API is available
+    if (navigator.share) {
+      navigator.share({
+        title: language === 'el' ? 'Daily Boost από Momster' : 'Daily Boost from Momster',
+        text: `"${moodQuote}"`,
+      }).catch(() => {
+        // User cancelled share
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(`"${moodQuote}"`);
+      showMascot({
+        state: "happy",
+        message: language === 'el' ? 'Αντιγράφηκε! 📋' : 'Copied! 📋',
+        duration: 1500,
+      });
+    }
   };
 
   return (
@@ -296,31 +337,64 @@ export default function DailyBoost() {
         </Card>
 
         {/* Mood Check */}
-        <Card className="p-6">
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold text-foreground">
+        <Card className="p-6 bg-gradient-to-br from-pink-50 to-purple-50 border-pink-200">
+          <div className="space-y-5">
+            <h2 className="text-lg font-bold text-foreground text-center">
               💭 {language === 'el' ? 'Πώς νιώθεις σήμερα;' : 'How are you feeling today?'}
             </h2>
             
-            <div className="grid grid-cols-4 gap-3 sm:flex sm:flex-wrap sm:justify-center">
+            {/* Mood buttons in horizontal row */}
+            <div className="flex justify-center items-center gap-4 flex-wrap">
               {MOODS.map((mood) => (
-                <Button
+                <button
                   key={mood.emoji}
-                  variant={selectedMood === mood.value ? "default" : "outline"}
-                  className="h-16 w-16 sm:h-20 sm:w-20 text-4xl hover:scale-110 transition-transform"
                   onClick={() => handleMoodSelect(mood.value)}
+                  className={`
+                    w-[60px] h-[60px] rounded-full text-3xl
+                    bg-gradient-to-br from-pink-100 to-purple-100
+                    border-2 transition-all duration-200
+                    hover:scale-110 hover:shadow-lg
+                    active:scale-95
+                    ${selectedMood === mood.value 
+                      ? 'border-primary shadow-lg scale-105 animate-bounce' 
+                      : 'border-pink-200 hover:border-primary/50'
+                    }
+                  `}
+                  aria-label={mood.label}
                 >
                   {mood.emoji}
-                </Button>
+                </button>
               ))}
             </div>
 
             {moodQuote && (
-              <Card className="p-4 bg-primary/5 border-primary/20 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <p className="text-base text-foreground italic leading-relaxed text-center">
-                  "{moodQuote}"
-                </p>
-              </Card>
+              <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <Card className="p-5 bg-white/80 border-primary/20 shadow-md">
+                  <p className="text-base text-foreground italic leading-relaxed text-center animate-in fade-in-50 duration-700">
+                    "{moodQuote}"
+                  </p>
+                </Card>
+                
+                {/* Action buttons */}
+                <div className="flex justify-center gap-3">
+                  <Button
+                    onClick={handleNextQuote}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 hover:scale-105 transition-transform"
+                  >
+                    🔄 {language === 'el' ? 'Επόμενο' : 'Next Quote'}
+                  </Button>
+                  <Button
+                    onClick={handleShareQuote}
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 hover:scale-105 transition-transform"
+                  >
+                    📤 {language === 'el' ? 'Μοιράσου' : 'Share'}
+                  </Button>
+                </div>
+              </div>
             )}
 
             {!moodQuote && (
