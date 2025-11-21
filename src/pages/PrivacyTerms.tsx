@@ -51,7 +51,51 @@ export default function PrivacyTerms() {
                 <li>Περιεχόμενο που ανεβάζετε (posts, φωτογραφίες, μηνύματα)</li>
                 <li>Δεδομένα συσκευής (IP, τύπος συσκευής, logs)</li>
                 <li>Cookies για λειτουργικούς και αναλυτικούς σκοπούς</li>
+                <li>Δεδομένα τοποθεσίας (κατά προσέγγιση περιοχή, όχι ακριβής διεύθυνση)</li>
               </ul>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">2.1.1 Χρήση Δεδομένων Τοποθεσίας</h3>
+              <p className="mb-2">
+                Η εφαρμογή «Momster» μπορεί να συλλέγει και να χρησιμοποιεί δεδομένα τοποθεσίας της χρήστριας, 
+                μόνο εφόσον δοθεί σχετική άδεια μέσα από το pop-up του συστήματος (iOS/Android).
+              </p>
+              <p className="mb-2">
+                Χρησιμοποιούμε κατά προσέγγιση τοποθεσία (approximate location) ή/και γεωγραφική περιοχή, με σκοπό:
+              </p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>την εμφάνιση άλλων μαμάδων που βρίσκονται κοντά</li>
+                <li>τη βελτίωση των προτάσεων γνωριμίας (matching)</li>
+                <li>τη δημιουργία πιο σχετικού περιεχομένου και προτεινόμενων επαφών</li>
+              </ul>
+
+              <h4 className="text-xl font-semibold text-foreground mt-4 mb-2">Απόλυτη Ιδιωτικότητα & Ασφάλεια</h4>
+              <p className="mb-4">
+                Η εφαρμογή <strong>δεν συλλέγει, δεν αποθηκεύει και δεν μοιράζεται ποτέ την ακριβή διεύθυνση της χρήστριας</strong>. 
+                Η τοποθεσία χρησιμοποιείται μόνο σε μορφή "ευρύτερης περιοχής" (π.χ. Δήμος ή γειτονιά) και 
+                <strong> δεν εμφανίζεται ποτέ δημόσια ή σε άλλες χρήστριες</strong>.
+              </p>
+
+              <h4 className="text-xl font-semibold text-foreground mt-4 mb-2">Άδεια & Έλεγχος</h4>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Η χρήση της τοποθεσίας γίνεται μόνο με τη ρητή συγκατάθεσή σας</li>
+                <li>Μπορείτε να ενεργοποιήσετε ή να απενεργοποιήσετε την πρόσβαση στην τοποθεσία οποιαδήποτε στιγμή μέσα από τις ρυθμίσεις της συσκευής σας</li>
+              </ul>
+
+              <h4 className="text-xl font-semibold text-foreground mt-4 mb-2">Τρόπος Επεξεργασίας</h4>
+              <p className="mb-2">Τα δεδομένα τοποθεσίας επεξεργάζονται αυτόματα και <strong>δεν χρησιμοποιούνται για</strong>:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>διαφημιστικούς σκοπούς</li>
+                <li>εμπορική εκμετάλλευση</li>
+                <li>παρακολούθηση</li>
+                <li>αποστολή στοχευμένων ειδοποιήσεων πέρα από τη λειτουργία της εφαρμογής</li>
+              </ul>
+
+              <h4 className="text-xl font-semibold text-foreground mt-4 mb-2">Τρίτοι Πάροχοι</h4>
+              <p className="mb-4">
+                Δεν κοινοποιούμε δεδομένα τοποθεσίας σε τρίτους. 
+                Αν χρησιμοποιηθούν υπηρεσίες χαρτών (π.χ. Google Maps APIs), αφορούν μόνο τεχνική λειτουργικότητα 
+                και δεν περιλαμβάνουν προσωπικά δεδομένα.
+              </p>
 
               <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">2.2 Νομικές βάσεις επεξεργασίας</h3>
               <ul className="list-disc pl-6 mb-4 space-y-1">
@@ -242,7 +286,50 @@ export default function PrivacyTerms() {
                 <li>User-generated content (posts, messages)</li>
                 <li>Device data (IP, logs)</li>
                 <li>Cookies</li>
+                <li>Location data (approximate area, not exact address)</li>
               </ul>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">2.1 Location Data Usage</h3>
+              <p className="mb-2">
+                Momster may collect and use your location data only if you grant permission through the system pop-up (iOS/Android).
+              </p>
+              <p className="mb-2">
+                We use approximate location or geographic area to:
+              </p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Show nearby moms</li>
+                <li>Improve matching suggestions</li>
+                <li>Create more relevant content and connection recommendations</li>
+              </ul>
+
+              <h4 className="text-xl font-semibold text-foreground mt-4 mb-2">Privacy & Security</h4>
+              <p className="mb-4">
+                The app <strong>never collects, stores or shares your exact address</strong>. 
+                Location is only used as "broader area" (e.g. municipality or neighborhood) and 
+                <strong> is never displayed publicly or to other users</strong>.
+              </p>
+
+              <h4 className="text-xl font-semibold text-foreground mt-4 mb-2">Permission & Control</h4>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Location is only used with your explicit consent</li>
+                <li>You can enable or disable location access at any time in your device settings</li>
+              </ul>
+
+              <h4 className="text-xl font-semibold text-foreground mt-4 mb-2">Processing Method</h4>
+              <p className="mb-2">Location data is processed automatically and <strong>is NOT used for</strong>:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Advertising purposes</li>
+                <li>Commercial exploitation</li>
+                <li>Tracking</li>
+                <li>Sending targeted notifications beyond app functionality</li>
+              </ul>
+
+              <h4 className="text-xl font-semibold text-foreground mt-4 mb-2">Third Parties</h4>
+              <p className="mb-4">
+                We do not share location data with third parties. 
+                If map services (e.g. Google Maps APIs) are used, they are for technical functionality only 
+                and do not include personal data.
+              </p>
 
               <h3 className="text-2xl font-semibold text-foreground mt-6 mb-3">Legal Basis</h3>
               <ul className="list-disc pl-6 mb-4 space-y-1">
