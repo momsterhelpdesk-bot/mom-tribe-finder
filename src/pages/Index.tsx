@@ -17,37 +17,37 @@ const Index = () => {
       icon: <Users className="h-6 w-6" />,
       title: t('connectLocalMoms'),
       description: t('connectLocalMomsDesc'),
-      bg: "bg-pink-100/80"
+      bg: "bg-gradient-to-br from-pink-50 to-rose-50"
     },
     {
       icon: <MessageCircle className="h-6 w-6" />,
       title: t('secureMessaging'),
       description: t('secureMessagingDesc'),
-      bg: "bg-purple-100/80"
+      bg: "bg-gradient-to-br from-pink-100 to-purple-100"
     },
     {
       icon: <ShoppingBag className="h-6 w-6" />,
       title: t('marketplace'),
       description: t('marketplaceDesc'),
-      bg: "bg-pink-50/80"
+      bg: "bg-gradient-to-br from-rose-50 to-pink-50"
     },
     {
       icon: <Heart className="h-6 w-6" />,
       title: t('askMoms'),
       description: t('askMomsDesc'),
-      bg: "bg-rose-100/80"
+      bg: "bg-gradient-to-br from-pink-100 to-rose-100"
     },
     {
       icon: <MapPin className="h-6 w-6" />,
       title: t('locationMatching'),
       description: t('locationMatchingDesc'),
-      bg: "bg-pink-100/80"
+      bg: "bg-gradient-to-br from-pink-100 to-rose-100"
     },
     {
       icon: <UtensilsCrossed className="h-6 w-6" />,
       title: "Momster Ταπεράκι",
       description: "Υγιεινές συνταγές για μικρά χεράκια",
-      bg: "bg-orange-100/80"
+      bg: "bg-gradient-to-br from-orange-100 to-pink-100"
     }
   ];
 
@@ -57,17 +57,21 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="pt-32 pb-16 px-4 relative overflow-hidden">
-        {/* Large animated mascot with more dynamic animation */}
+        {/* Large animated mascot with waving animation */}
         <div className="absolute top-10 right-10 hidden lg:block animate-float opacity-90">
           <img 
             src={mascot} 
             alt="Momster Mascot" 
-            className="w-56 h-56 object-contain drop-shadow-2xl transition-transform hover:scale-110 hover:rotate-6 duration-300" 
+            className="w-56 h-56 object-contain drop-shadow-2xl animate-wave" 
           />
         </div>
         <div className="container mx-auto text-center max-w-5xl">
           <div className="mb-6 flex justify-center">
-            <img src={logoFull} alt="Momster Logo" className="w-64 h-64 object-contain animate-scale-in drop-shadow-xl" />
+            <img 
+              src={logoFull} 
+              alt="Momster Logo" 
+              className="w-64 h-64 object-contain animate-scale-in drop-shadow-xl rounded-full bg-gradient-to-br from-pink-50 to-purple-50 p-4" 
+            />
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-3 text-primary leading-tight animate-fade-in" style={{ fontFamily: "'Pacifico', cursive" }}>
@@ -125,38 +129,31 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Grid with varied sizes */}
+          {/* Grid with varied sizes - Location Matching First */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Large feature card - Recipes spans 2 columns */}
-            <Link to="/recipes" className="md:col-span-2">
-              <Card className={`${features[5].bg} border-none hover:shadow-xl transition-all hover:scale-[1.02] h-full`}>
-                <CardContent className="p-8 relative overflow-hidden">
-                  <div className="absolute top-4 right-4 opacity-20">
-                    <img src={mascot} alt="Mascot" className="w-24 h-24 object-contain" />
-                  </div>
-                  <div className="text-primary mb-4">{features[5].icon}</div>
-                  <h3 className="text-2xl font-bold mb-3 text-foreground">
-                    {features[5].title}
-                  </h3>
-                  <p className="text-muted-foreground text-base">
-                    {features[5].description}
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
+            {/* Location Matching - FIRST, spans full width */}
+            <Card className="bg-gradient-to-br from-pink-100 to-rose-100 border-none hover:shadow-xl transition-all hover:scale-[1.02] md:col-span-3">
+              <CardContent className="p-8 relative overflow-hidden">
+                <div className="absolute top-4 right-4 opacity-20">
+                  <img src={mascot} alt="Mascot" className="w-24 h-24 object-contain animate-bounce" />
+                </div>
+                <div className="text-primary mb-4">{features[4].icon}</div>
+                <h3 className="text-2xl font-bold mb-3 text-foreground">
+                  {features[4].title}
+                </h3>
+                <p className="text-muted-foreground text-base">
+                  {features[4].description}
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Magic Matching Button - circular style */}
             <div className="md:col-span-1">
               <MagicMatching />
             </div>
 
-            {/* This or That - spans 2 columns */}
-            <div className="md:col-span-2">
-              <ThisOrThat />
-            </div>
-
-            {/* Regular feature card */}
-            <Card className={`${features[0].bg} border-none hover:shadow-lg transition-all hover:scale-[1.02]`}>
+            {/* Connect with local moms */}
+            <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-none hover:shadow-lg transition-all hover:scale-[1.02]">
               <CardContent className="p-6 relative overflow-hidden">
                 <div className="absolute top-2 right-2 opacity-10">
                   <img src={mascot} alt="Mascot" className="w-16 h-16 object-contain" />
@@ -171,8 +168,8 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {/* Second row - varied layout */}
-            <Card className={`${features[1].bg} border-none hover:shadow-lg transition-all hover:scale-[1.02]`}>
+            {/* Secure Messaging */}
+            <Card className="bg-gradient-to-br from-pink-100 to-purple-100 border-none hover:shadow-lg transition-all hover:scale-[1.02]">
               <CardContent className="p-6 relative overflow-hidden">
                 <div className="absolute top-2 right-2 opacity-10">
                   <img src={mascot} alt="Mascot" className="w-16 h-16 object-contain" />
@@ -187,7 +184,13 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className={`${features[2].bg} border-none hover:shadow-lg transition-all hover:scale-[1.02]`}>
+            {/* This or That - spans 2 columns */}
+            <div className="md:col-span-2">
+              <ThisOrThat />
+            </div>
+
+            {/* Marketplace */}
+            <Card className="bg-gradient-to-br from-rose-50 to-pink-50 border-none hover:shadow-lg transition-all hover:scale-[1.02]">
               <CardContent className="p-6 relative overflow-hidden">
                 <div className="absolute top-2 right-2 opacity-10">
                   <img src={mascot} alt="Mascot" className="w-16 h-16 object-contain" />
@@ -202,7 +205,8 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className={`${features[3].bg} border-none hover:shadow-lg transition-all hover:scale-[1.02]`}>
+            {/* Ask Moms */}
+            <Card className="bg-gradient-to-br from-pink-100 to-rose-100 border-none hover:shadow-lg transition-all hover:scale-[1.02]">
               <CardContent className="p-6 relative overflow-hidden">
                 <div className="absolute top-2 right-2 opacity-10">
                   <img src={mascot} alt="Mascot" className="w-16 h-16 object-contain" />
@@ -217,21 +221,23 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {/* Location feature spans 2 */}
-            <Card className={`${features[4].bg} border-none hover:shadow-lg transition-all hover:scale-[1.02] md:col-span-2`}>
-              <CardContent className="p-6 relative overflow-hidden">
-                <div className="absolute top-2 right-2 opacity-10">
-                  <img src={mascot} alt="Mascot" className="w-20 h-20 object-contain" />
-                </div>
-                <div className="text-primary mb-3">{features[4].icon}</div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">
-                  {features[4].title}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {features[4].description}
-                </p>
-              </CardContent>
-            </Card>
+            {/* Recipes - spans 2 columns at the END */}
+            <Link to="/recipes" className="md:col-span-2">
+              <Card className="bg-gradient-to-br from-orange-100 to-pink-100 border-none hover:shadow-xl transition-all hover:scale-[1.02] h-full">
+                <CardContent className="p-8 relative overflow-hidden">
+                  <div className="absolute top-4 right-4 opacity-20">
+                    <img src={mascot} alt="Mascot" className="w-24 h-24 object-contain" />
+                  </div>
+                  <div className="text-primary mb-4">{features[5].icon}</div>
+                  <h3 className="text-2xl font-bold mb-3 text-foreground">
+                    {features[5].title}
+                  </h3>
+                  <p className="text-muted-foreground text-base">
+                    {features[5].description}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>
