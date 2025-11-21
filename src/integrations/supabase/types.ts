@@ -279,6 +279,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age_range_months: number | null
           area: string
           avatar_data: Json | null
           bio: string | null
@@ -289,12 +290,17 @@ export type Database = {
           cookies_accepted: boolean | null
           created_at: string | null
           date_of_birth: string | null
+          distance_preference_km: number | null
           email: string
           full_name: string
           id: string
           interests: string[] | null
           is_blocked: boolean | null
+          latitude: number | null
+          longitude: number | null
           marital_status: string | null
+          match_age_filter: boolean | null
+          match_interests_filter: boolean | null
           match_preference: string
           mom_badge: string | null
           notification_settings: Json | null
@@ -303,11 +309,13 @@ export type Database = {
           profile_photo_url: string | null
           profile_photos_urls: string[] | null
           selfie_photo_url: string | null
+          show_location_filter: boolean | null
           updated_at: string | null
           username: string | null
           verified_status: boolean | null
         }
         Insert: {
+          age_range_months?: number | null
           area: string
           avatar_data?: Json | null
           bio?: string | null
@@ -318,12 +326,17 @@ export type Database = {
           cookies_accepted?: boolean | null
           created_at?: string | null
           date_of_birth?: string | null
+          distance_preference_km?: number | null
           email: string
           full_name: string
           id: string
           interests?: string[] | null
           is_blocked?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           marital_status?: string | null
+          match_age_filter?: boolean | null
+          match_interests_filter?: boolean | null
           match_preference: string
           mom_badge?: string | null
           notification_settings?: Json | null
@@ -332,11 +345,13 @@ export type Database = {
           profile_photo_url?: string | null
           profile_photos_urls?: string[] | null
           selfie_photo_url?: string | null
+          show_location_filter?: boolean | null
           updated_at?: string | null
           username?: string | null
           verified_status?: boolean | null
         }
         Update: {
+          age_range_months?: number | null
           area?: string
           avatar_data?: Json | null
           bio?: string | null
@@ -347,12 +362,17 @@ export type Database = {
           cookies_accepted?: boolean | null
           created_at?: string | null
           date_of_birth?: string | null
+          distance_preference_km?: number | null
           email?: string
           full_name?: string
           id?: string
           interests?: string[] | null
           is_blocked?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
           marital_status?: string | null
+          match_age_filter?: boolean | null
+          match_interests_filter?: boolean | null
           match_preference?: string
           mom_badge?: string | null
           notification_settings?: Json | null
@@ -361,6 +381,7 @@ export type Database = {
           profile_photo_url?: string | null
           profile_photos_urls?: string[] | null
           selfie_photo_url?: string | null
+          show_location_filter?: boolean | null
           updated_at?: string | null
           username?: string | null
           verified_status?: boolean | null

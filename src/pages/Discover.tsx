@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, MapPin, User } from "lucide-react";
+import { Heart, X, MapPin, User, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import mascot from "@/assets/mascot.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
+import { useMatching } from "@/hooks/use-matching";
 
 export default function Discover() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -18,29 +19,7 @@ export default function Discover() {
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { mascotConfig, visible, hideMascot, showMatch, showEmptyDiscover } = useMascot();
-
-  const profiles = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      age: 32,
-      location: "Downtown, 2 km away",
-      children: "2 kids (3 & 5 years old)",
-      interests: ["Playground dates", "Organic food", "Yoga"],
-      bio: "Looking for mom friends who love outdoor activities! Always up for a coffee while the kids play.",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400"
-    },
-    {
-      id: 2,
-      name: "Maria Papadopoulou",
-      age: 29,
-      location: "Kolonaki, 1.5 km away",
-      children: "1 kid (18 months)",
-      interests: ["Baby yoga", "Cooking", "Museums"],
-      bio: "New mom looking to connect with other mamas in the area. Love trying new cafes and baby-friendly activities!",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400"
-    }
-  ];
+  const { profiles, loading } = useMatching();
 
   const currentProfile = profiles[currentIndex];
 
@@ -155,10 +134,65 @@ export default function Discover() {
   };
 
   useEffect(() => {
-    if (profiles.length === 0) {
+    if (!loading && profiles.length === 0) {
       showEmptyDiscover();
     }
-  }, [profiles.length, showEmptyDiscover]);
+  }, [profiles.length, loading, showEmptyDiscover]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 flex items-center justify-center">
+        <div className="animate-spin text-4xl">🌸</div>
+      </div>
+    );
+  }
+
+  if (!currentProfile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative">
+        <img 
+          src={mascot} 
+          alt="Momster Mascot" 
+          className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none animate-[bounce_3s_ease-in-out_infinite]"
+        />
+        <div className="max-w-md mx-auto pt-20 pb-24 text-center">
+          <h1 className="text-2xl font-bold mb-6 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
+            Ανακάλυψε Μαμάδες
+          </h1>
+          <Card className="p-8">
+            <div className="text-6xl mb-4">🌸</div>
+            <h2 className="text-xl font-semibold mb-2">Δεν υπάρχουν άλλες μαμάδες</h2>
+            <p className="text-muted-foreground mb-4">Δοκίμασε να προσαρμόσεις τα φίλτρα σου</p>
+            <Button onClick={() => navigate("/matching-filters")}>
+              <Settings className="w-4 h-4 mr-2" />
+              Ρυθμίσεις Φίλτρων
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const getLocationText = () => {
+    if (currentProfile.distance) {
+      return `${currentProfile.area}, ${currentProfile.city} - ${currentProfile.distance} km`;
+    }
+    return `${currentProfile.area}, ${currentProfile.city}`;
+  };
+
+  const getChildrenText = () => {
+    if (!currentProfile.children || !Array.isArray(currentProfile.children) || currentProfile.children.length === 0) {
+      return "Χωρίς πληροφορίες παιδιών";
+    }
+    const childArray = currentProfile.children as any[];
+    const count = childArray.length;
+    const ages = childArray.map(c => c.ageGroup).join(", ");
+    return `${count} ${count === 1 ? 'παιδί' : 'παιδιά'} (${ages})`;
+  };
+
+  const profileImage = currentProfile.profile_photos_urls && currentProfile.profile_photos_urls.length > 0
+    ? currentProfile.profile_photos_urls[0]
+    : currentProfile.profile_photo_url || "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative">
@@ -167,6 +201,16 @@ export default function Discover() {
         alt="Momster Mascot" 
         className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none animate-[bounce_3s_ease-in-out_infinite]"
       />
+      
+      <Button
+        variant="outline"
+        size="icon"
+        className="fixed top-20 left-4 z-10"
+        onClick={() => navigate("/matching-filters")}
+      >
+        <Settings className="w-4 h-4" />
+      </Button>
+
       <div className="max-w-md mx-auto pt-20 pb-24">
         <h1 className="text-2xl font-bold text-center mb-6 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
           Ανακάλυψε Μαμάδες
@@ -186,8 +230,8 @@ export default function Discover() {
         >
           <div className="relative">
             <img
-              src={currentProfile.image}
-              alt={currentProfile.name}
+              src={profileImage}
+              alt={currentProfile.full_name}
               className="w-full h-96 object-cover pointer-events-none"
             />
             
@@ -246,10 +290,10 @@ export default function Discover() {
               </div>
             )}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-white">
-              <h2 className="text-2xl font-bold">{currentProfile.name}, {currentProfile.age}</h2>
+              <h2 className="text-2xl font-bold">{currentProfile.full_name}</h2>
               <div className="flex items-center gap-2 mt-1">
                 <MapPin className="w-4 h-4" />
-                <span className="text-sm font-semibold">{currentProfile.location}</span>
+                <span className="text-sm font-semibold">{getLocationText()}</span>
               </div>
             </div>
           </div>
@@ -257,18 +301,22 @@ export default function Discover() {
           <div className="p-6 space-y-4">
             <div className="flex items-center gap-2 text-sm">
               <User className="w-4 h-4 text-primary" />
-              <span className="font-medium">{currentProfile.children}</span>
+              <span className="font-medium">{getChildrenText()}</span>
             </div>
 
-            <p className="text-sm text-foreground/90 font-medium">{currentProfile.bio}</p>
+            {currentProfile.bio && (
+              <p className="text-sm text-foreground/90 font-medium">{currentProfile.bio}</p>
+            )}
 
-            <div className="flex flex-wrap gap-2">
-              {currentProfile.interests.map((interest) => (
-                <Badge key={interest} variant="secondary">
-                  {interest}
-                </Badge>
-              ))}
-            </div>
+            {currentProfile.interests && currentProfile.interests.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {currentProfile.interests.map((interest) => (
+                  <Badge key={interest} variant="secondary">
+                    {interest}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
         </Card>
 

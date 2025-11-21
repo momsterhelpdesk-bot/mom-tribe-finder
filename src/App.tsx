@@ -12,6 +12,7 @@ import ProfileSetup from "./pages/ProfileSetup";
 import PhotoVerification from "./pages/PhotoVerification";
 import Admin from "./pages/Admin";
 import Discover from "./pages/Discover";
+import MatchingFilters from "./pages/MatchingFilters";
 import Chats from "./pages/Chats";
 import ChatView from "./pages/ChatView";
 import AskMoms from "./pages/AskMoms";
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/photo-verification" element={<AuthGuard><PhotoVerification /></AuthGuard>} />
           <Route path="/admin" element={<AuthGuard><Admin /></AuthGuard>} />
           <Route path="/discover" element={<AuthGuard><><Discover /><MomAlerts /><BottomNav /></></AuthGuard>} />
+          <Route path="/matching-filters" element={<AuthGuard><MatchingFilters /></AuthGuard>} />
           <Route path="/chats" element={<AuthGuard><><Chats /><MomAlerts /><BottomNav /></></AuthGuard>} />
           <Route path="/chat/:matchId" element={<AuthGuard><ChatView /></AuthGuard>} />
           <Route path="/ask-moms" element={<AuthGuard><><AskMoms /><MomAlerts /><BottomNav /></></AuthGuard>} />
