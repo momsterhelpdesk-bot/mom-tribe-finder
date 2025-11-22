@@ -233,7 +233,7 @@ export default function DailyBoost() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-rose-50 pt-20 pb-24 px-4 relative">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-rose-50 pt-20 pb-32 px-4 relative overflow-y-auto">
       {/* Animated Mascot */}
       <div className="fixed top-20 right-4 z-30 animate-bounce">
         <img src={mascot} alt="Momster Mascot" className="w-20 h-20 object-contain" />
