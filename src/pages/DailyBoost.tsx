@@ -296,6 +296,30 @@ export default function DailyBoost() {
               </div>
             </Card>
 
+            {/* Mompreneur Section - Home Tab */}
+            <Card className="p-6 bg-gradient-to-br from-purple-100 via-pink-100 to-purple-200 border-purple-300 overflow-hidden relative hover:shadow-xl transition-all">
+              <div className="absolute top-2 right-2 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+                Mompreneur
+              </div>
+              <div className="absolute -top-6 -right-6 w-32 h-32 bg-purple-300/30 rounded-full blur-3xl" />
+              <div className="absolute -bottom-8 left-4 opacity-20">
+                <img src={mascot} alt="Mompreneur Mascot" className="w-24 h-24 object-contain" />
+              </div>
+              <div className="relative space-y-3">
+                <h2 className="text-xl font-bold text-purple-900 flex items-center gap-2">
+                  💼 Mompreneur
+                </h2>
+                <p className="text-sm text-purple-800 font-medium">
+                  {language === 'el'
+                    ? 'Χτίζουμε έναν χώρο ειδικά για μαμάδες που ξεκινούν ή τρέχουν τη δική τους επιχείρηση – με networking, συνεργασίες και πρακτικά tips.'
+                    : 'We are building a space just for moms who are starting or running their own business – with networking, collaborations and practical tips.'}
+                </p>
+                <p className="text-xs text-purple-900/80 font-semibold uppercase tracking-wide">
+                  Coming Soon ✨
+                </p>
+              </div>
+            </Card>
+
             {/* Magic Matching */}
             <MagicMatching />
 
