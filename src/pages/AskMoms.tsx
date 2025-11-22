@@ -37,6 +37,7 @@ interface Question {
   answers_count: number;
   created_at: string;
   user_id: string;
+  status: string;
   profiles?: {
     full_name: string;
   };
@@ -49,6 +50,7 @@ interface Answer {
   likes_count: number;
   created_at: string;
   user_id: string;
+  status: string;
   profiles?: {
     full_name: string;
   };
@@ -98,10 +100,20 @@ export default function AskMoms() {
   };
 
   const fetchQuestions = async () => {
-    const { data, error } = await supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let query = supabase
       .from('questions')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('*');
+    
+    // If not admin, only show approved questions + user's own questions
+    if (!isAdmin && user) {
+      query = query.or(`status.eq.approved,user_id.eq.${user.id}`);
+    } else if (!isAdmin) {
+      query = query.eq('status', 'approved');
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching questions:', error);
@@ -192,7 +204,8 @@ export default function AskMoms() {
           display_mode: displayMode,
           pseudonym: displayMode === 'pseudonym' ? pseudonym : null,
           category: category,
-          user_id: user.id
+          user_id: user.id,
+          status: 'pending'
         });
 
       if (error) {
@@ -200,7 +213,10 @@ export default function AskMoms() {
         return;
       }
 
-      toast({ title: "Επιτυχία! 💕", description: "Η ερώτησή σου δημοσιεύτηκε!" });
+      toast({ 
+        title: "Επιτυχία! 💕", 
+        description: "Η ερώτησή σου εστάλη προς έγκριση! Θα την δεις σύντομα." 
+      });
     }
     
     setNewQuestion("");
@@ -284,11 +300,21 @@ export default function AskMoms() {
   };
 
   const fetchAnswers = async (questionId: string) => {
-    const { data, error } = await supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let query = supabase
       .from('answers')
       .select('*')
-      .eq('question_id', questionId)
-      .order('created_at', { ascending: true });
+      .eq('question_id', questionId);
+    
+    // If not admin, only show approved answers + user's own answers
+    if (!isAdmin && user) {
+      query = query.or(`status.eq.approved,user_id.eq.${user.id}`);
+    } else if (!isAdmin) {
+      query = query.eq('status', 'approved');
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: true });
 
     if (error) {
       console.error('Error fetching answers:', error);
@@ -324,7 +350,8 @@ export default function AskMoms() {
     const answerData: any = {
       content: newAnswer,
       question_id: selectedQuestion.id,
-      user_id: user.id
+      user_id: user.id,
+      status: 'pending'
     };
 
     if (answerDisplayMode === 'pseudonym' && answerPseudonym.trim()) {
@@ -342,7 +369,10 @@ export default function AskMoms() {
       return;
     }
 
-    toast({ title: "Επιτυχία! 💕", description: "Η απάντησή σου δημοσιεύτηκε!" });
+    toast({ 
+      title: "Επιτυχία! 💕", 
+      description: "Η απάντησή σου εστάλη προς έγκριση! Θα την δεις σύντομα." 
+    });
     setNewAnswer("");
     setAnswerDisplayMode('name');
     setAnswerPseudonym("");
@@ -550,6 +580,11 @@ export default function AskMoms() {
                     {question.category && (
                       <Badge variant="secondary" className="text-xs">
                         {CATEGORIES.find(c => c.value === question.category)?.label}
+                      </Badge>
+                    )}
+                    {question.status === 'pending' && question.user_id === currentUserId && (
+                      <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-500 border-orange-500/20">
+                        Σε εκκρεμότητα
                       </Badge>
                     )}
                   </div>

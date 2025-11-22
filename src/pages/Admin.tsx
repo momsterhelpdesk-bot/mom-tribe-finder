@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, AlertCircle, Mail } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import AdminOverview from "@/components/admin/AdminOverview";
+import ForumModeration from "@/components/admin/ForumModeration";
+import UserManagement from "@/components/admin/UserManagement";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -216,25 +219,63 @@ export default function Admin() {
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 py-12">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl font-bold" style={{ fontFamily: "'Pacifico', cursive" }}>
+                  🌸 MOMSTER Admin Dashboard
+                </CardTitle>
+                <CardDescription>
+                  Πλήρης έλεγχος & διαχείριση της κοινότητας
+                </CardDescription>
+              </div>
+              <Button variant="outline" onClick={() => navigate("/profile")}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Πίσω στο Προφίλ
+              </Button>
+            </div>
+          </CardHeader>
+        </Card>
 
-        <Tabs defaultValue="verifications" className="space-y-4">
-          <TabsList>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="overview">Επισκόπηση</TabsTrigger>
+            <TabsTrigger value="moderation">
+              Forum
+              <Badge variant="secondary" className="ml-2 text-xs">
+                {/* Pending count will be shown by ForumModeration component */}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="users">Χρήστες</TabsTrigger>
             <TabsTrigger value="verifications">
-              Επαληθεύσεις 
-              <Badge variant="secondary" className="ml-2">
+              Επαληθεύσεις
+              <Badge variant="secondary" className="ml-2 text-xs">
                 {verificationRequests.filter(r => r.status === 'pending').length}
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="reports">
               Αναφορές
-              <Badge variant="secondary" className="ml-2">
+              <Badge variant="secondary" className="ml-2 text-xs">
                 {reports.filter(r => r.status === 'pending').length}
               </Badge>
             </TabsTrigger>
+            <TabsTrigger value="emails">Emails</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="overview">
+            <AdminOverview />
+          </TabsContent>
+
+          <TabsContent value="moderation">
+            <ForumModeration />
+          </TabsContent>
+
+          <TabsContent value="users">
+            <UserManagement />
+          </TabsContent>
 
           <TabsContent value="verifications" className="space-y-4">
             {verificationRequests.map(request => (
@@ -361,12 +402,12 @@ export default function Admin() {
 
           <TabsContent value="emails" className="space-y-4">
             {emailTemplates.map(template => (
-              <Card key={template.id} className="p-6">
-                <div className="space-y-4">
+              <Card key={template.id}>
+                <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-lg capitalize">{template.template_key}</h3>
-                      <p className="text-sm text-muted-foreground">{template.description}</p>
+                      <CardTitle className="capitalize">{template.template_key}</CardTitle>
+                      <CardDescription>{template.description}</CardDescription>
                     </div>
                     <Button
                       variant="outline"
@@ -375,79 +416,81 @@ export default function Admin() {
                       Επεξεργασία
                     </Button>
                   </div>
+                </CardHeader>
 
-                  {editingTemplate?.id === template.id && (
-                    <div className="space-y-4 border-t pt-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label>Subject (Ελληνικά)</Label>
-                          <Input
-                            value={editingTemplate.subject_el}
-                            onChange={(e) => setEditingTemplate({
-                              ...editingTemplate,
-                              subject_el: e.target.value
-                            })}
-                          />
-                        </div>
-                        <div>
-                          <Label>Subject (English)</Label>
-                          <Input
-                            value={editingTemplate.subject_en}
-                            onChange={(e) => setEditingTemplate({
-                              ...editingTemplate,
-                              subject_en: e.target.value
-                            })}
-                          />
-                        </div>
+                {editingTemplate?.id === template.id && (
+                  <CardContent className="space-y-4 border-t pt-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Subject (Ελληνικά)</Label>
+                        <Input
+                          value={editingTemplate.subject_el}
+                          onChange={(e) => setEditingTemplate({
+                            ...editingTemplate,
+                            subject_el: e.target.value
+                          })}
+                        />
                       </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label>Body (Ελληνικά)</Label>
-                          <Textarea
-                            value={editingTemplate.body_el}
-                            onChange={(e) => setEditingTemplate({
-                              ...editingTemplate,
-                              body_el: e.target.value
-                            })}
-                            rows={12}
-                            className="font-mono text-sm"
-                          />
-                        </div>
-                        <div>
-                          <Label>Body (English)</Label>
-                          <Textarea
-                            value={editingTemplate.body_en}
-                            onChange={(e) => setEditingTemplate({
-                              ...editingTemplate,
-                              body_en: e.target.value
-                            })}
-                            rows={12}
-                            className="font-mono text-sm"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button onClick={handleSaveTemplate}>
-                          Αποθήκευση
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          onClick={() => setEditingTemplate(null)}
-                        >
-                          Ακύρωση
-                        </Button>
+                      <div>
+                        <Label>Subject (English)</Label>
+                        <Input
+                          value={editingTemplate.subject_en}
+                          onChange={(e) => setEditingTemplate({
+                            ...editingTemplate,
+                            subject_en: e.target.value
+                          })}
+                        />
                       </div>
                     </div>
-                  )}
-                </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Body (Ελληνικά)</Label>
+                        <Textarea
+                          value={editingTemplate.body_el}
+                          onChange={(e) => setEditingTemplate({
+                            ...editingTemplate,
+                            body_el: e.target.value
+                          })}
+                          rows={12}
+                          className="font-mono text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label>Body (English)</Label>
+                        <Textarea
+                          value={editingTemplate.body_en}
+                          onChange={(e) => setEditingTemplate({
+                            ...editingTemplate,
+                            body_en: e.target.value
+                          })}
+                          rows={12}
+                          className="font-mono text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button onClick={handleSaveTemplate}>
+                        Αποθήκευση
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setEditingTemplate(null)}
+                      >
+                        Ακύρωση
+                      </Button>
+                    </div>
+                  </CardContent>
+                )}
               </Card>
             ))}
 
             {emailTemplates.length === 0 && (
-              <Card className="p-8 text-center text-muted-foreground">
-                Δεν υπάρχουν email templates
+              <Card>
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  Δεν υπάρχουν email templates
+                </CardContent>
               </Card>
             )}
           </TabsContent>
