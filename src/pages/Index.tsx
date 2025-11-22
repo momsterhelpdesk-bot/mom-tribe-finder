@@ -237,7 +237,7 @@ const Index = () => {
             </Link>
 
             {/* Mompreneur - Coming Soon */}
-            <Card className="bg-gradient-to-br from-purple-100 to-pink-100 border-none hover:shadow-lg transition-all hover:scale-[1.02] relative overflow-hidden">
+            <Card className="md:col-span-3 bg-gradient-to-br from-purple-100 to-pink-100 border-none hover:shadow-lg transition-all hover:scale-[1.02] relative overflow-hidden">
               <div className="absolute top-2 right-2">
                 <Badge variant="secondary" className="bg-purple-200 text-purple-700">Coming Soon</Badge>
               </div>
