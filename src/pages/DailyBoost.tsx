@@ -164,14 +164,22 @@ export default function DailyBoost() {
   const [showHearts, setShowHearts] = useState(false);
 
   useEffect(() => {
-    showMascot({
-      state: "happy",
-      message: language === 'el' 
-        ? "Γεια σου όμορφη! Πάρε τη δόση ενέργειας σου 💕" 
-        : "Hello beautiful! Get your energy boost 💕",
-      duration: 2500,
-    });
-  }, []);
+    // Check if welcome popup has been shown before
+    const hasSeenWelcome = localStorage.getItem('momster_home_welcome_shown');
+    
+    if (!hasSeenWelcome) {
+      showMascot({
+        state: "happy",
+        message: language === 'el' 
+          ? "Καλώς ήρθες στο Momster! 🌸\nΗ τέλεια κοινότητα για μαμάδες σαν κι εσένα.\nΠάμε να βρούμε το επόμενο match σου; ✨" 
+          : "Welcome to Momster! 🌸\nThe perfect community for moms like you.\nLet's find your next match! ✨",
+        duration: 4000,
+      });
+      
+      // Mark as shown
+      localStorage.setItem('momster_home_welcome_shown', 'true');
+    }
+  }, [language, showMascot]);
 
   const dailyQuote = DAILY_QUOTES[language][Math.floor(Math.random() * DAILY_QUOTES[language].length)];
   const selfCareTip = SELF_CARE_TIPS[language][Math.floor(Math.random() * SELF_CARE_TIPS[language].length)];
