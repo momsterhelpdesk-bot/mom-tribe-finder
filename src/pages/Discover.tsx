@@ -30,10 +30,19 @@ export default function Discover() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { mascotConfig, visible, hideMascot, showMatch, showEmptyDiscover } = useMascot();
   const { profiles, loading } = useMatching();
+
+  // Check if tutorial has been shown before
+  useEffect(() => {
+    const hasSeenTutorial = localStorage.getItem('discover_tutorial_shown');
+    if (!hasSeenTutorial && !loading) {
+      setShowTutorial(true);
+    }
+  }, [loading]);
 
   // Add demo profile to the beginning of the list
   const allProfiles = [demoProfile, ...profiles];
@@ -251,9 +260,8 @@ export default function Discover() {
             <img
               src={profileImage}
               alt={currentProfile.full_name}
-              className="w-full h-72 object-cover cursor-pointer"
+              className="w-full h-64 object-cover cursor-pointer"
               onClick={() => {
-                // Open profile details - for now just show an alert, you can create a profile detail page later
                 navigate(`/profile/${currentProfile.id}`);
               }}
             />
@@ -406,6 +414,58 @@ export default function Discover() {
           duration={mascotConfig.duration}
           onHide={hideMascot}
         />
+      )}
+
+      {/* Swipe Tutorial Overlay */}
+      {showTutorial && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fade-in">
+          <div className="relative max-w-md w-full mx-4">
+            {/* Animated arrows */}
+            <div className="absolute left-8 top-1/2 -translate-y-1/2 animate-[pulse_1.5s_ease-in-out_infinite]">
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-6xl animate-[bounce_1s_ease-in-out_infinite]">←</span>
+                <span className="text-white text-sm font-bold bg-destructive/90 px-3 py-1 rounded-full shadow-lg">
+                  Swipe Left
+                </span>
+                <span className="text-white text-xs">Not my vibe</span>
+              </div>
+            </div>
+            
+            <div className="absolute right-8 top-1/2 -translate-y-1/2 animate-[pulse_1.5s_ease-in-out_infinite] delay-75">
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-6xl animate-[bounce_1s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }}>→</span>
+                <span className="text-white text-sm font-bold bg-pink-500/90 px-3 py-1 rounded-full shadow-lg">
+                  Swipe Right
+                </span>
+                <span className="text-white text-xs">Yes! 💕</span>
+              </div>
+            </div>
+
+            {/* Central instruction */}
+            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl text-center">
+              <div className="mb-4">
+                <span className="text-5xl">👆</span>
+              </div>
+              <h2 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: "'Pacifico', cursive" }}>
+                Πώς λειτουργεί;
+              </h2>
+              <p className="text-muted-foreground mb-6 text-sm">
+                Σύρε την κάρτα αριστερά ή δεξιά<br />
+                για να επιλέξεις!
+              </p>
+              <Button
+                onClick={() => {
+                  setShowTutorial(false);
+                  localStorage.setItem('discover_tutorial_shown', 'true');
+                }}
+                className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-bold rounded-full"
+                size="lg"
+              >
+                Κατάλαβα! 🌸
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Match Celebration Video */}
