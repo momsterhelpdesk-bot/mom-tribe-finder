@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, MessageCircle, ShoppingBag, User, Sparkles } from "lucide-react";
+import { Heart, MessageCircle, ShoppingBag, User, Sparkles, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useNotifications } from "@/hooks/use-notifications";
@@ -13,8 +13,8 @@ export default function BottomNav() {
   const navItems = [
     { path: "/discover", icon: Heart, label: "Find a New Friend" },
     { path: "/chats", icon: MessageCircle, label: "Chat", badge: unreadCount },
+    { path: "/ask-moms", icon: HelpCircle, label: "Ρώτα μία μαμά" },
     { path: "/daily-boost", icon: Sparkles, label: "Momster Home" },
-    { path: "/marketplace", icon: ShoppingBag, label: "Marketplace" },
     { path: "/profile", icon: User, label: "Profile" },
   ];
 
