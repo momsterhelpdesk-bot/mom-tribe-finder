@@ -201,6 +201,23 @@ const Index = () => {
               </CardContent>
             </Card>
 
+
+            {/* Ask Moms */}
+            <Card className="bg-gradient-to-br from-pink-100 to-rose-100 border-none hover:shadow-lg transition-all hover:scale-[1.02]">
+              <CardContent className="p-6 relative overflow-hidden">
+                <div className="absolute top-2 right-2 opacity-10">
+                  <img src={mascot} alt="Mascot" className="w-16 h-16 object-contain" />
+                </div>
+                <div className="text-primary mb-3">{features[3].icon}</div>
+                <h3 className="text-lg font-semibold mb-2 text-foreground">
+                  {features[3].title}
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  {features[3].description}
+                </p>
+              </CardContent>
+            </Card>
+
             {/* Recipes - spans 2 columns */}
             <Link to="/recipes" className="md:col-span-2">
               <Card className="bg-gradient-to-br from-orange-100 to-pink-100 border-none hover:shadow-xl transition-all hover:scale-[1.02] h-full">
@@ -218,22 +235,6 @@ const Index = () => {
                 </CardContent>
               </Card>
             </Link>
-
-            {/* Ask Moms */}
-            <Card className="bg-gradient-to-br from-pink-100 to-rose-100 border-none hover:shadow-lg transition-all hover:scale-[1.02]">
-              <CardContent className="p-6 relative overflow-hidden">
-                <div className="absolute top-2 right-2 opacity-10">
-                  <img src={mascot} alt="Mascot" className="w-16 h-16 object-contain" />
-                </div>
-                <div className="text-primary mb-3">{features[3].icon}</div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">
-                  {features[3].title}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {features[3].description}
-                </p>
-              </CardContent>
-            </Card>
 
             {/* Mompreneur - Coming Soon */}
             <Card className="bg-gradient-to-br from-purple-100 to-pink-100 border-none hover:shadow-lg transition-all hover:scale-[1.02] relative overflow-hidden">
