@@ -31,6 +31,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
   const [photoUploadOpen, setPhotoUploadOpen] = useState(false);
@@ -63,7 +64,20 @@ export default function Profile() {
 
   useEffect(() => {
     fetchProfile();
+    checkAdminRole();
   }, []);
+
+  const checkAdminRole = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+
+    setIsAdmin(roles?.some(r => r.role === 'admin') || false);
+  };
 
   const fetchProfile = async () => {
     try {
@@ -346,20 +360,33 @@ export default function Profile() {
           <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
             {language === "el" ? "Προφίλ" : "Profile"}
           </h1>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setViewAsPublic(!viewAsPublic)}
-            className="flex items-center gap-2"
-          >
-            {viewAsPublic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            <span className="text-xs">
-              {viewAsPublic 
-                ? (language === "el" ? "Προσωπική Προβολή" : "Personal View")
-                : (language === "el" ? "Δημόσια Προβολή" : "View as Public")
-              }
-            </span>
-          </Button>
+          <div className="flex gap-2">
+            {isAdmin && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => navigate('/admin')}
+                className="flex items-center gap-2"
+              >
+                <Settings className="w-4 h-4" />
+                <span className="text-xs">Admin</span>
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewAsPublic(!viewAsPublic)}
+              className="flex items-center gap-2"
+            >
+              {viewAsPublic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              <span className="text-xs">
+                {viewAsPublic 
+                  ? (language === "el" ? "Προσωπική Προβολή" : "Personal View")
+                  : (language === "el" ? "Δημόσια Προβολή" : "View as Public")
+                }
+              </span>
+            </Button>
+          </div>
         </div>
 
         {/* Profile Header Card */}
