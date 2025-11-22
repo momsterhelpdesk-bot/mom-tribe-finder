@@ -2,6 +2,7 @@ import Navigation from "@/components/Navigation";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Calendar, ShoppingBag, Users, MapPin, UtensilsCrossed, Settings } from "lucide-react";
 import logoFull from "@/assets/logo-full.jpg";
 import mascot from "@/assets/mascot.jpg";
@@ -48,6 +49,12 @@ const Index = () => {
       title: "Momster Ταπεράκι",
       description: "Υγιεινές συνταγές για μικρά χεράκια",
       bg: "bg-gradient-to-br from-orange-100 to-pink-100"
+    },
+    {
+      icon: <ShoppingBag className="h-6 w-6" />,
+      title: "Mompreneur",
+      description: "Υποστήριξη για μαμάδες επιχειρηματίες - Coming Soon",
+      bg: "bg-gradient-to-br from-purple-100 to-pink-100"
     }
   ];
 
@@ -204,7 +211,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {/* Recipes - spans 2 columns at the END */}
+            {/* Recipes - spans 2 columns */}
             <Link to="/recipes" className="md:col-span-2">
               <Card className="bg-gradient-to-br from-orange-100 to-pink-100 border-none hover:shadow-xl transition-all hover:scale-[1.02] h-full">
                 <CardContent className="p-8 relative overflow-hidden">
@@ -221,6 +228,25 @@ const Index = () => {
                 </CardContent>
               </Card>
             </Link>
+
+            {/* Mompreneur - Coming Soon */}
+            <Card className="bg-gradient-to-br from-purple-100 to-pink-100 border-none hover:shadow-lg transition-all hover:scale-[1.02] relative overflow-hidden">
+              <div className="absolute top-2 right-2">
+                <Badge variant="secondary" className="bg-purple-200 text-purple-700">Coming Soon</Badge>
+              </div>
+              <CardContent className="p-6 relative overflow-hidden">
+                <div className="absolute top-2 right-16 opacity-10">
+                  <img src={mascot} alt="Mascot" className="w-16 h-16 object-contain" />
+                </div>
+                <div className="text-primary mb-3">{features[6].icon}</div>
+                <h3 className="text-lg font-semibold mb-2 text-foreground">
+                  {features[6].title}
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  {features[6].description}
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

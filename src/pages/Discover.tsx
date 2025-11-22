@@ -251,7 +251,11 @@ export default function Discover() {
             <img
               src={profileImage}
               alt={currentProfile.full_name}
-              className="w-full h-96 object-cover pointer-events-none"
+              className="w-full h-72 object-cover cursor-pointer"
+              onClick={() => {
+                // Open profile details - for now just show an alert, you can create a profile detail page later
+                navigate(`/profile/${currentProfile.id}`);
+              }}
             />
             
             {/* Swipe indicators */}
@@ -339,28 +343,28 @@ export default function Discover() {
           </div>
         </Card>
 
-        <div className="flex justify-center gap-8 mt-8 mb-6">
+        <div className="flex justify-center gap-6 mt-6 mb-6">
           <Button
             size="lg"
             variant="outline"
-            className="rounded-full h-20 px-8 border-4 border-muted hover:border-muted-foreground transition-all hover:scale-105 active:scale-95 bg-background/80 backdrop-blur-sm shadow-lg hover:shadow-xl"
+            className="rounded-full h-16 px-6 border-4 border-muted hover:border-muted-foreground transition-all hover:scale-105 active:scale-95 bg-background/80 backdrop-blur-sm shadow-lg hover:shadow-xl"
             onClick={() => handleSwipe(false)}
           >
             <div className="flex flex-col items-center gap-1">
-              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-2xl">
+              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl">
                 🙅‍♀️
               </div>
-              <span className="text-sm font-semibold text-muted-foreground">Not my vibe</span>
+              <span className="text-xs font-semibold text-muted-foreground">Not my vibe</span>
             </div>
           </Button>
           <Button
             size="lg"
-            className="rounded-full h-20 px-8 bg-gradient-to-br from-pink-300 via-rose-300 to-pink-400 hover:from-pink-400 hover:via-rose-400 hover:to-pink-500 border-4 border-pink-200 transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl relative overflow-hidden group"
+            className="rounded-full h-16 px-6 bg-gradient-to-br from-pink-300 via-rose-300 to-pink-400 hover:from-pink-400 hover:via-rose-400 hover:to-pink-500 border-4 border-pink-200 transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl relative overflow-hidden group"
             onClick={() => handleSwipe(true)}
           >
             <div className="flex flex-col items-center gap-1 relative z-10">
-              <div className="text-4xl group-hover:animate-bounce">🌸</div>
-              <span className="text-sm font-bold text-white drop-shadow-md">Yes</span>
+              <div className="text-3xl group-hover:animate-bounce">🌸</div>
+              <span className="text-xs font-bold text-white drop-shadow-md">Yes</span>
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl opacity-0 group-active:opacity-100 group-active:scale-150 transition-all pointer-events-none">
