@@ -51,6 +51,8 @@ export type Database = {
           likes_count: number
           pseudonym: string | null
           question_id: string
+          rejection_reason: string | null
+          status: string | null
           updated_at: string
           user_id: string
         }
@@ -61,6 +63,8 @@ export type Database = {
           likes_count?: number
           pseudonym?: string | null
           question_id: string
+          rejection_reason?: string | null
+          status?: string | null
           updated_at?: string
           user_id: string
         }
@@ -71,6 +75,8 @@ export type Database = {
           likes_count?: number
           pseudonym?: string | null
           question_id?: string
+          rejection_reason?: string | null
+          status?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -83,6 +89,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      app_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
       }
       chat_messages: {
         Row: {
@@ -176,6 +206,36 @@ export type Database = {
           last_message_at?: string | null
           user1_id?: string
           user2_id?: string
+        }
+        Relationships: []
+      }
+      moderation_logs: {
+        Row: {
+          action: string
+          admin_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_id?: string
+          target_type?: string
         }
         Relationships: []
       }
@@ -489,6 +549,8 @@ export type Database = {
           id: string
           likes_count: number
           pseudonym: string | null
+          rejection_reason: string | null
+          status: string | null
           updated_at: string
           user_id: string
         }
@@ -501,6 +563,8 @@ export type Database = {
           id?: string
           likes_count?: number
           pseudonym?: string | null
+          rejection_reason?: string | null
+          status?: string | null
           updated_at?: string
           user_id: string
         }
@@ -513,6 +577,8 @@ export type Database = {
           id?: string
           likes_count?: number
           pseudonym?: string | null
+          rejection_reason?: string | null
+          status?: string | null
           updated_at?: string
           user_id?: string
         }
