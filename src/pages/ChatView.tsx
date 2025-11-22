@@ -169,7 +169,10 @@ export default function ChatView() {
           <ArrowLeft className="w-5 h-5" />
         </Button>
 
-        <div className="relative">
+        <button 
+          onClick={() => otherUser && navigate(`/profile/${otherUser.id}`)}
+          className="relative cursor-pointer hover:scale-105 transition-transform"
+        >
           {/* Floral outline */}
           <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-pink-200 via-purple-200 to-pink-300 animate-pulse" />
           <Avatar className="w-12 h-12 relative border-2 border-white shadow-md">
@@ -178,7 +181,7 @@ export default function ChatView() {
               {otherUser?.full_name?.[0] || "M"}
             </AvatarFallback>
           </Avatar>
-        </div>
+        </button>
 
         <div className="flex-1">
           <h2 className="font-bold text-base text-foreground">{otherUser?.full_name}</h2>

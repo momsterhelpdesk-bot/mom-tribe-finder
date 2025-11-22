@@ -59,6 +59,7 @@ const App = () => (
           <Route path="/notifications" element={<AuthGuard><><Notifications /><MomAlerts /><BottomNav /></></AuthGuard>} />
           <Route path="/marketplace" element={<AuthGuard><><Marketplace /><MomAlerts /><BottomNav /></></AuthGuard>} />
           <Route path="/profile" element={<AuthGuard><><Profile /><MomAlerts /><BottomNav /></></AuthGuard>} />
+          <Route path="/profile/:userId" element={<AuthGuard><><Profile /><MomAlerts /><BottomNav /></></AuthGuard>} />
           <Route path="/privacy-terms" element={<PrivacyTerms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

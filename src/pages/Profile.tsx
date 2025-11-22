@@ -11,13 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Settings, MapPin, Calendar, MessageCircle, LogOut, Edit, Mail, Heart, ChevronLeft, ChevronRight, Sparkles, Bell, Eye, EyeOff } from "lucide-react";
+import { Settings, MapPin, Calendar, MessageCircle, LogOut, Edit, Mail, Heart, ChevronLeft, ChevronRight, Sparkles, Bell, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import floralBg from "@/assets/floral-profile-bg.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { PhotoUpload } from "@/components/PhotoUpload";
@@ -29,6 +29,7 @@ export default function Profile() {
   const { mascotConfig, visible, hideMascot } = useMascot();
   const { language } = useLanguage();
   const navigate = useNavigate();
+  const { userId } = useParams();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -38,6 +39,7 @@ export default function Profile() {
   const [avatarBuilderOpen, setAvatarBuilderOpen] = useState(false);
   const [viewAsPublic, setViewAsPublic] = useState(false);
   const [childrenArray, setChildrenArray] = useState<any[]>([]);
+  const [isOwnProfile, setIsOwnProfile] = useState(true);
   
   // Edit form states
   const [editForm, setEditForm] = useState({
@@ -87,10 +89,15 @@ export default function Profile() {
         return;
       }
 
+      // If userId param exists, fetch that user's profile (public view)
+      const profileId = userId || user.id;
+      const isOwn = !userId || userId === user.id;
+      setIsOwnProfile(isOwn);
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("id", profileId)
         .single();
 
       if (error) throw error;
@@ -355,38 +362,49 @@ export default function Profile() {
         className="fixed top-24 right-4 w-24 h-24 opacity-70 object-contain pointer-events-none animate-bounce z-10 drop-shadow-lg"
       />
       
-      <div className="max-w-2xl mx-auto pt-20 pb-24 px-4 relative z-10">
+      <div className="max-w-2xl mx-auto pt-20 pb-40 px-4 relative z-10">
         <div className="flex justify-between items-center mb-6">
+          {!isOwnProfile && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          )}
           <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
-            {language === "el" ? "Προφίλ" : "Profile"}
+            {isOwnProfile ? (language === "el" ? "Προφίλ" : "Profile") : profile?.full_name}
           </h1>
-          <div className="flex gap-2">
-            {isAdmin && (
+          {isOwnProfile && (
+            <div className="flex gap-2">
+              {isAdmin && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => navigate('/admin')}
+                  className="flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span className="text-xs">Admin</span>
+                </Button>
+              )}
               <Button
-                variant="default"
+                variant="outline"
                 size="sm"
-                onClick={() => navigate('/admin')}
+                onClick={() => setViewAsPublic(!viewAsPublic)}
                 className="flex items-center gap-2"
               >
-                <Settings className="w-4 h-4" />
-                <span className="text-xs">Admin</span>
+                {viewAsPublic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                <span className="text-xs">
+                  {viewAsPublic 
+                    ? (language === "el" ? "Προσωπική Προβολή" : "Personal View")
+                    : (language === "el" ? "Δημόσια Προβολή" : "View as Public")
+                  }
+                </span>
               </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setViewAsPublic(!viewAsPublic)}
-              className="flex items-center gap-2"
-            >
-              {viewAsPublic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              <span className="text-xs">
-                {viewAsPublic 
-                  ? (language === "el" ? "Προσωπική Προβολή" : "Personal View")
-                  : (language === "el" ? "Δημόσια Προβολή" : "View as Public")
-                }
-              </span>
-            </Button>
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Profile Header Card */}
@@ -539,38 +557,40 @@ export default function Profile() {
             )}
 
             {/* Photo/Avatar Management */}
-            <div className="flex gap-2 mt-4 justify-center">
-              <Dialog open={photoUploadOpen} onOpenChange={setPhotoUploadOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Edit className="w-4 h-4 mr-2" />
-                    Change Photo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-lg">
-                  <PhotoUpload 
-                    onPhotoUploaded={handlePhotoUploaded}
-                    currentPhotoUrl={profile.profile_photo_url}
-                  />
-                </DialogContent>
-              </Dialog>
+            {isOwnProfile && !viewAsPublic && (
+              <div className="flex gap-2 mt-4 justify-center">
+                <Dialog open={photoUploadOpen} onOpenChange={setPhotoUploadOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Change Photo
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-lg">
+                    <PhotoUpload 
+                      onPhotoUploaded={handlePhotoUploaded}
+                      currentPhotoUrl={profile.profile_photo_url}
+                    />
+                  </DialogContent>
+                </Dialog>
 
-              <Dialog open={avatarBuilderOpen} onOpenChange={setAvatarBuilderOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Create Avatar
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                  <AvatarBuilder 
-                    onSave={handleSaveAvatar}
-                    onCancel={() => setAvatarBuilderOpen(false)}
-                    initialConfig={profile.avatar_data as AvatarConfig}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
+                <Dialog open={avatarBuilderOpen} onOpenChange={setAvatarBuilderOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Create Avatar
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <AvatarBuilder 
+                      onSave={handleSaveAvatar}
+                      onCancel={() => setAvatarBuilderOpen(false)}
+                      initialConfig={profile.avatar_data as AvatarConfig}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )}
 
             {/* Badges Section */}
             <div className="mt-4 flex flex-wrap gap-2 justify-center">
@@ -579,13 +599,14 @@ export default function Profile() {
               </Badge>
             </div>
 
-            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="mt-4" size="sm">
-                  <Edit className="w-4 h-4 mr-2" />
-                  {language === "el" ? "Επεξεργασία Προφίλ" : "Edit Profile"}
-                </Button>
-              </DialogTrigger>
+            {isOwnProfile && !viewAsPublic && (
+              <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="mt-4" size="sm">
+                    <Edit className="w-4 h-4 mr-2" />
+                    {language === "el" ? "Επεξεργασία Προφίλ" : "Edit Profile"}
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>{language === "el" ? "Επεξεργασία Προφίλ" : "Edit Profile"}</DialogTitle>
@@ -746,6 +767,7 @@ export default function Profile() {
                 </div>
               </DialogContent>
             </Dialog>
+            )}
           </div>
 
         </Card>
@@ -759,12 +781,13 @@ export default function Profile() {
                 {language === "el" ? "Σχετικά με μένα / Ενδιαφέροντα" : "About Me / Interests"}
               </h3>
             </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Edit className="w-4 h-4" />
-                </Button>
-              </DialogTrigger>
+            {isOwnProfile && !viewAsPublic && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
@@ -811,6 +834,7 @@ export default function Profile() {
                 </div>
               </DialogContent>
             </Dialog>
+            )}
           </div>
           {profile.interests && profile.interests.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -831,14 +855,15 @@ export default function Profile() {
         </Card>
 
         {/* Settings Card */}
-        <Card className="p-6 mb-6">
-          <Dialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full justify-start" size="lg">
-                <Settings className="w-5 h-5 mr-3" />
-                {language === "el" ? "Ρυθμίσεις" : "Settings"}
-              </Button>
-            </DialogTrigger>
+        {isOwnProfile && !viewAsPublic && (
+          <Card className="p-6 mb-6">
+            <Dialog open={settingsDialogOpen} onOpenChange={setSettingsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full justify-start" size="lg">
+                  <Settings className="w-5 h-5 mr-3" />
+                  {language === "el" ? "Ρυθμίσεις" : "Settings"}
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{language === "el" ? "Ρυθμίσεις" : "Settings"}</DialogTitle>
@@ -941,12 +966,15 @@ export default function Profile() {
             </DialogContent>
           </Dialog>
         </Card>
+        )}
 
         {/* Logout */}
-        <Button variant="destructive" className="w-full" size="lg" onClick={handleSignOut}>
-          <LogOut className="w-5 h-5 mr-3" />
-          {language === "el" ? "Αποσύνδεση" : "Sign Out"}
-        </Button>
+        {isOwnProfile && !viewAsPublic && (
+          <Button variant="destructive" className="w-full mb-6" size="lg" onClick={handleSignOut}>
+            <LogOut className="w-5 h-5 mr-3" />
+            {language === "el" ? "Αποσύνδεση" : "Sign Out"}
+          </Button>
+        )}
       </div>
 
       {/* Footer with quick actions */}
