@@ -241,7 +241,7 @@ export default function Admin() {
         </Card>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="flex w-full flex-wrap gap-2">
+          <TabsList className="flex w-full flex-wrap gap-2 h-auto">
             <TabsTrigger value="overview">Επισκόπηση</TabsTrigger>
             <TabsTrigger value="moderation">
               Forum

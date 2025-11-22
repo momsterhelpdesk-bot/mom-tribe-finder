@@ -258,6 +258,38 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Mompreneur Section */}
+      <section id="mompreneur" className="py-16 px-4 bg-gradient-to-br from-purple-50 to-pink-50">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold mb-3 text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>
+              Mompreneur
+            </h2>
+            <p className="text-base text-muted-foreground">
+              Υποστήριξη για μαμάδες επιχειρηματίες - Coming Soon
+            </p>
+          </div>
+          <Card className="bg-gradient-to-br from-purple-100 to-pink-100 border-none hover:shadow-xl transition-all relative overflow-hidden">
+            <div className="absolute top-4 right-4">
+              <Badge variant="secondary" className="bg-purple-200 text-purple-700">Coming Soon</Badge>
+            </div>
+            <CardContent className="p-8 relative overflow-hidden">
+              <div className="absolute top-4 right-24 opacity-10">
+                <img src={mascot} alt="Mompreneur Mascot" className="w-20 h-20 object-contain" />
+              </div>
+              <div className="text-primary mb-4">{features[6].icon}</div>
+              <h3 className="text-2xl font-bold mb-3 text-foreground">
+                Υποστήριξη για Mompreneurs
+              </h3>
+              <p className="text-muted-foreground text-base max-w-2xl">
+                Χτίζουμε έναν χώρο ειδικά για μαμάδες που ξεκινούν ή τρέχουν τη δική τους επιχείρηση - με networking,
+                συνεργασίες και πρακτικά tips.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 px-4 relative bg-gradient-to-br from-pink-50/50 to-purple-50/50">
         <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
