@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Calendar, ShoppingBag, Users, MapPin, UtensilsCrossed, Settings } from "lucide-react";
 import communityLogo from "@/assets/community-logo.jpg";
+import logo from "@/assets/logo-new.jpg";
 import mascot from "@/assets/mascot.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ThisOrThat from "@/components/ThisOrThat";
@@ -67,24 +68,20 @@ const Index = () => {
         {/* Large animated mascot with waving animation */}
         <div className="absolute top-10 right-10 hidden lg:block animate-float opacity-90">
           <img 
-            src={mascot} 
-            alt="Momster Mascot" 
-            className="w-56 h-56 object-contain drop-shadow-2xl animate-wave" 
+            src={logo} 
+            alt="Momster Logo" 
+            className="w-56 h-56 object-contain drop-shadow-2xl" 
           />
         </div>
         <div className="container mx-auto text-center max-w-5xl">
           <div className="mb-6 flex flex-col items-center justify-center gap-4">
             <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-pink-200 via-purple-200 to-rose-200 animate-pulse opacity-60 blur-xl"></div>
               <img 
-                src={communityLogo} 
-                alt="Momster Community" 
-                className="relative w-80 h-80 object-contain animate-scale-in drop-shadow-2xl rounded-full bg-gradient-to-br from-pink-50/80 to-purple-50/80 p-6 border-4 border-pink-200/50" 
+                src={logo} 
+                alt="Momster Logo" 
+                className="relative w-full max-w-2xl h-auto object-contain animate-scale-in drop-shadow-2xl" 
               />
             </div>
-            <h1 className="text-6xl font-bold text-primary animate-fade-in" style={{ fontFamily: "'Pacifico', cursive" }}>
-              momster
-            </h1>
           </div>
           
           <p className="text-xl text-foreground mb-6 font-medium">

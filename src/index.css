@@ -18,8 +18,9 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 340 30% 30%;
 
-    --primary: 340 60% 80%;      /* baby pink */
-    --primary-foreground: 340 30% 30%;
+    --primary: 344 43% 63%;
+    --primary-foreground: 0 0% 100%;
+    --nav-pink: 344 43% 63%;
 
     --secondary: 150 30% 85%;    /* pastel mint */
     --secondary-foreground: 340 30% 30%;
