@@ -7,6 +7,7 @@ import { Heart, MessageCircle, Calendar, ShoppingBag, Users, MapPin, UtensilsCro
 import communityLogo from "@/assets/community-logo.jpg";
 import logo from "@/assets/logo-new.jpg";
 import mascot from "@/assets/mascot.jpg";
+import mompreneurBadge from "@/assets/mompreneur-badge.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ThisOrThat from "@/components/ThisOrThat";
 import MagicMatching from "@/components/MagicMatching";
@@ -258,12 +259,14 @@ const Index = () => {
       {/* Mompreneur Section - Enhanced Visibility */}
       <section id="mompreneur" className="py-20 px-4 bg-gradient-to-br from-purple-100 via-pink-100 to-purple-200">
         <div className="container mx-auto max-w-5xl">
-          <div className="text-center mb-10">
+          <div className="text-center mb-10 flex flex-col items-center gap-4">
+            <img src={mompreneurBadge} alt="Mompreneur Badge" className="w-64 h-64 object-contain drop-shadow-2xl" />
             <h2 className="text-4xl font-bold mb-4 text-purple-800" style={{ fontFamily: "'Pacifico', cursive" }}>
-              💼 Mompreneur 💼
+              Mompreneur: Συνάντησε τις Boss Moms της Κοινότητας
             </h2>
-            <p className="text-lg font-semibold text-purple-700">
-              Υποστήριξη για μαμάδες επιχειρηματίες - Coming Soon
+            <p className="text-lg font-semibold text-purple-700 max-w-3xl">
+              Κάθε εβδομάδα, μια νέα ιστορία έμπνευσης από μια μαμά που δημιούργησε τη δική της επιχείρηση, 
+              ισορροπώντας τέλεια την καριέρα και την οικογένεια. Get Inspired!
             </p>
           </div>
           <Card className="bg-gradient-to-br from-white via-pink-50 to-purple-50 border-4 border-purple-300 hover:shadow-2xl transition-all relative overflow-hidden">
