@@ -17,8 +17,8 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white z-50 py-4 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
-      <div className="max-w-screen-xl mx-auto flex justify-around items-center px-3">
+    <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-sm z-50 py-3 shadow-[0_-2px_16px_rgba(200,120,141,0.12)]">
+      <div className="max-w-screen-xl mx-auto flex justify-around items-center px-4 gap-2">
         {navItems.map(({ path, icon: Icon, label, badge, isCenter, isMascot }) => {
           const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
           return (
@@ -26,36 +26,41 @@ export default function BottomNav() {
               key={path}
               to={path}
               className={cn(
-                "flex flex-col items-center justify-center gap-2 transition-all relative",
+                "flex flex-col items-center justify-center gap-1.5 transition-all duration-300 relative min-w-[68px]",
                 isCenter 
-                  ? "px-6 py-5 bg-nav-pink text-white rounded-3xl shadow-xl -mt-4"
-                  : "px-2 py-2",
-                !isCenter && isActive && "text-nav-pink",
-                !isCenter && !isActive && "text-gray-400"
+                  ? "px-5 py-4 bg-gradient-to-br from-[#C8788D] to-[#B86B80] text-white rounded-[20px] shadow-[0_4px_16px_rgba(200,120,141,0.35)] hover:shadow-[0_6px_20px_rgba(200,120,141,0.45)] -mt-3 scale-105"
+                  : cn(
+                      "px-3 py-2.5 rounded-2xl",
+                      isActive 
+                        ? "bg-gradient-to-br from-[#F5E5EA] to-[#F0D5DD] text-[#C8788D] shadow-sm" 
+                        : "bg-transparent text-gray-400 hover:bg-[#FDF7F9] hover:text-[#C8788D]/70"
+                    )
               )}
             >
               <div className="relative flex items-center justify-center">
                 {isMascot ? (
-                  <img src={mascot} alt="Momster" className="w-12 h-12 object-contain" />
+                  <img src={mascot} alt="Momster" className="w-11 h-11 object-contain drop-shadow-md" />
                 ) : (
                   Icon && <Icon 
                     className={cn(
-                      "w-7 h-7",
-                      isCenter && "stroke-white",
-                      !isCenter && "stroke-[2]"
+                      "w-6 h-6 transition-all duration-300",
+                      isCenter && "stroke-white drop-shadow-sm",
+                      !isCenter && isActive && "stroke-[2.5]",
+                      !isCenter && !isActive && "stroke-[2]"
                     )} 
-                    strokeWidth={2.5}
+                    strokeWidth={isCenter ? 2.5 : isActive ? 2.5 : 2}
                   />
                 )}
-                {badge && badge > 0 && (
-                  <div className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-rose-500 border-2 border-white" />
+                {badge !== undefined && badge > 0 && (
+                  <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-gradient-to-br from-rose-400 to-rose-500 border border-white shadow-sm animate-pulse" />
                 )}
               </div>
               <span className={cn(
-                "text-center leading-tight whitespace-pre-line",
+                "text-center leading-tight whitespace-pre-line transition-all duration-300",
                 isCenter 
-                  ? "text-sm font-semibold" 
-                  : "text-xs font-medium"
+                  ? "text-[11px] font-bold tracking-wide" 
+                  : "text-[10px] font-semibold",
+                isActive && !isCenter && "font-bold"
               )}>{label}</span>
             </Link>
           );
