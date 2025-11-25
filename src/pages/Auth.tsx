@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import mascot from "@/assets/mascot.jpg";
-import logoFull from "@/assets/logo-full.jpg";
+import logoNew from "@/assets/logo-new.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
 import { z } from "zod";
@@ -237,7 +237,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 shadow-lg relative overflow-hidden bg-background/95 backdrop-blur-sm">
+      <Card className="w-full max-w-md p-8 shadow-lg relative overflow-hidden bg-white/95 backdrop-blur-sm border-nav-pink/20">
         <img 
           src={mascot} 
           alt="Momster Mascot" 
@@ -245,13 +245,13 @@ export default function Auth() {
         />
         
         <div className="flex flex-col items-center mb-6 relative z-10">
-          <img src={logoFull} alt="Momster Logo" className="h-24 mb-4 animate-fade-in" />
-          <h1 className="text-3xl font-bold text-primary animate-scale-in" style={{ fontFamily: "'Pacifico', cursive" }}>
+          <img src={logoNew} alt="Momster Logo" className="h-24 mb-4 animate-fade-in" />
+          <h1 className="text-3xl font-bold text-nav-pink animate-scale-in" style={{ fontFamily: "'Pacifico', cursive" }}>
             Momster
           </h1>
         </div>
         
-        <p className="text-center text-muted-foreground mb-8 italic text-lg">
+        <p className="text-center text-nav-pink/70 mb-8 italic text-lg">
           "Together, moms thrive!"
         </p>
 
@@ -320,7 +320,7 @@ export default function Auth() {
                 />
                 <Label htmlFor="terms" className="text-sm leading-tight cursor-pointer">
                   Έχω διαβάσει και αποδέχομαι τους{" "}
-                  <Link to="/privacy-terms" className="text-primary hover:underline" target="_blank">
+                  <Link to="/privacy-terms" className="text-nav-pink hover:underline" target="_blank">
                     Όρους Χρήσης, την Πολιτική Απορρήτου και την Πολιτική Cookies
                   </Link>
                   {" "}και συμφωνώ με την επεξεργασία των προσωπικών μου δεδομένων σύμφωνα με το GDPR
@@ -331,7 +331,7 @@ export default function Auth() {
 
           <Button 
             type="submit" 
-            className="w-full" 
+            className="w-full bg-nav-pink hover:bg-nav-pink/90 text-white" 
             size="lg" 
             disabled={loading || (!isLogin && (!acceptedTerms || !acceptedAge))}
           >
@@ -350,7 +350,7 @@ export default function Auth() {
           <Button 
             type="button"
             variant="outline" 
-            className="w-full" 
+            className="w-full border-nav-pink/30 hover:bg-nav-pink/10" 
             onClick={handleGoogleSignIn}
             disabled={loading}
           >
@@ -368,14 +368,14 @@ export default function Auth() {
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
-                className="text-primary hover:underline"
+                className="text-nav-pink hover:underline"
               >
                 Ξέχασες τον κωδικό;
               </button>
               <button
                 type="button"
                 onClick={() => setShowForgotUsername(true)}
-                className="text-primary hover:underline"
+                className="text-nav-pink hover:underline"
               >
                 Ξέχασες το email σου;
               </button>
@@ -387,7 +387,7 @@ export default function Auth() {
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-primary hover:underline font-medium"
+              className="text-nav-pink hover:underline font-medium"
             >
               {isLogin ? "Εγγραφή" : "Σύνδεση"}
             </button>
@@ -395,7 +395,7 @@ export default function Auth() {
         </form>
 
         <div className="mt-6 text-center">
-          <Link to="/privacy-terms" className="text-xs text-muted-foreground hover:text-primary underline">
+          <Link to="/privacy-terms" className="text-xs text-muted-foreground hover:text-nav-pink underline">
           Πολιτική Απορρήτου & Όροι Χρήσης
           </Link>
         </div>
