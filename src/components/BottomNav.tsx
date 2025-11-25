@@ -17,8 +17,8 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md z-50 py-3 shadow-[0_-2px_20px_rgba(0,0,0,0.08)]">
-      <div className="max-w-screen-xl mx-auto flex justify-center items-end gap-2 px-4">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md z-50 py-4 shadow-[0_-2px_20px_rgba(0,0,0,0.08)]">
+      <div className="max-w-screen-xl mx-auto flex justify-around items-end px-2">
         {navItems.map(({ path, icon: Icon, label, badge, isCenter, isMascot }) => {
           const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
           return (
@@ -26,20 +26,20 @@ export default function BottomNav() {
               key={path}
               to={path}
               className={cn(
-                "flex flex-col items-center justify-center gap-1.5 rounded-3xl transition-all relative",
+                "flex flex-col items-center justify-center gap-2 rounded-2xl transition-all relative min-w-[70px]",
                 isCenter 
-                  ? "px-6 py-3 bg-nav-pink text-white shadow-lg -mt-4"
-                  : "px-4 py-2",
+                  ? "px-5 py-4 bg-nav-pink text-white shadow-lg -mt-6 scale-110"
+                  : "px-3 py-2",
                 !isCenter && isActive && "text-nav-pink",
-                !isCenter && !isActive && "text-gray-400"
+                !isCenter && !isActive && "text-gray-500"
               )}
             >
               <div className="relative">
                 {isMascot ? (
-                  <img src={mascot} alt="Momster" className="w-8 h-8 object-contain" />
+                  <img src={mascot} alt="Momster" className="w-10 h-10 object-contain" />
                 ) : (
                   Icon && <Icon className={cn(
-                    isCenter ? "w-7 h-7" : "w-6 h-6",
+                    isCenter ? "w-8 h-8" : "w-6 h-6",
                     isCenter && "fill-white"
                   )} />
                 )}
@@ -48,8 +48,8 @@ export default function BottomNav() {
                 )}
               </div>
               <span className={cn(
-                "font-semibold text-center leading-tight whitespace-nowrap",
-                isCenter ? "text-xs" : "text-[10px]"
+                "font-bold text-center leading-tight",
+                isCenter ? "text-xs whitespace-nowrap" : "text-[11px] max-w-[65px]"
               )}>{label}</span>
             </Link>
           );
