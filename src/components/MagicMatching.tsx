@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,6 +23,16 @@ export default function MagicMatching() {
   const { language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [matchedProfile, setMatchedProfile] = useState<MatchedProfile | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setIsLoggedIn(!!user);
+  };
 
   const findMagicMatch = async () => {
     setLoading(true);
@@ -33,6 +43,7 @@ export default function MagicMatching() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error(language === "el" ? "Συνδεθείτε πρώτα" : "Please sign in first");
+        navigate("/auth");
         setLoading(false);
         return;
       }
@@ -158,75 +169,96 @@ export default function MagicMatching() {
       <CardContent className="p-6">
         <div className="text-center">
           <h3 className="text-xl font-bold text-foreground mb-4 flex items-center justify-center gap-2" style={{ fontFamily: "'Pacifico', cursive" }}>
-            💕 Μαγικό Matching 💕
+            💕 Μαγικό Matching* 💕
           </h3>
 
-          {!matchedProfile && !loading && (
-            <Button
-              onClick={findMagicMatch}
-              size="lg"
-              className="w-full rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-semibold py-6 transition-all hover:scale-105"
-            >
-              <span className="text-xl mr-2">🌸</span>
-              Βρες το Match σου
-              <span className="text-xl ml-2">✨</span>
-            </Button>
-          )}
-
-          {loading && (
-            <div className="flex flex-col items-center gap-4 py-8">
-              <div className="relative animate-bounce">
-                <span className="text-5xl">💕</span>
-                <span className="text-2xl absolute top-0 right-0 animate-ping">✨</span>
-              </div>
-              <p className="text-muted-foreground animate-pulse">
-                {language === "el" ? "Μαγεύουμε το matching..." : "Finding your match..."}
+          {!isLoggedIn ? (
+            <div className="space-y-4 py-4">
+              <p className="text-muted-foreground text-sm">
+                {language === "el" 
+                  ? "Βρες το τέλειο match με μία μόνο κίνηση! ✨" 
+                  : "Find your perfect match with one click! ✨"}
               </p>
+              <Button
+                onClick={() => navigate('/auth')}
+                size="lg"
+                className="w-full rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-semibold py-6"
+              >
+                <span className="text-xl mr-2">🌸</span>
+                {language === "el" ? "Δημιούργησε Προφίλ" : "Create Profile"}
+                <span className="text-xl ml-2">✨</span>
+              </Button>
             </div>
-          )}
+          ) : (
+            <>
+              {!matchedProfile && !loading && (
+                <Button
+                  onClick={findMagicMatch}
+                  size="lg"
+                  className="w-full rounded-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white font-semibold py-6 transition-all hover:scale-105"
+                >
+                  <span className="text-xl mr-2">🌸</span>
+                  Βρες το Match σου
+                  <span className="text-xl ml-2">✨</span>
+                </Button>
+              )}
 
-          {matchedProfile && (
-            <div className="space-y-4 animate-scale-in">
-              <div className="flex flex-col items-center gap-3">
-                <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
-                  <AvatarImage src={matchedProfile.profile_photo_url || undefined} />
-                  <AvatarFallback className="text-2xl">{matchedProfile.full_name?.[0]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h4 className="font-bold text-lg text-foreground">{matchedProfile.full_name}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {matchedProfile.city}{matchedProfile.area ? `, ${matchedProfile.area}` : ''}
+              {loading && (
+                <div className="flex flex-col items-center gap-4 py-8">
+                  <div className="relative animate-bounce">
+                    <span className="text-5xl">💕</span>
+                    <span className="text-2xl absolute top-0 right-0 animate-ping">✨</span>
+                  </div>
+                  <p className="text-muted-foreground animate-pulse">
+                    {language === "el" ? "Μαγεύουμε το matching..." : "Finding your match..."}
                   </p>
-                </div>
-              </div>
-
-              {matchedProfile.interests && matchedProfile.interests.length > 0 && (
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {matchedProfile.interests.slice(0, 3).map((interest, i) => (
-                    <span key={i} className="text-xs bg-white/60 px-2 py-1 rounded-full">
-                      {interest}
-                    </span>
-                  ))}
                 </div>
               )}
 
-              <div className="flex gap-2">
-                <Button
-                  onClick={sendMessage}
-                  className="flex-1 rounded-full bg-primary hover:bg-primary/90"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  {language === "el" ? "Στείλε Μήνυμα" : "Send Message"}
-                </Button>
-                <Button
-                  onClick={findMagicMatch}
-                  variant="outline"
-                  className="rounded-full"
-                >
-                  <span className="text-lg">🌸</span>
-                </Button>
-              </div>
-            </div>
+              {matchedProfile && (
+                <div className="space-y-4 animate-scale-in">
+                  <div className="flex flex-col items-center gap-3">
+                    <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
+                      <AvatarImage src={matchedProfile.profile_photo_url || undefined} />
+                      <AvatarFallback className="text-2xl">{matchedProfile.full_name?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h4 className="font-bold text-lg text-foreground">{matchedProfile.full_name}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {matchedProfile.city}{matchedProfile.area ? `, ${matchedProfile.area}` : ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  {matchedProfile.interests && matchedProfile.interests.length > 0 && (
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {matchedProfile.interests.slice(0, 3).map((interest, i) => (
+                        <span key={i} className="text-xs bg-white/60 px-2 py-1 rounded-full">
+                          {interest}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={sendMessage}
+                      className="flex-1 rounded-full bg-primary hover:bg-primary/90"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      {language === "el" ? "Στείλε Μήνυμα" : "Send Message"}
+                    </Button>
+                    <Button
+                      onClick={findMagicMatch}
+                      variant="outline"
+                      className="rounded-full"
+                    >
+                      <span className="text-lg">🌸</span>
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </CardContent>

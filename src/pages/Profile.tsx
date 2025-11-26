@@ -21,6 +21,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { PhotoUpload } from "@/components/PhotoUpload";
+import { PhotoUploadWithDelete } from "@/components/PhotoUploadWithDelete";
 import { AvatarBuilder, AvatarConfig } from "@/components/AvatarBuilder";
 import { AvatarDisplay } from "@/components/AvatarDisplay";
 import { INTERESTS } from "@/lib/interests";
@@ -343,26 +344,27 @@ export default function Profile() {
     : "";
 
   return (
-    <div className="min-h-screen relative">
-      {/* Floral Background */}
-      <div 
-        className="fixed inset-0 z-0"
-        style={{
-          backgroundImage: `url(${floralBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.4
-        }}
-      />
+    <div className="min-h-screen relative" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)' }}>
       {/* Animated Mascot */}
       <img 
         src={mascot} 
         alt="Momster Mascot" 
-        className="fixed top-24 right-4 w-24 h-24 opacity-70 object-contain pointer-events-none animate-bounce z-10 drop-shadow-lg"
+        className="fixed top-24 right-4 w-24 h-24 opacity-40 object-contain pointer-events-none animate-bounce z-10 drop-shadow-lg"
       />
       
       <div className="max-w-2xl mx-auto pt-20 pb-40 px-4 relative z-10">
+        {/* Welcome Header */}
+        {isOwnProfile && !viewAsPublic && (
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-foreground mb-1" style={{ fontFamily: "'Pacifico', cursive" }}>
+              Hi {profile?.username || profile?.full_name?.split(' ')[0]} 🌸
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {language === "el" ? "Το προφίλ σου" : "Your Profile"}
+            </p>
+          </div>
+        )}
+        
         <div className="flex justify-between items-center mb-6">
           {!isOwnProfile && (
             <Button
@@ -373,9 +375,11 @@ export default function Profile() {
               <ArrowLeft className="w-5 h-5" />
             </Button>
           )}
-          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
-            {isOwnProfile ? (language === "el" ? "Προφίλ" : "Profile") : profile?.full_name}
-          </h1>
+          {!isOwnProfile && (
+            <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
+              {profile?.full_name}
+            </h1>
+          )}
           {isOwnProfile && (
             <div className="flex gap-2">
               {isAdmin && (
@@ -558,25 +562,19 @@ export default function Profile() {
 
             {/* Photo/Avatar Management */}
             {isOwnProfile && !viewAsPublic && (
-              <div className="flex gap-2 mt-4 justify-center">
-                <Dialog open={photoUploadOpen} onOpenChange={setPhotoUploadOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Edit className="w-4 h-4 mr-2" />
-                      Change Photo
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-lg">
-                    <PhotoUpload 
-                      onPhotoUploaded={handlePhotoUploaded}
-                      currentPhotoUrl={profile.profile_photo_url}
-                    />
-                  </DialogContent>
-                </Dialog>
+              <div className="mt-6">
+                <PhotoUploadWithDelete
+                  photos={profilePhotos}
+                  onPhotosUpdated={fetchProfile}
+                />
+              </div>
+            )}
 
+            {isOwnProfile && !viewAsPublic && (
+              <div className="flex gap-2 mt-4 justify-center">
                 <Dialog open={avatarBuilderOpen} onOpenChange={setAvatarBuilderOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="rounded-[25px]">
                       <Sparkles className="w-4 h-4 mr-2" />
                       Create Avatar
                     </Button>
@@ -968,22 +966,51 @@ export default function Profile() {
         </Card>
         )}
 
+        {/* Boost My Profile Button - Premium Feature */}
+        {isOwnProfile && !viewAsPublic && (
+          <Card className="p-6 mb-6 bg-gradient-to-br from-[#F8E9EE] to-[#F5E8F0] border-[#F3DCE5]">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-foreground mb-1 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  Boost My Profile*
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {language === "el" ? "Εμφάνισε το προφίλ σου σε περισσότερες μαμάδες" : "Show your profile to more moms"}
+                </p>
+              </div>
+              <Button
+                disabled
+                size="lg"
+                className="rounded-[30px] bg-gradient-to-br from-[#C8788D] to-[#B86B80] opacity-50"
+              >
+                Boost
+              </Button>
+            </div>
+          </Card>
+        )}
+        
         {/* Logout */}
         {isOwnProfile && !viewAsPublic && (
-          <Button variant="destructive" className="w-full mb-6" size="lg" onClick={handleSignOut}>
+          <Button variant="destructive" className="w-full mb-6 rounded-[30px]" size="lg" onClick={handleSignOut}>
             <LogOut className="w-5 h-5 mr-3" />
             {language === "el" ? "Αποσύνδεση" : "Sign Out"}
           </Button>
         )}
       </div>
 
-      {/* Footer with quick actions */}
-      <footer className="fixed bottom-20 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
-        <div className="max-w-2xl mx-auto flex items-center justify-center gap-2">
-          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain animate-bounce" />
-          <span className="text-sm text-muted-foreground">
-            {language === "el" ? "Μαζί, οι μαμάδες ανθίζουν!" : "Together, moms thrive!"}
-          </span>
+      {/* Footer with Premium Message */}
+      <footer className="fixed bottom-20 left-0 right-0 py-4 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
+        <div className="max-w-2xl mx-auto text-center space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-foreground">
+              {language === "el" ? "Μαζί, οι μαμάδες ανθίζουν!" : "Together, moms thrive!"}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            *Momster Perks — free for now, Premium later.
+          </p>
         </div>
       </footer>
 
