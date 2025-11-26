@@ -246,7 +246,7 @@ export default function Discover() {
 
         <Card 
           ref={cardRef}
-          className="overflow-hidden shadow-xl select-none"
+          className="overflow-hidden shadow-xl select-none rounded-[25px] border-2 border-[#F3DCE5]"
           style={getCardStyle()}
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
@@ -260,7 +260,7 @@ export default function Discover() {
             <img
               src={profileImage}
               alt={currentProfile.full_name}
-              className="w-full h-64 object-cover cursor-pointer"
+              className="w-full h-56 object-cover cursor-pointer"
               onClick={() => {
                 navigate(`/profile/${currentProfile.id}`);
               }}
@@ -320,8 +320,8 @@ export default function Discover() {
                 />
               </div>
             )}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6 text-white">
-              <h2 className="text-2xl font-bold">{currentProfile.full_name}</h2>
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+              <h2 className="text-xl font-bold">{currentProfile.full_name}</h2>
               <div className="flex items-center gap-2 mt-1">
                 <MapPin className="w-4 h-4" />
                 <span className="text-sm font-semibold">{getLocationText()}</span>
@@ -329,17 +329,17 @@ export default function Discover() {
             </div>
           </div>
 
-          <div className="p-6 space-y-4">
+          <div className="p-4 space-y-3">
             {/* Children Info with Icons */}
             {currentProfile.children && Array.isArray(currentProfile.children) && currentProfile.children.length > 0 && (
-              <div className="bg-gradient-to-br from-pink-50 to-purple-50 p-3 rounded-lg border border-pink-200">
-                <div className="flex items-center gap-2 text-sm mb-2">
-                  <User className="w-4 h-4 text-primary" />
+              <div className="bg-gradient-to-br from-pink-50 to-purple-50 p-2 rounded-lg border border-pink-200">
+                <div className="flex items-center gap-2 text-xs mb-1">
+                  <User className="w-3 h-3 text-primary" />
                   <span className="font-bold text-foreground">Παιδιά:</span>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1">
                   {currentProfile.children.map((child: any, idx: number) => (
-                    <div key={idx} className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-full text-xs">
+                    <div key={idx} className="flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-full text-xs">
                       <span>{child.gender === 'boy' ? '👦' : child.gender === 'girl' ? '👧' : '👶'}</span>
                       <span className="font-medium">{child.ageGroup || child.age}</span>
                     </div>
@@ -349,13 +349,13 @@ export default function Discover() {
             )}
 
             {currentProfile.bio && (
-              <p className="text-sm text-foreground/90 font-medium">{currentProfile.bio}</p>
+              <p className="text-xs text-foreground/90 font-medium line-clamp-2">{currentProfile.bio}</p>
             )}
 
             {currentProfile.interests && currentProfile.interests.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {currentProfile.interests.map((interest) => (
-                  <Badge key={interest} variant="secondary">
+              <div className="flex flex-wrap gap-1">
+                {currentProfile.interests.slice(0, 3).map((interest) => (
+                  <Badge key={interest} variant="secondary" className="text-xs px-2 py-0.5">
                     {interest}
                   </Badge>
                 ))}
@@ -364,7 +364,40 @@ export default function Discover() {
           </div>
         </Card>
 
-        <div className="flex justify-center gap-6 mt-6 mb-6">
+        {/* Premium Actions */}
+        <div className="flex justify-center gap-4 mt-4">
+          <Button
+            disabled
+            size="sm"
+            variant="outline"
+            className="rounded-full border-2 border-[#F3DCE5] opacity-50 cursor-not-allowed"
+          >
+            <Heart className="w-4 h-4 mr-1" />
+            Super Yes*
+          </Button>
+          <Button
+            disabled
+            size="sm"
+            variant="outline"
+            className="rounded-full border-2 border-[#F3DCE5] opacity-50 cursor-not-allowed"
+          >
+            🔄 Second Chance*
+          </Button>
+        </div>
+
+        {/* Daily Swipes Slider */}
+        <div className="mt-4 bg-gradient-to-br from-[#F8E9EE] to-[#F5E8F0] p-4 rounded-[20px] border border-[#F3DCE5]">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-bold text-foreground">Daily Swipes:</span>
+            <span className="text-sm font-bold text-primary">∞/15</span>
+          </div>
+          <div className="w-full bg-white rounded-full h-2">
+            <div className="bg-gradient-to-r from-[#C8788D] to-[#B86B80] h-2 rounded-full w-full"></div>
+          </div>
+          <p className="text-xs text-muted-foreground text-center mt-2">Unlimited για αρχή!</p>
+        </div>
+
+        <div className="flex justify-center gap-6 mt-6 mb-6"
           <Button
             size="lg"
             variant="outline"
@@ -395,11 +428,16 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
-        <div className="max-w-md mx-auto flex items-center justify-center gap-2">
-          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
-          <span className="text-sm text-muted-foreground">Together, moms thrive!</span>
+      {/* Footer with Premium Message */}
+      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
+        <div className="max-w-md mx-auto text-center space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-foreground">Together, moms thrive!</span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            *Momster Perks — free for now, Premium later.
+          </p>
         </div>
       </footer>
 

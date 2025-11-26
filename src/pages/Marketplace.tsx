@@ -86,6 +86,9 @@ export default function Marketplace() {
               <p className="text-sm italic text-muted-foreground">
                 Λίγη υπομονή… φορτώνουμε με αγάπη! 💕
               </p>
+              <p className="text-xs text-muted-foreground mt-4">
+                *Momster Perks — free for now, Premium later.
+              </p>
             </div>
 
             {/* Categories preview - Products */}
@@ -161,6 +164,21 @@ export default function Marketplace() {
           </div>
         </div>
       </div>
+
+      {/* Footer with Premium Message */}
+      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
+        <div className="max-w-2xl mx-auto text-center space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-foreground">
+              Together, moms thrive!
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            *Momster Perks — free for now, Premium later.
+          </p>
+        </div>
+      </footer>
 
       {/* Rules Dialog */}
       <Dialog open={showRules} onOpenChange={setShowRules}>
