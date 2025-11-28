@@ -281,9 +281,9 @@ export default function ProfileNew() {
       <footer className="fixed bottom-0 left-0 right-0 py-6 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
         <div className="max-w-3xl mx-auto">
           <div className="flex flex-col items-center gap-3 text-center">
-            {/* Logo in soft powder pink frame */}
-            <div className="relative inline-block p-4 rounded-full bg-[#F8E9EE]/30 backdrop-blur-sm">
-              <img src={logo} alt="Momster Logo" className="w-20 h-auto object-contain" style={{ opacity: 0.9 }} />
+            {/* Logo in soft powder pink circular frame */}
+            <div className="relative inline-block p-3 rounded-full bg-[#F8E9EE]/25 backdrop-blur-sm">
+              <img src={logo} alt="Momster Logo" className="w-16 h-16 object-cover rounded-full" style={{ opacity: 0.95 }} />
             </div>
             
             <div className="space-y-1">
