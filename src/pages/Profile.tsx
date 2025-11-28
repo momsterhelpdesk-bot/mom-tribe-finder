@@ -48,12 +48,15 @@ export default function ProfileNew() {
 
       // Check if user is admin
       if (isOwn) {
-        const { data: roles } = await supabase
+        const { data: roles, error: rolesError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id);
         
+        console.log('User roles:', roles, 'Error:', rolesError);
+        
         const hasAdminRole = roles?.some(r => r.role === 'admin');
+        console.log('Is admin:', hasAdminRole);
         setIsAdmin(hasAdminRole || false);
       }
     } catch (error) {
