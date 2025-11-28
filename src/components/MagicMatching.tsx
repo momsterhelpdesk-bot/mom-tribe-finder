@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageCircle, Heart } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MessageCircle, Heart, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +25,7 @@ export default function MagicMatching() {
   const [loading, setLoading] = useState(false);
   const [matchedProfile, setMatchedProfile] = useState<MatchedProfile | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showNoMomsDialog, setShowNoMomsDialog] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -67,7 +69,7 @@ export default function MagicMatching() {
       if (matchError) throw matchError;
 
       if (!potentialMatches || potentialMatches.length === 0) {
-        toast.error(language === "el" ? "Δεν βρέθηκαν matches στην περιοχή σας" : "No matches found in your area");
+        setShowNoMomsDialog(true);
         setLoading(false);
         return;
       }
@@ -261,6 +263,53 @@ export default function MagicMatching() {
             </>
           )}
         </div>
+
+        {/* No Moms Available Dialog */}
+        <Dialog open={showNoMomsDialog} onOpenChange={setShowNoMomsDialog}>
+          <DialogContent className="max-w-md bg-gradient-to-br from-[#FDF7F9] to-[#F5E8F0] border-2 border-[#F3DCE5] rounded-[32px]">
+            <button 
+              onClick={() => setShowNoMomsDialog(false)}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <DialogHeader>
+              <DialogTitle className="text-2xl text-center pt-4" style={{ fontFamily: "'Pacifico', cursive" }}>
+                Δεν υπάρχουν νέες μαμάδες εδώ γύρω… ακόμα! 🌸
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4 text-center py-6">
+              <p className="text-base text-foreground/90 leading-relaxed">
+                Η γειτονιά είναι λίγο ήσυχη αυτή τη στιγμή,<br />
+                αλλά οι μαμάδες εμφανίζονται συνέχεια! ✨
+              </p>
+              
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>• Μείνε συντονισμένη — νέες μαμάδες μπαίνουν κάθε μέρα 💕</p>
+                <p>• Δοκίμασε πάλι σε λίγο!</p>
+                <p>• Στο μεταξύ, μπορείς να φτιάξεις το προφίλ σου ακόμη πιο όμορφο ✨</p>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={() => navigate('/profile-setup')}
+                  className="flex-1 rounded-[30px] bg-gradient-to-r from-[#C8788D] to-[#B86B80]"
+                >
+                  ✨ Επεξεργασία Προφίλ
+                </Button>
+                <Button
+                  onClick={() => setShowNoMomsDialog(false)}
+                  variant="outline"
+                  className="rounded-[30px] border-2 border-[#F3DCE5]"
+                >
+                  OK
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

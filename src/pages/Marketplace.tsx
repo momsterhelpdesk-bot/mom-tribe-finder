@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Heart, ShoppingBag, Sparkles } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
@@ -8,60 +9,58 @@ import { supabase } from "@/integrations/supabase/client";
 
 export default function Marketplace() {
   const [showRules, setShowRules] = useState(false);
+  const [showWaitlistForm, setShowWaitlistForm] = useState(false);
+  const [email, setEmail] = useState("");
   const [notified, setNotified] = useState(false);
   const { toast } = useToast();
 
-  const handleNotifyMe = async () => {
+  const handleOpenWaitlist = () => {
+    setShowWaitlistForm(true);
+  };
+
+  const handleSubmitWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !email.includes('@')) {
+      toast({
+        title: "❌ Σφάλμα",
+        description: "Παρακαλώ βάλε ένα έγκυρο email",
+      });
+      return;
+    }
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "🔒 Σύνδεση απαραίτητη",
-          description: "Παρακαλώ συνδέσου για να λαμβάνεις ειδοποιήσεις!",
-        });
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('id', user.id)
-        .single();
-
-      if (!profile?.email) {
-        toast({
-          title: "❌ Σφάλμα",
-          description: "Δεν βρέθηκε email",
-        });
-        return;
-      }
-
+      
       // Check if already subscribed
       const { data: existing } = await supabase
         .from('marketplace_notifications')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('email', email)
         .single();
 
       if (existing) {
         toast({
           title: "✅ Ήδη εγγεγραμμένη!",
-          description: "Είσαι ήδη στη λίστα αναμονής!",
+          description: "Αυτό το email είναι ήδη στη λίστα αναμονής!",
         });
         setNotified(true);
+        setShowWaitlistForm(false);
         return;
       }
 
       const { error } = await supabase
         .from('marketplace_notifications')
         .insert([{
-          email: profile.email,
-          user_id: user.id
+          email: email,
+          user_id: user?.id || null
         }]);
 
       if (error) throw error;
 
       setNotified(true);
+      setShowWaitlistForm(false);
+      setEmail("");
       toast({
         title: "🌷 Τέλεια!",
         description: "Θα σε ενημερώσουμε μόλις ανοίξει το Marketplace!",
@@ -203,7 +202,7 @@ export default function Marketplace() {
 
           <div className="space-y-3">
             <Button 
-              onClick={handleNotifyMe}
+              onClick={handleOpenWaitlist}
               disabled={notified}
               className="w-full text-base"
               size="lg"
@@ -236,6 +235,42 @@ export default function Marketplace() {
           </p>
         </div>
       </footer>
+
+      {/* Waitlist Form Dialog */}
+      <Dialog open={showWaitlistForm} onOpenChange={setShowWaitlistForm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-center" style={{ fontFamily: "'Pacifico', cursive" }}>
+              🌸 Waitlist Marketplace
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Γράψε το email σου για να σε ειδοποιήσουμε!
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmitWaitlist} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Email Address</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your.email@example.com"
+                className="w-full mt-1 px-4 py-3 rounded-2xl border-2 border-[#F3DCE5] focus:border-primary focus:outline-none"
+                required
+              />
+            </div>
+            
+            <Button 
+              type="submit" 
+              className="w-full rounded-[30px] text-base"
+              size="lg"
+            >
+              ✨ Ειδοποίησέ με
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Rules Dialog */}
       <Dialog open={showRules} onOpenChange={setShowRules}>

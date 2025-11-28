@@ -19,6 +19,7 @@ export default function ProfileNew() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [isOwnProfile, setIsOwnProfile] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -44,6 +45,17 @@ export default function ProfileNew() {
 
       if (error) throw error;
       setProfile(data);
+
+      // Check if user is admin
+      if (isOwn) {
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+        
+        const hasAdminRole = roles?.some(r => r.role === 'admin');
+        setIsAdmin(hasAdminRole || false);
+      }
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error(language === "el" ? "Σφάλμα φόρτωσης προφίλ" : "Error loading profile");
@@ -231,22 +243,36 @@ export default function ProfileNew() {
 
         {/* Settings / Edit Buttons - Capsule Style */}
         {isOwnProfile && (
-          <div className="flex gap-4">
-            <Button
-              onClick={() => navigate("/profile-setup")}
-              className="flex-1 rounded-[30px] bg-gradient-to-r from-[#C8788D] to-[#B86B80] hover:from-[#B86B80] hover:to-[#C8788D] text-white shadow-md hover:shadow-lg transition-all"
-              size="lg"
-            >
-              Edit Profile
-            </Button>
-            <Button
-              variant="outline"
-              className="rounded-[30px] border-2 border-[#F3DCE5] hover:bg-[#FDF7F9] shadow-sm hover:shadow-md transition-all"
-              size="lg"
-              onClick={handleSignOut}
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <Button
+                onClick={() => navigate("/profile-setup")}
+                className="flex-1 rounded-[30px] bg-gradient-to-r from-[#C8788D] to-[#B86B80] hover:from-[#B86B80] hover:to-[#C8788D] text-white shadow-md hover:shadow-lg transition-all"
+                size="lg"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Edit Profile
+              </Button>
+              <Button
+                variant="outline"
+                className="rounded-[30px] border-2 border-[#F3DCE5] hover:bg-[#FDF7F9] shadow-sm hover:shadow-md transition-all"
+                size="lg"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {isAdmin && (
+              <Button
+                onClick={() => navigate("/admin")}
+                className="w-full rounded-[30px] bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white shadow-md hover:shadow-lg transition-all"
+                size="lg"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Admin Dashboard
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -255,9 +281,9 @@ export default function ProfileNew() {
       <footer className="fixed bottom-0 left-0 right-0 py-6 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
         <div className="max-w-3xl mx-auto">
           <div className="flex flex-col items-center gap-3 text-center">
-            {/* Logo in soft frame */}
-            <div className="relative inline-block p-3 rounded-full bg-[#F8E9EE]/30">
-              <img src={logo} alt="Momster Logo" className="w-24 h-auto object-contain opacity-90" />
+            {/* Logo in soft powder pink frame */}
+            <div className="relative inline-block p-4 rounded-full bg-[#F8E9EE]/30 backdrop-blur-sm">
+              <img src={logo} alt="Momster Logo" className="w-20 h-auto object-contain" style={{ opacity: 0.9 }} />
             </div>
             
             <div className="space-y-1">

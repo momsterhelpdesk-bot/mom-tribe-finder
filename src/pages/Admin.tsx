@@ -22,6 +22,7 @@ export default function Admin() {
   const [reports, setReports] = useState<any[]>([]);
   const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
   const [editingTemplate, setEditingTemplate] = useState<any | null>(null);
+  const [marketplaceNotifications, setMarketplaceNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     checkAdminStatus();
@@ -61,6 +62,16 @@ export default function Admin() {
     
     if (templates) {
       setEmailTemplates(templates);
+    }
+
+    // Load marketplace notifications
+    const { data: notifications } = await supabase
+      .from('marketplace_notifications')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (notifications) {
+      setMarketplaceNotifications(notifications);
     }
 
     // Load verification requests - use profiles instead of profiles_safe for admin
@@ -208,6 +219,18 @@ export default function Admin() {
     }
   };
 
+  const exportMarketplaceEmails = () => {
+    const emails = marketplaceNotifications.map(n => n.email).join(',');
+    const blob = new Blob([emails], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'marketplace-emails.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Emails exported!");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -260,6 +283,12 @@ export default function Admin() {
               Αναφορές
               <Badge variant="secondary" className="ml-2 text-xs">
                 {reports.filter(r => r.status === 'pending').length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="marketplace">
+              Marketplace Waitlist
+              <Badge variant="secondary" className="ml-2 text-xs">
+                {marketplaceNotifications.length}
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
@@ -398,6 +427,45 @@ export default function Admin() {
                 Δεν υπάρχουν αναφορές
               </Card>
             )}
+          </TabsContent>
+
+          <TabsContent value="marketplace" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Marketplace Waitlist</CardTitle>
+                    <CardDescription>
+                      Όλοι οι εγγεγραμμένοι για ειδοποίηση Marketplace
+                    </CardDescription>
+                  </div>
+                  <Button onClick={exportMarketplaceEmails}>
+                    Export Emails
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {marketplaceNotifications.map((notification, idx) => (
+                    <div key={notification.id} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-mono">{idx + 1}.</span>
+                        <span className="text-sm">{notification.email}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(notification.created_at).toLocaleDateString('el-GR')}
+                      </span>
+                    </div>
+                  ))}
+                  
+                  {marketplaceNotifications.length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">
+                      Δεν υπάρχουν εγγραφές ακόμα
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="emails" className="space-y-4">
