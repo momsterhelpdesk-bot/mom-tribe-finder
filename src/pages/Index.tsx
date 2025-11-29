@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Calendar, ShoppingBag, Users, MapPin, UtensilsCrossed, Settings } from "lucide-react";
 import communityLogo from "@/assets/community-logo.jpg";
-import logo from "@/assets/logo-full.jpg";
+import logo from "@/assets/logo-elegant.png";
 import mascot from "@/assets/mascot.jpg";
 import mompreneurBadge from "@/assets/mompreneur-badge.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";

@@ -7,6 +7,7 @@ import { Heart, X, MapPin, User, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import mascot from "@/assets/mascot.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
+import MomsterPopup from "@/components/MomsterPopup";
 import { useMascot } from "@/hooks/use-mascot";
 import { useMatching } from "@/hooks/use-matching";
 
@@ -31,6 +32,7 @@ export default function Discover() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showNoMomsPopup, setShowNoMomsPopup] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { mascotConfig, visible, hideMascot, showMatch, showEmptyDiscover } = useMascot();
@@ -83,10 +85,7 @@ export default function Discover() {
     
     if (nextIndex >= allProfiles.length) {
       // Show empty state
-      showEmptyDiscover();
-      setTimeout(() => {
-        setCurrentIndex(0); // Reset to beginning
-      }, 3000);
+      setShowNoMomsPopup(true);
     } else {
       setCurrentIndex(nextIndex);
     }
@@ -527,6 +526,33 @@ export default function Discover() {
           </video>
         </div>
       )}
+
+      <MomsterMascot
+        state={mascotConfig.state}
+        message={mascotConfig.message}
+        visible={visible}
+        showButton={mascotConfig.showButton}
+        buttonText={mascotConfig.buttonText}
+        onButtonClick={mascotConfig.onButtonClick}
+        duration={mascotConfig.duration}
+        onHide={hideMascot}
+      />
+
+      <MomsterPopup
+        title="Δεν υπάρχουν νέες μαμάδες εδώ γύρω… ακόμα! 🌸"
+        subtitle="Η γειτονιά είναι λίγο ήσυχη αυτή τη στιγμή, αλλά οι μαμάδες εμφανίζονται συνέχεια! ✨"
+        bullets={[
+          "• Μείνε συντονισμένη — νέες μαμάδες μπαίνουν κάθε μέρα 💕",
+          "• Δοκίμασε ξανά σε λίγο!",
+          "• Φτιάξε το προφίλ σου ακόμη πιο όμορφο ✨"
+        ]}
+        buttonText="Μάλιστα! 💗"
+        onButtonClick={() => {
+          setShowNoMomsPopup(false);
+          setCurrentIndex(0);
+        }}
+        visible={showNoMomsPopup}
+      />
     </div>
   );
 }
