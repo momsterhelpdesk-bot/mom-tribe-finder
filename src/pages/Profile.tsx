@@ -48,15 +48,12 @@ export default function ProfileNew() {
 
       // Check if user is admin
       if (isOwn) {
-        const { data: roles, error: rolesError } = await supabase
+        const { data: roles } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id);
         
-        console.log('User roles:', roles, 'Error:', rolesError);
-        
         const hasAdminRole = roles?.some(r => r.role === 'admin');
-        console.log('Is admin:', hasAdminRole);
         setIsAdmin(hasAdminRole || false);
       }
     } catch (error) {
@@ -266,14 +263,16 @@ export default function ProfileNew() {
               </Button>
             </div>
             
-            <Button
-              onClick={() => navigate("/admin")}
-              className="w-full rounded-[30px] bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white shadow-md hover:shadow-lg transition-all"
-              size="lg"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Admin Dashboard
-            </Button>
+            {isAdmin && (
+              <Button
+                onClick={() => navigate("/admin")}
+                className="w-full rounded-[30px] bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white shadow-md hover:shadow-lg transition-all"
+                size="lg"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Admin Dashboard
+              </Button>
+            )}
           </div>
         )}
       </div>
