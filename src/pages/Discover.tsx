@@ -527,16 +527,18 @@ export default function Discover() {
         </div>
       )}
 
-      <MomsterMascot
-        state={mascotConfig.state}
-        message={mascotConfig.message}
-        visible={visible}
-        showButton={mascotConfig.showButton}
-        buttonText={mascotConfig.buttonText}
-        onButtonClick={mascotConfig.onButtonClick}
-        duration={mascotConfig.duration}
-        onHide={hideMascot}
-      />
+      {mascotConfig && (
+        <MomsterMascot
+          state={mascotConfig.state}
+          message={mascotConfig.message}
+          visible={visible}
+          showButton={mascotConfig.showButton}
+          buttonText={mascotConfig.buttonText}
+          onButtonClick={mascotConfig.onButtonClick}
+          duration={mascotConfig.duration}
+          onHide={hideMascot}
+        />
+      )}
 
       <MomsterPopup
         title="Δεν υπάρχουν νέες μαμάδες εδώ γύρω… ακόμα! 🌸"
