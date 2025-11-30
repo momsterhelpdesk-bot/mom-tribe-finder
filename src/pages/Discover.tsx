@@ -73,6 +73,21 @@ export default function Discover() {
             }]);
 
           if (!error) {
+            // Create notification for the match
+            await supabase
+              .from('notifications')
+              .insert({
+                user_id: user.id,
+                type: 'match',
+                title: 'Νέο Match! 💕',
+                message: `Έχεις νέο match με την ${currentProfile.full_name}!`,
+                icon: '💕',
+                metadata: {
+                  match_id: currentProfile.id,
+                  match_name: currentProfile.full_name
+                }
+              });
+
             setShowMatchVideo(true);
             setTimeout(() => {
               setShowMatchVideo(false);
