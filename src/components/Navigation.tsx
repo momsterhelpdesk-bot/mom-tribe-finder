@@ -11,7 +11,11 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-          <img src={logo} alt="Momster Logo" className="h-12 object-contain" />
+          <img 
+            src={logo} 
+            alt="Momster Logo" 
+            className="h-12 object-contain drop-shadow-sm opacity-95 mix-blend-multiply dark:mix-blend-normal dark:opacity-90 transition-all" 
+          />
         </Link>
         
         <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
