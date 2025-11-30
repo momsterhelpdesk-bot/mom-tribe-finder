@@ -322,22 +322,17 @@ export default function DailyBoost() {
             </div>
           </Card>
 
-          {/* Mompreneur Section */}
-          <Card className="p-6 bg-gradient-to-br from-purple-100 via-pink-100 to-purple-200 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
-            <div className="absolute top-3 right-3 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-              *
-            </div>
+          {/* Did You Know Section */}
+          <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
             <div className="relative space-y-3">
-              <h2 className="text-xl font-bold text-purple-900 flex items-center gap-2">
-                💼 Mompreneur
-              </h2>
-              <p className="text-sm text-purple-800 font-medium">
-                {language === 'el'
-                  ? 'Χώρος για μαμάδες επιχειρηματίες – networking, συνεργασίες & tips.'
-                  : 'Space for entrepreneur moms – networking, collaborations & tips.'}
-              </p>
-              <p className="text-xs text-purple-900/80 font-semibold uppercase tracking-wide text-center">
-                Coming Soon ✨
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-6 h-6 text-blue-700" />
+                <h2 className="text-xl font-bold text-blue-700">
+                  {language === 'el' ? 'Ήξερες ότι;' : 'Did You Know?'}
+                </h2>
+              </div>
+              <p className="text-sm text-blue-600 leading-relaxed">
+                {didYouKnowFact}
               </p>
             </div>
           </Card>

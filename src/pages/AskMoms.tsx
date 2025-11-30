@@ -100,20 +100,11 @@ export default function AskMoms() {
   };
 
   const fetchQuestions = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    let query = supabase
+    // Show all questions without approval filter
+    const { data, error } = await supabase
       .from('questions')
-      .select('*');
-    
-    // If not admin, only show approved questions + user's own questions
-    if (!isAdmin && user) {
-      query = query.or(`status.eq.approved,user_id.eq.${user.id}`);
-    } else if (!isAdmin) {
-      query = query.eq('status', 'approved');
-    }
-    
-    const { data, error } = await query.order('created_at', { ascending: false });
+      .select('*')
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching questions:', error);
@@ -205,7 +196,7 @@ export default function AskMoms() {
           pseudonym: displayMode === 'pseudonym' ? pseudonym : null,
           category: category,
           user_id: user.id,
-          status: 'pending'
+          status: 'approved'
         });
 
       if (error) {
@@ -215,7 +206,7 @@ export default function AskMoms() {
 
       toast({ 
         title: "Επιτυχία! 💕", 
-        description: "Η ερώτησή σου εστάλη προς έγκριση! Θα την δεις σύντομα." 
+        description: "Η ερώτησή σου δημοσιεύτηκε!" 
       });
     }
     
@@ -300,21 +291,12 @@ export default function AskMoms() {
   };
 
   const fetchAnswers = async (questionId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    let query = supabase
+    // Show all answers without approval filter
+    const { data, error } = await supabase
       .from('answers')
       .select('*')
-      .eq('question_id', questionId);
-    
-    // If not admin, only show approved answers + user's own answers
-    if (!isAdmin && user) {
-      query = query.or(`status.eq.approved,user_id.eq.${user.id}`);
-    } else if (!isAdmin) {
-      query = query.eq('status', 'approved');
-    }
-    
-    const { data, error } = await query.order('created_at', { ascending: true });
+      .eq('question_id', questionId)
+      .order('created_at', { ascending: true });
 
     if (error) {
       console.error('Error fetching answers:', error);
@@ -351,7 +333,7 @@ export default function AskMoms() {
       content: newAnswer,
       question_id: selectedQuestion.id,
       user_id: user.id,
-      status: 'pending'
+      status: 'approved'
     };
 
     if (answerDisplayMode === 'pseudonym' && answerPseudonym.trim()) {
@@ -371,7 +353,7 @@ export default function AskMoms() {
 
     toast({ 
       title: "Επιτυχία! 💕", 
-      description: "Η απάντησή σου εστάλη προς έγκριση! Θα την δεις σύντομα." 
+      description: "Η απάντησή σου δημοσιεύτηκε!" 
     });
     setNewAnswer("");
     setAnswerDisplayMode('name');
