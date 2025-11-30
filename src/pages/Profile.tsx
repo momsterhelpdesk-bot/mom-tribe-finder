@@ -138,6 +138,26 @@ export default function ProfileNew() {
           <div className="mt-2 h-[1px] w-24 mx-auto bg-gradient-to-r from-transparent via-[#F3DCE5] to-transparent opacity-50" />
         </div>
 
+        {/* Admin Panel Button - Prominent Position */}
+        {isOwnProfile && isAdmin && (
+          <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-[28px] shadow-lg">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-500" />
+                <h3 className="text-lg font-bold text-purple-700">Admin Access</h3>
+              </div>
+              <Button
+                onClick={() => navigate("/admin")}
+                className="w-full rounded-[30px] bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-md hover:shadow-xl transition-all"
+                size="lg"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Open Admin Dashboard
+              </Button>
+            </div>
+          </Card>
+        )}
+
         {/* Profile Photo Section - Cute & Elegant */}
         <Card className="p-8 bg-gradient-to-br from-white/80 to-[#FDF7F9] border-2 border-[#F3DCE5] rounded-[35px] shadow-lg hover:shadow-xl transition-all">
           <div className="flex flex-col items-center space-y-6">
@@ -265,17 +285,6 @@ export default function ProfileNew() {
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
-            
-            {isAdmin && (
-              <Button
-                onClick={() => navigate("/admin")}
-                className="w-full rounded-[30px] bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white shadow-md hover:shadow-lg transition-all"
-                size="lg"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Admin Dashboard
-              </Button>
-            )}
           </div>
         )}
       </div>
