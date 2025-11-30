@@ -21,17 +21,17 @@ export default function AuthCallback() {
           .from('profiles')
           .select('profile_completed, has_completed_onboarding')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
 
         // If profile doesn't exist yet, wait a bit and retry (trigger might be running)
-        if (profileError && profileError.code === 'PGRST116') {
+        if (profileError || !profile) {
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           const { data: retryProfile } = await supabase
             .from('profiles')
             .select('profile_completed, has_completed_onboarding')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
           
           if (!retryProfile?.profile_completed) {
             navigate("/profile-setup");

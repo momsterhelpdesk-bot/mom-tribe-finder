@@ -33,6 +33,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       if (!session) {
         navigate("/auth");
       }
+    }).catch((error) => {
+      console.error('Session error:', error);
+      setLoading(false);
+      navigate("/auth");
     });
 
     return () => subscription.unsubscribe();
