@@ -13,6 +13,8 @@ export function useActivityTracker() {
           .upsert({
             user_id: session.user.id,
             last_activity_at: new Date().toISOString(),
+          }, {
+            onConflict: 'user_id'
           });
       }
     };

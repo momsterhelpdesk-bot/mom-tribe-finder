@@ -274,8 +274,21 @@ export default function ProfileSetup() {
 
       if (updateError) throw updateError;
 
+      // Check if onboarding has been completed
+      const { data: updatedProfile } = await supabase
+        .from('profiles')
+        .select('has_completed_onboarding')
+        .eq('id', userId)
+        .single();
+
       toast.success("Το προφίλ σας ολοκληρώθηκε!");
-      navigate("/discover");
+      
+      // If onboarding not completed, go there, otherwise go to discover
+      if (!updatedProfile?.has_completed_onboarding) {
+        navigate("/onboarding");
+      } else {
+        navigate("/discover");
+      }
     } catch (error: any) {
       toast.error(error.message || "Σφάλμα κατά την ενημέρωση του προφίλ");
     } finally {
