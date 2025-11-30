@@ -36,14 +36,12 @@ export default function Admin() {
       return;
     }
 
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', session.user.id);
+    const { data: hasAdminRole, error } = await supabase.rpc("has_role", {
+      _user_id: session.user.id,
+      _role: "admin",
+    });
 
-    const hasAdminRole = roles?.some(r => r.role === 'admin');
-    
-    if (!hasAdminRole) {
+    if (error || !hasAdminRole) {
       toast.error("Δεν έχετε δικαιώματα διαχειριστή");
       navigate("/discover");
       return;
