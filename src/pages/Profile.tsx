@@ -139,8 +139,8 @@ export default function ProfileNew() {
   const primaryPhoto = profilePhotos[0] || profile.profile_photo_url;
 
   return (
-    <div className="min-h-screen pt-24 pb-32 px-4" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)' }}>
-      <div className="max-w-3xl mx-auto space-y-6">
+    <div className="min-h-screen pt-24 pb-48 px-4" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)' }}>
+      <div className="max-w-3xl mx-auto space-y-6 mb-8">
         {/* Welcome Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
@@ -286,18 +286,18 @@ export default function ProfileNew() {
               <div className="relative">
                 <Button
                   variant="outline"
-                  className="w-full rounded-[30px] border-2 border-destructive/50 hover:bg-destructive hover:text-white text-destructive shadow-md hover:shadow-xl transition-all font-bold text-lg py-8 relative overflow-hidden"
+                  className="w-full rounded-[30px] border-2 border-destructive/50 hover:bg-destructive hover:text-white text-destructive shadow-md hover:shadow-xl transition-all font-bold text-lg py-6 relative overflow-hidden"
                   size="lg"
                   onClick={handleSignOut}
                 >
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-16 h-16 opacity-30">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 opacity-30">
                     <img src={mascot} alt="" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex items-center gap-2 relative z-10">
-                    <LogOut className="w-6 h-6" />
+                    <LogOut className="w-5 h-5" />
                     <span>Αποσύνδεση</span>
                   </div>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-5xl opacity-20">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-4xl opacity-20">
                     🚪
                   </div>
                 </Button>
