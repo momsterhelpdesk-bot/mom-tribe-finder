@@ -41,9 +41,17 @@ export default function ProfileNew() {
         .from("profiles")
         .select("*")
         .eq("id", profileId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      // If profile not found or error, sign out and redirect
+      if (error || !data) {
+        console.error("Profile error:", error);
+        toast.error(language === "el" ? "Το προφίλ δεν βρέθηκε. Παρακαλώ συνδεθείτε ξανά." : "Profile not found. Please sign in again.");
+        await supabase.auth.signOut();
+        navigate("/auth");
+        return;
+      }
+
       setProfile(data);
 
       // Check if user is admin
@@ -62,6 +70,8 @@ export default function ProfileNew() {
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error(language === "el" ? "Σφάλμα φόρτωσης προφίλ" : "Error loading profile");
+      await supabase.auth.signOut();
+      navigate("/auth");
     } finally {
       setLoading(false);
     }
