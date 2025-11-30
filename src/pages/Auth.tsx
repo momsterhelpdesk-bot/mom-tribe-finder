@@ -45,11 +45,18 @@ export default function Auth() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         // Check profile completion status
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('profile_completed, has_completed_onboarding')
           .eq('id', session.user.id)
-          .single();
+          .maybeSingle();
+
+        if (profileError) {
+          console.error('Profile error:', profileError);
+          await supabase.auth.signOut();
+          toast.error("Σφάλμα με το προφίλ. Παρακαλώ συνδεθείτε ξανά.");
+          return;
+        }
 
         if (!profile?.profile_completed) {
           navigate("/profile-setup");
@@ -152,11 +159,18 @@ export default function Auth() {
 
       if (data.user) {
         // Check if profile is completed
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('profile_completed, has_completed_onboarding')
           .eq('id', data.user.id)
-          .single();
+          .maybeSingle();
+
+        if (profileError) {
+          console.error('Profile error:', profileError);
+          await supabase.auth.signOut();
+          toast.error("Σφάλμα με το προφίλ. Παρακαλώ δοκιμάστε ξανά.");
+          return;
+        }
 
         if (!profile?.profile_completed) {
           showWelcome();
