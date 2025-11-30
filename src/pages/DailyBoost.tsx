@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Sparkles, X, Lightbulb, ChefHat, Calendar } from "lucide-react";
 import { useMascot } from "@/hooks/use-mascot";
+import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import mascot from "@/assets/mascot.jpg";
 import ThisOrThat from "@/components/ThisOrThat";
@@ -158,6 +159,7 @@ const DID_YOU_KNOW_FACTS = {
 
 export default function DailyBoost() {
   const { language } = useLanguage();
+  const { toast } = useToast();
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [moodQuote, setMoodQuote] = useState<string>("");
   const [currentMoodQuoteIndex, setCurrentMoodQuoteIndex] = useState(0);
@@ -294,6 +296,51 @@ export default function DailyBoost() {
           <p className="text-sm text-muted-foreground">
             {language === 'el' ? 'Η καθημερινή σου δόση ενέργειας' : 'Your daily dose of energy'}
           </p>
+        </div>
+
+        {/* Quote of the Day - Full width */}
+        <div className="max-w-5xl mx-auto">
+          <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
+            <div className="flex items-start gap-4">
+              <div className="text-4xl">💭</div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-purple-700 mb-2">
+                  {language === 'el' ? 'Quote of the Day' : 'Quote of the Day'}
+                </h3>
+                <p className="text-purple-600 italic text-base leading-relaxed">
+                  {dailyQuote}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* How Are You Feeling Today? - Full width */}
+        <div className="max-w-5xl mx-auto">
+          <Card className="p-6 bg-gradient-to-br from-yellow-50 to-orange-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
+            <h3 className="text-xl font-bold text-orange-700 mb-4 text-center">
+              {language === 'el' ? 'Πώς νιώθεις σήμερα;' : 'How are you feeling today?'}
+            </h3>
+            <div className="grid grid-cols-5 gap-3">
+              {MOODS.map((mood) => (
+                <button
+                  key={mood.value}
+                  className={`aspect-square rounded-full bg-white/80 hover:bg-white shadow-md hover:shadow-lg transition-all hover:scale-110 flex items-center justify-center text-4xl ${
+                    selectedMood === mood.value ? 'ring-4 ring-orange-400 bg-white' : ''
+                  }`}
+                  onClick={() => handleMoodSelect(mood.value)}
+                  title={mood.label}
+                >
+                  {mood.emoji}
+                </button>
+              ))}
+            </div>
+            {selectedMood && moodQuote && (
+              <div className="mt-4 p-4 bg-white/60 rounded-2xl text-center">
+                <p className="text-orange-700 italic">{moodQuote}</p>
+              </div>
+            )}
+          </Card>
         </div>
 
         {/* 2x2 Grid Layout with generous spacing */}
