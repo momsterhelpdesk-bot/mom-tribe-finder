@@ -25,9 +25,16 @@ const Navigation = () => {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast.success("Αποσυνδεθήκατε επιτυχώς");
-    navigate("/");
+    try {
+      await supabase.auth.signOut();
+      // Clear any cached data
+      localStorage.clear();
+      toast.success("Αποσυνδεθήκατε επιτυχώς");
+      navigate("/auth");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Σφάλμα αποσύνδεσης");
+    }
   };
 
   return (
