@@ -64,15 +64,8 @@ export default function Discover() {
     }
   }, [loading]);
 
-  // Filter out admin profiles and add demo profile
-  const filteredProfiles = profiles.filter(async (profile) => {
-    // Check if profile is admin
-    const { data: hasAdminRole } = await supabase.rpc("has_role", {
-      _user_id: profile.id,
-      _role: "admin",
-    });
-    return !hasAdminRole;
-  });
+  // Filter out current user and add demo profile
+  const filteredProfiles = profiles.filter(profile => profile.id !== currentUserId);
   
   const allProfiles = [demoProfile, ...filteredProfiles];
   const currentProfile = allProfiles[currentIndex];
@@ -82,46 +75,30 @@ export default function Discover() {
     
     const nextIndex = currentIndex + 1;
     
-    if (liked) {
-      // Create match in database
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user && currentProfile) {
-        // In a real app, you'd check if other user also liked
-        // For demo, we'll simulate mutual match (50% chance)
-        const isMutualMatch = Math.random() > 0.5;
-        
-        if (isMutualMatch) {
-          // Create match record
-          const { error } = await supabase
-            .from("matches")
-            .insert([{
-              user1_id: user.id,
-              user2_id: currentProfile.id.toString()
-            }]);
-
-          if (!error) {
-            // Create notification for the match
-            await supabase
-              .from('notifications')
-              .insert({
-                user_id: user.id,
-                type: 'match',
-                title: 'Νέο Match! 💕',
-                message: `Έχεις νέο match με την ${currentProfile.full_name}!`,
-                icon: '💕',
-                metadata: {
-                  match_id: currentProfile.id,
-                  match_name: currentProfile.full_name
-                }
-              });
-
-            setShowMatchVideo(true);
-            setTimeout(() => {
-              setShowMatchVideo(false);
-              showMatch(() => navigate("/chats"));
-            }, 3000);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && currentProfile && currentProfile.id !== 'demo-123') {
+      try {
+        // Call edge function to check for mutual match
+        const { data, error } = await supabase.functions.invoke('check-mutual-match', {
+          body: {
+            fromUserId: user.id,
+            toUserId: currentProfile.id,
+            choice: liked ? 'yes' : 'no'
           }
+        });
+
+        if (error) {
+          console.error('Error checking mutual match:', error);
+        } else if (data?.mutualMatch) {
+          // Show match celebration
+          setShowMatchVideo(true);
+          setTimeout(() => {
+            setShowMatchVideo(false);
+            showMatch(() => navigate("/chats"));
+          }, 3000);
         }
+      } catch (error) {
+        console.error('Error in handleSwipe:', error);
       }
     }
     

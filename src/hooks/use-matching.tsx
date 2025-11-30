@@ -88,7 +88,7 @@ export function useMatching() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get current user's profile with filters
+      // Get current user's profile
       const { data: currentProfile, error: profileError } = await supabase
         .from("profiles")
         .select("*")
@@ -98,70 +98,88 @@ export function useMatching() {
       if (profileError) throw profileError;
       
       setCurrentUser(currentProfile);
-      setFilters({
-        showLocationFilter: currentProfile.show_location_filter || false,
-        distancePreferenceKm: currentProfile.distance_preference_km || 5,
-        matchAgeFilter: currentProfile.match_age_filter || false,
-        ageRangeMonths: currentProfile.age_range_months || 3,
-        matchInterestsFilter: currentProfile.match_interests_filter || false
-      });
 
-      // Get all profiles except current user
-      let query = supabase
+      // Get ALL profiles with complete profile (photo + interests + children)
+      // Exclude: current user, admin users, incomplete profiles
+      const { data: allProfiles, error: profilesError } = await supabase
         .from("profiles")
         .select("id, full_name, profile_photo_url, profile_photos_urls, bio, city, area, interests, children, latitude, longitude")
         .neq("id", user.id)
         .eq("profile_completed", true)
-        .not("profile_photo_url", "is", null);
-
-      const { data: allProfiles, error: profilesError } = await query;
+        .not("profile_photo_url", "is", null)
+        .not("interests", "is", null)
+        .not("children", "is", null);
 
       if (profilesError) throw profilesError;
 
-      // Apply filters
-      let filteredProfiles = allProfiles || [];
+      let profilesWithScores = allProfiles || [];
 
-      // Location filter
-      if (currentProfile.show_location_filter && currentProfile.latitude && currentProfile.longitude) {
-        const profilesWithDistance = await Promise.all(
-          filteredProfiles.map(async (profile) => {
-            if (!profile.latitude || !profile.longitude) return null;
-            
-            const distance = await calculateDistance(
+      // Filter out profiles with empty interests or children arrays
+      profilesWithScores = profilesWithScores.filter(profile => 
+        profile.interests && Array.isArray(profile.interests) && profile.interests.length > 0 &&
+        profile.children && Array.isArray(profile.children) && (profile.children as any[]).length > 0
+      );
+
+      // Calculate distance for all profiles
+      const profilesWithDistance = await Promise.all(
+        profilesWithScores.map(async (profile) => {
+          let distance = 9999; // Default large distance
+          
+          if (currentProfile.latitude && currentProfile.longitude && 
+              profile.latitude && profile.longitude) {
+            distance = await calculateDistance(
               currentProfile.latitude,
               currentProfile.longitude,
               profile.latitude,
               profile.longitude
             );
+          } else if (profile.area === currentProfile.area) {
+            distance = 1; // Same area
+          } else if (profile.city === currentProfile.city) {
+            distance = 5; // Same city
+          }
+          
+          return { ...profile, distance };
+        })
+      );
 
-            if (distance <= currentProfile.distance_preference_km) {
-              return { ...profile, distance };
-            }
-            return null;
-          })
-        );
-        filteredProfiles = profilesWithDistance.filter(p => p !== null) as ProfileMatch[];
-      }
+      // Calculate kids age match score
+      const currentUserAvgAge = getAverageChildAge(currentProfile.children);
+      const profilesWithAgeScore = profilesWithDistance.map(profile => {
+        const profileAvgAge = getAverageChildAge(profile.children);
+        const ageDiff = Math.abs(profileAvgAge - currentUserAvgAge);
+        // Lower diff = higher score (inverse relationship)
+        const ageMatchScore = Math.max(0, 100 - ageDiff * 2);
+        return { ...profile, ageMatchScore };
+      });
 
-      // Age filter
-      if (currentProfile.match_age_filter && currentProfile.children) {
-        const currentUserAvgAge = getAverageChildAge(currentProfile.children);
-        filteredProfiles = filteredProfiles.filter(profile => {
-          if (!profile.children) return false;
-          const profileAvgAge = getAverageChildAge(profile.children);
-          return Math.abs(profileAvgAge - currentUserAvgAge) <= currentProfile.age_range_months;
-        });
-      }
+      // Calculate interests match score
+      const profilesWithInterestScore = profilesWithAgeScore.map(profile => {
+        if (!currentProfile.interests || !profile.interests) {
+          return { ...profile, interestsMatchScore: 0 };
+        }
+        const commonInterests = profile.interests.filter(interest => 
+          currentProfile.interests.includes(interest)
+        ).length;
+        const interestsMatchScore = (commonInterests / Math.max(currentProfile.interests.length, 1)) * 100;
+        return { ...profile, interestsMatchScore };
+      });
 
-      // Interests filter
-      if (currentProfile.match_interests_filter && currentProfile.interests && currentProfile.interests.length > 0) {
-        filteredProfiles = filteredProfiles.filter(profile => {
-          if (!profile.interests || profile.interests.length === 0) return false;
-          return profile.interests.some(interest => currentProfile.interests.includes(interest));
-        });
-      }
+      // Sort: distance ASC → kidsAgeMatch DESC → interestsMatch DESC
+      profilesWithInterestScore.sort((a, b) => {
+        // First by distance (ascending)
+        if (a.distance !== b.distance) {
+          return a.distance - b.distance;
+        }
+        // Then by age match score (descending)
+        if (a.ageMatchScore !== b.ageMatchScore) {
+          return b.ageMatchScore - a.ageMatchScore;
+        }
+        // Finally by interests match score (descending)
+        return b.interestsMatchScore - a.interestsMatchScore;
+      });
 
-      setProfiles(filteredProfiles);
+      setProfiles(profilesWithInterestScore);
     } catch (error) {
       console.error("Error loading matching profiles:", error);
     } finally {
