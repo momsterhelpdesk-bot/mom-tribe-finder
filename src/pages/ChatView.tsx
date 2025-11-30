@@ -77,10 +77,10 @@ export default function ChatView() {
 
     if (!match) return;
 
-    // Get other user's profile
+    // Get other user's profile - only need public info for chat header
     const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
     const { data: profile } = await supabase
-      .from("profiles")
+      .from("profiles_safe")
       .select("*")
       .eq("id", otherUserId)
       .single();

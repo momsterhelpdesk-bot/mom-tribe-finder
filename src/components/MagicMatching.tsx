@@ -16,7 +16,8 @@ interface MatchedProfile {
   city: string;
   area: string;
   interests: string[];
-  children: any[];
+  child_age_group?: string;
+  child_names?: string;
 }
 
 export default function MagicMatching() {
@@ -59,9 +60,9 @@ export default function MagicMatching() {
 
       if (currentError) throw currentError;
 
-      // Find potential matches with similar criteria
+      // Find potential matches with similar criteria - use profiles_safe for public matching
       const { data: potentialMatches, error: matchError } = await supabase
-        .from('profiles')
+        .from('profiles_safe')
         .select('*')
         .neq('id', user.id)
         .eq('city', currentProfile.city);
@@ -80,15 +81,17 @@ export default function MagicMatching() {
 
       const scoredMatches = potentialMatches.map(profile => {
         let score = 0;
-        const profileChildren = Array.isArray(profile.children) ? profile.children : [];
+        // profiles_safe doesn't have children field, use child_age_group for scoring
         const profileInterests = Array.isArray(profile.interests) ? profile.interests : [];
 
         // Same area bonus
         if (profile.area === currentProfile.area) score += 3;
 
-        // Similar child ages (simplified scoring)
-        if (profileChildren.length > 0 && currentChildren.length > 0) {
-          score += 2;
+        // Similar child ages (simplified scoring using child_age_group)
+        if (profile.child_age_group && currentProfile.child_age_group) {
+          if (profile.child_age_group === currentProfile.child_age_group) {
+            score += 2;
+          }
         }
 
         // Shared interests
@@ -107,7 +110,6 @@ export default function MagicMatching() {
         const bestMatch = scoredMatches[0].profile;
         setMatchedProfile({
           ...bestMatch,
-          children: Array.isArray(bestMatch.children) ? bestMatch.children : [],
           interests: Array.isArray(bestMatch.interests) ? bestMatch.interests : []
         });
       } else {
@@ -115,7 +117,6 @@ export default function MagicMatching() {
         const randomMatch = potentialMatches[Math.floor(Math.random() * potentialMatches.length)];
         setMatchedProfile({
           ...randomMatch,
-          children: Array.isArray(randomMatch.children) ? randomMatch.children : [],
           interests: Array.isArray(randomMatch.interests) ? randomMatch.interests : []
         });
       }

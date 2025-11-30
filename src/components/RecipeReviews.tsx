@@ -56,7 +56,7 @@ export function RecipeReviews({ recipeId }: RecipeReviewsProps) {
       if (reviewsData && reviewsData.length > 0) {
         const userIds = reviewsData.map((r) => r.user_id);
         const { data: profilesData, error: profilesError } = await supabase
-          .from("profiles")
+          .from("profiles_safe")
           .select("id, full_name")
           .in("id", userIds);
 

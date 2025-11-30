@@ -132,7 +132,7 @@ export default function PhotoVerification() {
       // Upload photo if new one selected
       if (selfiePhoto) {
         const fileExt = selfiePhoto.name.split('.').pop();
-        const fileName = `${userId}-${Date.now()}.${fileExt}`;
+        const fileName = `${userId}/${Date.now()}.${fileExt}`;
         
         const { error: uploadError } = await supabase.storage
           .from('selfie-photos')
@@ -140,11 +140,14 @@ export default function PhotoVerification() {
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        // Use signed URL for private bucket
+        const { data: signedData, error: signedError } = await supabase.storage
           .from('selfie-photos')
-          .getPublicUrl(fileName);
+          .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year expiry
 
-        photoUrl = publicUrl;
+        if (signedError) throw signedError;
+        
+        photoUrl = signedData.signedUrl;
       }
 
       // Create or update verification request

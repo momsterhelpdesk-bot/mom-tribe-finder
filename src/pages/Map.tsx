@@ -49,17 +49,29 @@ export default function Map() {
 
       setUserLocation({ lat: profile.latitude, lng: profile.longitude });
 
-      // Get all moms with locations (exclude current user)
+      // Get all moms with locations (exclude current user) - use profiles_safe for public display
       const { data: allMoms } = await supabase
+        .from('profiles_safe')
+        .select('id, full_name, profile_photo_url, child_age_group')
+        .neq('id', user.id);
+      
+      // Get user's own location from profiles table
+      const { data: locations } = await supabase
         .from('profiles')
-        .select('id, full_name, profile_photo_url, child_age_group, latitude, longitude')
-        .neq('id', user.id)
+        .select('id, latitude, longitude')
+        .in('id', allMoms?.map(m => m.id) || [])
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
+      
+      // Merge location data with public profile data
+      const allMomsWithLocation = allMoms?.map(mom => {
+        const location = locations?.find(l => l.id === mom.id);
+        return location ? { ...mom, latitude: location.latitude, longitude: location.longitude } : null;
+      }).filter(Boolean) || [];
 
-      if (allMoms) {
+      if (allMomsWithLocation) {
         // Calculate distances client-side for now
-        const momsWithDistance = allMoms.map(mom => ({
+        const momsWithDistance = allMomsWithLocation.map((mom: any) => ({
           ...mom,
           distance: calculateDistance(
             profile.latitude,
@@ -67,8 +79,8 @@ export default function Map() {
             mom.latitude!,
             mom.longitude!
           )
-        })).filter(mom => mom.distance <= 50) // Within 50km
-        .sort((a, b) => a.distance - b.distance)
+        })).filter((mom: any) => mom.distance <= 50) // Within 50km
+        .sort((a: any, b: any) => a.distance - b.distance)
         .slice(0, 20); // Show top 20 closest
 
         setNearbyMoms(momsWithDistance);

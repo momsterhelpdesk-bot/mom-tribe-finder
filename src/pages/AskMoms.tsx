@@ -121,10 +121,10 @@ export default function AskMoms() {
     }
 
     if (data) {
-      // Fetch profiles for each question
+      // Fetch profiles_safe for each question
       const userIds = [...new Set(data.map(q => q.user_id))];
       const { data: profiles } = await supabase
-        .from('profiles')
+        .from('profiles_safe')
         .select('id, full_name')
         .in('id', userIds);
 
@@ -322,10 +322,10 @@ export default function AskMoms() {
     }
 
     if (data) {
-      // Fetch profiles for each answer
+      // Fetch profiles_safe for each answer
       const userIds = [...new Set(data.map(a => a.user_id))];
       const { data: profiles } = await supabase
-        .from('profiles')
+        .from('profiles_safe')
         .select('id, full_name')
         .in('id', userIds);
 
