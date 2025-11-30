@@ -19,7 +19,7 @@ export default function AuthCallback() {
         // Check if profile exists
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
-          .select('profile_completed')
+          .select('profile_completed, has_completed_onboarding')
           .eq('id', session.user.id)
           .single();
 
@@ -29,12 +29,17 @@ export default function AuthCallback() {
           
           const { data: retryProfile } = await supabase
             .from('profiles')
-            .select('profile_completed')
+            .select('profile_completed, has_completed_onboarding')
             .eq('id', session.user.id)
             .single();
           
           if (!retryProfile?.profile_completed) {
             navigate("/profile-setup");
+            return;
+          }
+          
+          if (!retryProfile?.has_completed_onboarding) {
+            navigate("/onboarding");
             return;
           }
         }
@@ -45,7 +50,13 @@ export default function AuthCallback() {
           return;
         }
 
-        // Profile completed, go to discover
+        // If profile completed but onboarding not done, go to onboarding
+        if (!profile?.has_completed_onboarding) {
+          navigate("/onboarding");
+          return;
+        }
+
+        // Everything completed, go to discover
         navigate("/discover");
       } catch (error: any) {
         console.error('Auth callback error:', error);

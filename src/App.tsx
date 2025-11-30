@@ -23,6 +23,7 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import PrivacyTerms from "./pages/PrivacyTerms";
 import NotFound from "./pages/NotFound";
+import Onboarding from "./pages/Onboarding";
 import BottomNav from "./components/BottomNav";
 import AuthGuard from "./components/AuthGuard";
 import MomAlerts from "./components/MomAlerts";
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth-callback" element={<AuthCallback />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/onboarding" element={<AuthGuard><Onboarding /></AuthGuard>} />
           <Route path="/profile-setup" element={<AuthGuard><ProfileSetup /></AuthGuard>} />
           <Route path="/photo-verification" element={<AuthGuard><PhotoVerification /></AuthGuard>} />
           <Route path="/admin" element={<AuthGuard><Admin /></AuthGuard>} />

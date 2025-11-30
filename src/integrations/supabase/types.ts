@@ -436,6 +436,7 @@ export type Database = {
           distance_preference_km: number | null
           email: string
           full_name: string
+          has_completed_onboarding: boolean | null
           id: string
           interests: string[] | null
           is_blocked: boolean | null
@@ -472,6 +473,7 @@ export type Database = {
           distance_preference_km?: number | null
           email: string
           full_name: string
+          has_completed_onboarding?: boolean | null
           id: string
           interests?: string[] | null
           is_blocked?: boolean | null
@@ -508,6 +510,7 @@ export type Database = {
           distance_preference_km?: number | null
           email?: string
           full_name?: string
+          has_completed_onboarding?: boolean | null
           id?: string
           interests?: string[] | null
           is_blocked?: boolean | null
