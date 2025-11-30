@@ -7,7 +7,6 @@ import { Heart, MessageCircle, Calendar, ShoppingBag, Users, MapPin, UtensilsCro
 import communityLogo from "@/assets/community-logo.jpg";
 import logo from "@/assets/logo-full.jpg";
 import mascot from "@/assets/mascot.jpg";
-import mompreneurBadge from "@/assets/mompreneur-badge.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ThisOrThat from "@/components/ThisOrThat";
 import MagicMatching from "@/components/MagicMatching";
@@ -51,12 +50,6 @@ const Index = () => {
       title: "Momster Ταπεράκι",
       description: "Υγιεινές συνταγές για μικρά χεράκια",
       bg: "bg-gradient-to-br from-orange-100 to-pink-100"
-    },
-    {
-      icon: <ShoppingBag className="h-6 w-6" />,
-      title: "Mompreneur",
-      description: "Υποστήριξη για μαμάδες επιχειρηματίες - Coming Soon",
-      bg: "bg-gradient-to-br from-purple-100 to-pink-100"
     }
   ];
 
@@ -68,23 +61,31 @@ const Index = () => {
       <section className="pt-32 pb-16 px-4 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)' }}>
         {/* Large animated mascot with waving animation */}
         <div className="absolute top-10 right-10 hidden lg:block animate-float opacity-90">
-        <div className="w-56 h-56 rounded-full flex items-center justify-center bg-[#F8E9EE]/25">
+        <div className="w-56 h-56 rounded-full flex items-center justify-center bg-gradient-to-br from-[#F8E9EE]/40 to-transparent">
           <img 
             src={logo} 
             alt="Momster Logo" 
             className="w-48 h-48 object-cover rounded-full drop-shadow-2xl" 
-            style={{ opacity: 0.95 }}
+            style={{ 
+              opacity: 0.95,
+              maskImage: 'radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
+              WebkitMaskImage: 'radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
+            }}
           />
         </div>
         </div>
         <div className="container mx-auto text-center max-w-5xl">
           <div className="mb-6 flex flex-col items-center justify-center gap-4">
-            <div className="relative inline-block p-4 rounded-full bg-[#F8E9EE]/25">
+              <div className="relative inline-block p-4 rounded-full bg-gradient-to-br from-[#F8E9EE]/40 to-transparent">
                <img 
                  src={logo} 
                  alt="Momster Logo" 
                  className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-cover rounded-full animate-scale-in drop-shadow-2xl" 
-                 style={{ opacity: 0.95 }}
+                 style={{ 
+                   opacity: 0.95,
+                   maskImage: 'radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
+                   WebkitMaskImage: 'radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
+                 }}
                />
              </div>
           </div>
@@ -220,8 +221,8 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {/* Recipes - spans 2 columns */}
-            <Link to="/recipes" className="md:col-span-2">
+            {/* Recipes - spans 3 columns */}
+            <Link to="/recipes" className="md:col-span-3">
               <Card className="bg-gradient-to-br from-orange-100 to-pink-100 border-none hover:shadow-xl transition-all hover:scale-[1.02] h-full">
                 <CardContent className="p-8 relative overflow-hidden">
                   <div className="absolute top-4 right-4 opacity-20">
@@ -237,63 +238,7 @@ const Index = () => {
                 </CardContent>
               </Card>
             </Link>
-
-            {/* Mompreneur - Coming Soon */}
-            <Card className="md:col-span-3 bg-gradient-to-br from-purple-100 to-pink-100 border-none hover:shadow-lg transition-all hover:scale-[1.02] relative overflow-hidden">
-              <div className="absolute top-2 right-2">
-                <Badge variant="secondary" className="bg-purple-200 text-purple-700">Coming Soon</Badge>
-              </div>
-              <CardContent className="p-6 relative overflow-hidden">
-                <div className="absolute top-2 right-16 opacity-10">
-                  <img src={mascot} alt="Mascot" className="w-16 h-16 object-contain" />
-                </div>
-                <div className="text-primary mb-3">{features[6].icon}</div>
-                <h3 className="text-lg font-semibold mb-2 text-foreground">
-                  {features[6].title}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {features[6].description}
-                </p>
-              </CardContent>
-            </Card>
           </div>
-        </div>
-      </section>
-
-      {/* Mompreneur Section - Enhanced Visibility */}
-      <section id="mompreneur" className="py-20 px-4 bg-gradient-to-br from-purple-100 via-pink-100 to-purple-200">
-        <div className="container mx-auto max-w-5xl">
-          <div className="text-center mb-10 flex flex-col items-center gap-4">
-            <img src={mompreneurBadge} alt="Mompreneur Badge" className="w-64 h-64 object-contain drop-shadow-2xl" />
-            <h2 className="text-4xl font-bold mb-4 text-purple-800" style={{ fontFamily: "'Pacifico', cursive" }}>
-              Mompreneur: Συνάντησε τις Boss Moms της Κοινότητας
-            </h2>
-            <p className="text-lg font-semibold text-purple-700 max-w-3xl">
-              Κάθε εβδομάδα, μια νέα ιστορία έμπνευσης από μια μαμά που δημιούργησε τη δική της επιχείρηση, 
-              ισορροπώντας τέλεια την καριέρα και την οικογένεια. Get Inspired!
-            </p>
-          </div>
-          <Card className="bg-gradient-to-br from-white via-pink-50 to-purple-50 border-4 border-purple-300 hover:shadow-2xl transition-all relative overflow-hidden">
-            <div className="absolute top-6 right-6 z-10">
-              <Badge variant="secondary" className="bg-purple-300 text-purple-900 text-sm font-bold px-4 py-2 shadow-lg">
-                Coming Soon
-              </Badge>
-            </div>
-            <CardContent className="p-10 relative overflow-hidden">
-              {/* Animated mascots in background */}
-              <div className="absolute top-8 right-32 opacity-20 animate-bounce">
-                <img src={mascot} alt="Mompreneur Mascot" className="w-24 h-24 object-contain" />
-              </div>
-              <div className="absolute bottom-8 left-8 opacity-15 animate-pulse">
-                <img src={mascot} alt="Mompreneur Mascot" className="w-20 h-20 object-contain" />
-              </div>
-              
-              <div className="text-purple-600 mb-6 text-5xl">{features[6].icon}</div>
-              <h3 className="text-3xl font-bold mb-4 text-purple-900">
-                Υποστήριξη για Mompreneurs
-              </h3>
-            </CardContent>
-          </Card>
         </div>
       </section>
 
@@ -334,8 +279,17 @@ const Index = () => {
             {/* Brand Section */}
             <div className="text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
-                  <div className="relative inline-block p-3 rounded-full bg-[#F8E9EE]/25 backdrop-blur-sm">
-                    <img src={logo} alt="Momster Logo" className="w-16 h-16 object-cover rounded-full" style={{ opacity: 0.95 }} />
+                  <div className="relative inline-block p-3 rounded-full bg-gradient-to-br from-[#F8E9EE]/40 to-transparent backdrop-blur-sm">
+                    <img 
+                      src={logo} 
+                      alt="Momster Logo" 
+                      className="w-16 h-16 object-cover rounded-full" 
+                      style={{ 
+                        opacity: 0.95,
+                        maskImage: 'radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
+                        WebkitMaskImage: 'radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)'
+                      }}
+                    />
                   </div>
               </div>
             </div>
