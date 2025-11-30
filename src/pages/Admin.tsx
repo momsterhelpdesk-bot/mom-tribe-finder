@@ -13,6 +13,11 @@ import { CheckCircle, XCircle, AlertCircle, ArrowLeft } from "lucide-react";
 import AdminOverview from "@/components/admin/AdminOverview";
 import ForumModeration from "@/components/admin/ForumModeration";
 import UserManagement from "@/components/admin/UserManagement";
+import EventsManagement from "@/components/admin/EventsManagement";
+import ContentManagement from "@/components/admin/ContentManagement";
+import AppSettings from "@/components/admin/AppSettings";
+import SystemLogs from "@/components/admin/SystemLogs";
+import NotificationsPanel from "@/components/admin/NotificationsPanel";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -262,15 +267,10 @@ export default function Admin() {
         </Card>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="flex w-full flex-wrap gap-2 h-auto">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2 h-auto">
             <TabsTrigger value="overview">Επισκόπηση</TabsTrigger>
-            <TabsTrigger value="moderation">
-              Forum
-              <Badge variant="secondary" className="ml-2 text-xs">
-                {/* Pending count will be shown by ForumModeration component */}
-              </Badge>
-            </TabsTrigger>
             <TabsTrigger value="users">Χρήστες</TabsTrigger>
+            <TabsTrigger value="moderation">Forum</TabsTrigger>
             <TabsTrigger value="verifications">
               Επαληθεύσεις
               <Badge variant="secondary" className="ml-2 text-xs">
@@ -284,11 +284,16 @@ export default function Admin() {
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="marketplace">
-              Marketplace Waitlist
+              Marketplace
               <Badge variant="secondary" className="ml-2 text-xs">
                 {marketplaceNotifications.length}
               </Badge>
             </TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="logs">Logs</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
           </TabsList>
 
@@ -296,12 +301,32 @@ export default function Admin() {
             <AdminOverview />
           </TabsContent>
 
+          <TabsContent value="users">
+            <UserManagement />
+          </TabsContent>
+
           <TabsContent value="moderation">
             <ForumModeration />
           </TabsContent>
 
-          <TabsContent value="users">
-            <UserManagement />
+          <TabsContent value="notifications">
+            <NotificationsPanel />
+          </TabsContent>
+
+          <TabsContent value="events">
+            <EventsManagement />
+          </TabsContent>
+
+          <TabsContent value="content">
+            <ContentManagement />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <AppSettings />
+          </TabsContent>
+
+          <TabsContent value="logs">
+            <SystemLogs />
           </TabsContent>
 
           <TabsContent value="verifications" className="space-y-4">

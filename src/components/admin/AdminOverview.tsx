@@ -16,6 +16,11 @@ export default function AdminOverview() {
     totalMatches: 0,
     pendingApprovals: 0,
     pendingReports: 0,
+    totalMessages: 0,
+    totalSwipes: 0,
+    magicMatchPlays: 0,
+    marketplaceSignups: 0,
+    usersByArea: [] as { area: string; count: number }[],
   });
 
   useEffect(() => {
@@ -88,11 +93,43 @@ export default function AdminOverview() {
         .select("*", { count: "exact", head: true })
         .eq("status", "pending");
 
+      // Total messages
+      const { count: totalMessages } = await supabase
+        .from("chat_messages")
+        .select("*", { count: "exact", head: true });
+
+      // Marketplace signups
+      const { count: marketplaceSignups } = await supabase
+        .from("marketplace_notifications")
+        .select("*", { count: "exact", head: true });
+
+      // Magic Match plays (poll votes)
+      const { count: magicMatchPlays } = await supabase
+        .from("poll_votes")
+        .select("*", { count: "exact", head: true });
+
+      // Users by area (top 10)
+      const { data: areaData } = await supabase
+        .from("profiles")
+        .select("area")
+        .not("area", "eq", "");
+
+      const areaCounts = areaData?.reduce((acc: any, curr) => {
+        const area = curr.area || "Χωρίς περιοχή";
+        acc[area] = (acc[area] || 0) + 1;
+        return acc;
+      }, {});
+
+      const usersByArea = Object.entries(areaCounts || {})
+        .map(([area, count]) => ({ area, count: count as number }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
       setStats({
         totalUsers: totalUsers || 0,
         newUsersToday: newUsersToday || 0,
         newUsersWeek: newUsersWeek || 0,
-        activeUsersToday: 0, // TODO: Track from user_activity
+        activeUsersToday: 0,
         totalQuestions: totalQuestions || 0,
         questionsToday: questionsToday || 0,
         totalAnswers: totalAnswers || 0,
@@ -100,6 +137,11 @@ export default function AdminOverview() {
         totalMatches: totalMatches || 0,
         pendingApprovals: (pendingQuestions || 0) + (pendingAnswers || 0),
         pendingReports: pendingReports || 0,
+        totalMessages: totalMessages || 0,
+        totalSwipes: 0, // Not tracked currently
+        magicMatchPlays: magicMatchPlays || 0,
+        marketplaceSignups: marketplaceSignups || 0,
+        usersByArea,
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -179,6 +221,45 @@ export default function AdminOverview() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Engagement Stats */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">📊 Engagement Στατιστικά</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-primary">{stats.totalMessages}</div>
+            <p className="text-sm text-muted-foreground">Μηνύματα</p>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-primary">{stats.totalSwipes}</div>
+            <p className="text-sm text-muted-foreground">Swipes</p>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-primary">{stats.magicMatchPlays}</div>
+            <p className="text-sm text-muted-foreground">Magic Match</p>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-primary">{stats.marketplaceSignups}</div>
+            <p className="text-sm text-muted-foreground">Marketplace Signups</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Top 10 Areas */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">🗺️ Top 10 Περιοχές</h3>
+        <div className="space-y-2">
+          {stats.usersByArea.map((item, idx) => (
+            <div key={idx} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">
+              <div className="flex items-center gap-3">
+                <span className="font-bold text-lg text-primary">#{idx + 1}</span>
+                <span className="font-medium">{item.area}</span>
+              </div>
+              <span className="text-sm font-semibold text-muted-foreground">{item.count} μαμάδες</span>
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }
