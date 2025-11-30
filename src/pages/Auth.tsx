@@ -44,7 +44,20 @@ export default function Auth() {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/profile-setup");
+        // Check profile completion status
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('profile_completed, has_completed_onboarding')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!profile?.profile_completed) {
+          navigate("/profile-setup");
+        } else if (!profile?.has_completed_onboarding) {
+          navigate("/onboarding");
+        } else {
+          navigate("/discover");
+        }
       }
     };
     checkAuth();
@@ -141,13 +154,16 @@ export default function Auth() {
         // Check if profile is completed
         const { data: profile } = await supabase
           .from('profiles')
-          .select('profile_completed')
+          .select('profile_completed, has_completed_onboarding')
           .eq('id', data.user.id)
           .single();
 
         if (!profile?.profile_completed) {
           showWelcome();
           setTimeout(() => navigate("/profile-setup"), 2000);
+        } else if (!profile?.has_completed_onboarding) {
+          showWelcome();
+          setTimeout(() => navigate("/onboarding"), 2000);
         } else {
           showWelcome();
           setTimeout(() => navigate("/discover"), 2000);
