@@ -255,48 +255,44 @@ export default function ProfileNew() {
           </Card>
         )}
 
-        {/* Premium Perk Section - Elegant & Subtle */}
+        {/* Profile Actions Card */}
         {isOwnProfile && (
-          <Card className="p-6 bg-gradient-to-br from-white/90 to-[#FCF0F5] border-2 border-[#F3DCE5] rounded-[28px] shadow-md relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#F3DCE5]/20 rounded-full blur-3xl" />
-            <div className="relative flex flex-col items-center text-center space-y-3">
+          <Card className="p-6 bg-gradient-to-br from-white/90 to-[#FCF0F5] border-2 border-[#F3DCE5] rounded-[28px] shadow-lg">
+            <div className="space-y-4">
               <Button
                 disabled
-                className="rounded-[30px] bg-gradient-to-r from-[#F3DCE5] to-[#F5E8F0] text-foreground border-2 border-[#F3DCE5] hover:shadow-lg transition-all opacity-60 cursor-not-allowed"
+                className="w-full rounded-[30px] bg-gradient-to-r from-[#F3DCE5] to-[#F5E8F0] text-foreground border-2 border-[#F3DCE5] hover:shadow-lg transition-all opacity-60 cursor-not-allowed"
                 size="lg"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 Boost My Profile*
               </Button>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground text-center">
                 *Momster Perks — free for now, Premium later.
               </p>
+
+              <div className="h-[1px] bg-[#F3DCE5]/40 my-4" />
+
+              <Button
+                onClick={() => navigate("/profile-setup")}
+                className="w-full rounded-[30px] bg-gradient-to-r from-[#C8788D] to-[#B86B80] hover:from-[#B86B80] hover:to-[#C8788D] text-white shadow-md hover:shadow-xl transition-all"
+                size="lg"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Επεξεργασία Προφίλ
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="w-full rounded-[30px] border-2 border-destructive/50 hover:bg-destructive hover:text-white text-destructive shadow-sm hover:shadow-lg transition-all font-semibold"
+                size="lg"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Αποσύνδεση
+              </Button>
             </div>
           </Card>
-        )}
-
-        {/* Settings / Edit Buttons - Capsule Style */}
-        {isOwnProfile && (
-          <div className="space-y-3">
-            <Button
-              onClick={() => navigate("/profile-setup")}
-              className="w-full rounded-[30px] bg-gradient-to-r from-[#C8788D] to-[#B86B80] hover:from-[#B86B80] hover:to-[#C8788D] text-white shadow-md hover:shadow-lg transition-all"
-              size="lg"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Επεξεργασία Προφίλ
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="w-full rounded-[30px] border-2 border-[#F3DCE5] hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 shadow-sm hover:shadow-md transition-all"
-              size="lg"
-              onClick={handleSignOut}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Αποσύνδεση
-            </Button>
-          </div>
         )}
       </div>
 
