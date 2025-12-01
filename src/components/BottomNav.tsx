@@ -13,7 +13,6 @@ export default function BottomNav() {
     { path: "/chats", icon: MessageCircle, label: "Chat", badge: unreadCount },
     { path: "/daily-boost", label: "Momster Home", isCenter: true, isMascot: true },
     { path: "/ask-moms", icon: MessageSquare, label: "Ρώτα μια\nμαμά" },
-    { path: "/marketplace", icon: ShoppingBag, label: "Marketplace" },
     { path: "/profile", icon: User, label: "Profile" },
   ];
 
