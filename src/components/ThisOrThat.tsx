@@ -46,7 +46,8 @@ export default function ThisOrThat() {
           toast.error("Σφάλμα φόρτωσης polls");
         } else if (pollsData && pollsData.length > 0) {
           setPolls(pollsData);
-          setCurrentIndex(Math.floor(Math.random() * pollsData.length));
+          const randomIndex = Math.floor(Math.random() * pollsData.length);
+          setCurrentIndex(randomIndex);
           
           // Load user's existing votes
           const { data: votes } = await supabase
@@ -60,6 +61,12 @@ export default function ThisOrThat() {
               votesMap[vote.poll_id] = vote.choice;
             });
             setUserVotes(votesMap);
+            
+            // Check if user already voted on initial poll
+            const initialPollVote = votesMap[pollsData[randomIndex].id];
+            if (initialPollVote) {
+              setSelectedOption(initialPollVote.toUpperCase() as 'A' | 'B');
+            }
           }
         }
       }
@@ -79,13 +86,13 @@ export default function ThisOrThat() {
     const currentPoll = polls[currentIndex];
     
     try {
-      // Save vote
+      // Save vote (database expects lowercase 'a' or 'b')
       const { error } = await supabase
         .from('poll_votes')
         .upsert({
           user_id: userId,
           poll_id: currentPoll.id,
-          choice: choice
+          choice: choice.toLowerCase()
         }, {
           onConflict: 'user_id,poll_id'
         });
@@ -93,7 +100,7 @@ export default function ThisOrThat() {
       if (error) throw error;
 
       // Update local state
-      setUserVotes(prev => ({ ...prev, [currentPoll.id]: choice }));
+      setUserVotes(prev => ({ ...prev, [currentPoll.id]: choice.toLowerCase() }));
       setSelectedOption(choice);
 
       // Fetch results
@@ -104,8 +111,8 @@ export default function ThisOrThat() {
 
       if (resultsError) throw resultsError;
 
-      const aVotes = results?.filter(r => r.choice === 'A').length || 0;
-      const bVotes = results?.filter(r => r.choice === 'B').length || 0;
+      const aVotes = results?.filter(r => r.choice === 'a').length || 0;
+      const bVotes = results?.filter(r => r.choice === 'b').length || 0;
 
       setPollResults({ a: aVotes, b: bVotes });
       setShowResults(true);
@@ -146,7 +153,8 @@ export default function ThisOrThat() {
       const newIndex = (currentIndex + 1) % polls.length;
       setCurrentIndex(newIndex);
       const newPoll = polls[newIndex];
-      setSelectedOption(userVotes[newPoll.id] as 'A' | 'B' | null || null);
+      const existingVote = userVotes[newPoll.id];
+      setSelectedOption(existingVote ? existingVote.toUpperCase() as 'A' | 'B' : null);
       setShowResults(false);
       setPollResults(null);
       setSlideDirection(null);
@@ -162,7 +170,8 @@ export default function ThisOrThat() {
       const newIndex = (currentIndex - 1 + polls.length) % polls.length;
       setCurrentIndex(newIndex);
       const newPoll = polls[newIndex];
-      setSelectedOption(userVotes[newPoll.id] as 'A' | 'B' | null || null);
+      const existingVote = userVotes[newPoll.id];
+      setSelectedOption(existingVote ? existingVote.toUpperCase() as 'A' | 'B' : null);
       setShowResults(false);
       setPollResults(null);
       setSlideDirection(null);
