@@ -18,6 +18,7 @@ import ContentManagement from "@/components/admin/ContentManagement";
 import AppSettings from "@/components/admin/AppSettings";
 import SystemLogs from "@/components/admin/SystemLogs";
 import NotificationsPanel from "@/components/admin/NotificationsPanel";
+import { TestAccountsManager } from "@/components/admin/TestAccountsManager";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -295,6 +296,7 @@ export default function Admin() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="logs">Logs</TabsTrigger>
             <TabsTrigger value="emails">Emails</TabsTrigger>
+            <TabsTrigger value="test-accounts">Test Accounts</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -584,6 +586,10 @@ export default function Admin() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          <TabsContent value="test-accounts">
+            <TestAccountsManager />
           </TabsContent>
         </Tabs>
       </div>
