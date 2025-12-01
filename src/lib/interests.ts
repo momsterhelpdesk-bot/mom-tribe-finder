@@ -69,6 +69,11 @@ export const INTERESTS = [
   { id: "beauty", label: { el: "💅 Beauty / Make-up", en: "💅 Beauty / Make-up" } },
   { id: "couch_potato", label: { el: "😅 Couch Potato", en: "😅 Couch Potato" } },
   { id: "nerdy", label: { el: "🤓 Nerdy Mom", en: "🤓 Nerdy Mom" } },
+  { id: "luxury_lover", label: { el: "🌟 Luxury lover", en: "🌟 Luxury lover" } },
+  { id: "boss_mom", label: { el: "💼 Boss mom", en: "💼 Boss mom" } },
+  { id: "queen_vibes", label: { el: "👑 Queen vibes", en: "👑 Queen vibes" } },
+  { id: "mountain_lover", label: { el: "⛰️ Mountain lover", en: "⛰️ Mountain lover" } },
+  { id: "sea_lover", label: { el: "🌊 Sea lover", en: "🌊 Sea lover" } },
 
   // Personality & Vibes
   { id: "positive_vibes", label: { el: "🌈 Positive Vibes", en: "🌈 Positive Vibes" } },

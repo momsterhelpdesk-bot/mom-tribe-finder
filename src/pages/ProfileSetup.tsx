@@ -11,6 +11,8 @@ import { Upload, X, AlertCircle } from "lucide-react";
 import { z } from "zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LocationPermissionDialog } from "@/components/LocationPermissionDialog";
+import { INTERESTS } from "@/lib/interests";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const profileSetupSchema = z.object({
   username: z.string().trim().min(3, { message: "Το username πρέπει να είναι τουλάχιστον 3 χαρακτήρες" }).max(20, { message: "Το username πρέπει να είναι μικρότερο από 20 χαρακτήρες" }).regex(/^[a-zA-Z0-9_]+$/, { message: "Το username μπορεί να περιέχει μόνο γράμματα, αριθμούς και _" }),
@@ -25,12 +27,6 @@ const profileSetupSchema = z.object({
   interests: z.array(z.string()).min(1, { message: "Επέλεξε τουλάχιστον ένα ενδιαφέρον" }).max(20, { message: "Μέγιστο 20 ενδιαφέροντα" })
 });
 
-const INTERESTS_OPTIONS = [
-  "Ύπνος", "Καφέ", "Βόλτες", "Σινεμά", "Γυμναστική", 
-  "Σειρές", "Παιχνίδι με τα παιδιά", "Μαγειρική", 
-  "Ζαχαροπλαστική", "Εκδρομές", "Πεζοπορία", "Σκι", 
-  "Κολυμβητήριο", "Μπουζούκια", "Ανάγνωση", "DIY Projects"
-];
 
 const GREEK_CITIES = [
   "Αθήνα", "Θεσσαλονίκη", "Πάτρα", "Ηράκλειο", "Λάρισα",
@@ -62,6 +58,7 @@ type PhotoItem = {
 
 export default function ProfileSetup() {
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   
@@ -527,22 +524,26 @@ export default function ProfileSetup() {
 
           {/* Interests */}
           <div className="space-y-3">
-            <Label>Ενδιαφέροντα * (επέλεξε τουλάχιστον 1)</Label>
+            <Label>Ενδιαφέροντα / Lifestyle * (επέλεξε τουλάχιστον 1)</Label>
             <div className="flex flex-wrap gap-2">
-              {INTERESTS_OPTIONS.map(interest => (
-                <button
-                  key={interest}
-                  type="button"
-                  onClick={() => toggleInterest(interest)}
-                  className={`px-4 py-2 rounded-full text-sm transition-colors ${
-                    interests.includes(interest)
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                  }`}
-                >
-                  {interest}
-                </button>
-              ))}
+              {INTERESTS.map(interest => {
+                const interestId = interest.id;
+                const interestLabel = interest.label[language as 'el' | 'en'];
+                return (
+                  <button
+                    key={interestId}
+                    type="button"
+                    onClick={() => toggleInterest(interestId)}
+                    className={`px-4 py-2 rounded-full text-sm transition-colors ${
+                      interests.includes(interestId)
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {interestLabel}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
