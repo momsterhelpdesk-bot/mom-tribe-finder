@@ -63,10 +63,24 @@ function getRandomElements<T>(array: T[], count: number): T[] {
 }
 
 function generateUsername(name: string): string {
-  const cleaned = name.toLowerCase().replace(/ά/g, 'a').replace(/έ/g, 'e')
-    .replace(/ή/g, 'i').replace(/ί/g, 'i').replace(/ό/g, 'o').replace(/ύ/g, 'y')
-    .replace(/ώ/g, 'o').replace(/ϊ/g, 'i').replace(/ϋ/g, 'y');
-  const randomNum = Math.floor(Math.random() * 999);
+  // Complete Greek to Latin transliteration
+  const greekToLatin: Record<string, string> = {
+    'α': 'a', 'ά': 'a', 'β': 'v', 'γ': 'g', 'δ': 'd', 'ε': 'e', 'έ': 'e',
+    'ζ': 'z', 'η': 'i', 'ή': 'i', 'θ': 'th', 'ι': 'i', 'ί': 'i', 'ϊ': 'i', 'ΐ': 'i',
+    'κ': 'k', 'λ': 'l', 'μ': 'm', 'ν': 'n', 'ξ': 'x', 'ο': 'o', 'ό': 'o',
+    'π': 'p', 'ρ': 'r', 'σ': 's', 'ς': 's', 'τ': 't', 'υ': 'y', 'ύ': 'y', 'ϋ': 'y', 'ΰ': 'y',
+    'φ': 'f', 'χ': 'ch', 'ψ': 'ps', 'ω': 'o', 'ώ': 'o'
+  };
+  
+  let cleaned = name.toLowerCase();
+  for (const [greek, latin] of Object.entries(greekToLatin)) {
+    cleaned = cleaned.replace(new RegExp(greek, 'g'), latin);
+  }
+  
+  // Remove any remaining non-alphanumeric characters
+  cleaned = cleaned.replace(/[^a-z0-9]/g, '');
+  
+  const randomNum = Math.floor(Math.random() * 9999);
   return `${cleaned}_mom${randomNum}`;
 }
 
@@ -122,7 +136,7 @@ Deno.serve(async (req) => {
     for (let i = 0; i < count; i++) {
       const name = getRandomElement(GREEK_FEMALE_NAMES);
       const username = generateUsername(name);
-      const email = `test_${username}@momconnect.test`;
+      const email = `${username}@test.momconnect.com`;
       const password = 'TestMom2024!';
 
       // Create user

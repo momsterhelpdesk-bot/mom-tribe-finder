@@ -56,9 +56,9 @@ export function TestAccountsManager() {
           <AlertDescription>
             Τα test accounts θα έχουν:
             <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Email: test_[username]@momconnect.test</li>
+              <li>Email: [username]@test.momconnect.com</li>
               <li>Password: TestMom2024!</li>
-              <li>Τυχαία ονόματα, πόλεις, περιοχές</li>
+              <li>Τυχαία ελληνικά ονόματα, πόλεις, περιοχές</li>
               <li>Τυχαία ενδιαφέροντα (5-12)</li>
               <li>Τυχαία παιδιά (1-2)</li>
               <li>Placeholder φωτογραφίες (2-5)</li>
