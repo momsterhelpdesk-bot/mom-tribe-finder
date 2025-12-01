@@ -86,9 +86,15 @@ function generateUsername(name: string): string {
 
 function generatePlaceholderPhotos(count: number): string[] {
   const photos: string[] = [];
+  // Use female avatar range and ensure they're unique
+  const usedSeeds = new Set<number>();
   for (let i = 0; i < count; i++) {
-    const seed = Math.floor(Math.random() * 1000);
-    photos.push(`https://i.pravatar.cc/400?img=${seed}`);
+    let seed;
+    do {
+      seed = Math.floor(Math.random() * 70); // pravatar has 70 avatars
+    } while (usedSeeds.has(seed));
+    usedSeeds.add(seed);
+    photos.push(`https://i.pravatar.cc/600?img=${seed}`);
   }
   return photos;
 }

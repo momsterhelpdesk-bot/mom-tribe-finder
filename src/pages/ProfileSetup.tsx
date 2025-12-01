@@ -33,6 +33,18 @@ const GREEK_CITIES = [
   "Βόλος", "Ιωάννινα", "Χανιά", "Ρόδος", "Καβάλα", "Άλλη"
 ];
 
+const ATHENS_AREAS = [
+  'Κολωνάκι', 'Παγκράτι', 'Κηφισιά', 'Χαλάνδρι', 'Μαρούσι',
+  'Γλυφάδα', 'Βούλα', 'Βριλήσσια', 'Αμπελόκηποι', 'Ζωγράφου',
+  'Ψυχικό', 'Ηλιούπολη', 'Νέα Σμύρνη', 'Αιγάλεω', 'Περιστέρι'
+];
+
+const THESSALONIKI_AREAS = [
+  'Καλαμαριά', 'Πανόραμα', 'Τούμπα', 'Τριανδρία', 'Εύοσμος',
+  'Κέντρο', 'Νέα Παραλία', 'Χαριλάου', 'Πυλαία', 'Θέρμη',
+  'Καραμπουρνάκι', 'Νεάπολη', 'Αμπελόκηποι', 'Συκιές'
+];
+
 const CHILD_AGE_GROUPS = [
   "Είμαι έγκυος 🤰",
   "0-6 μήνες",
@@ -65,6 +77,7 @@ export default function ProfileSetup() {
   const [username, setUsername] = useState("");
   const [city, setCity] = useState("");
   const [area, setArea] = useState("");
+  const [availableAreas, setAvailableAreas] = useState<string[]>([]);
   const [children, setChildren] = useState<Array<{ name?: string; ageGroup: string; gender?: 'boy' | 'girl' | 'baby' }>>([{ ageGroup: "", gender: 'baby' }]);
   const [matchPreference, setMatchPreference] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
@@ -91,8 +104,19 @@ export default function ProfileSetup() {
 
       if (profile) {
         setUsername(profile.username || "");
-        setCity(profile.city || "");
+        const profileCity = profile.city || "";
+        setCity(profileCity);
         setArea(profile.area || "");
+        
+        // Set available areas based on city
+        if (profileCity === "Αθήνα") {
+          setAvailableAreas(ATHENS_AREAS);
+        } else if (profileCity === "Θεσσαλονίκη") {
+          setAvailableAreas(THESSALONIKI_AREAS);
+        } else {
+          setAvailableAreas([]);
+        }
+        
         setChildren((profile.children as Array<{ name?: string; ageGroup: string }>) || [{ ageGroup: "" }]);
         setMatchPreference(profile.match_preference || "");
         setInterests(profile.interests || []);
@@ -377,7 +401,17 @@ export default function ProfileSetup() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="city">Πόλη *</Label>
-              <Select value={city} onValueChange={setCity}>
+              <Select value={city} onValueChange={(value) => {
+                setCity(value);
+                setArea(""); // Reset area when city changes
+                if (value === "Αθήνα") {
+                  setAvailableAreas(ATHENS_AREAS);
+                } else if (value === "Θεσσαλονίκη") {
+                  setAvailableAreas(THESSALONIKI_AREAS);
+                } else {
+                  setAvailableAreas([]);
+                }
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Επέλεξε πόλη" />
                 </SelectTrigger>
@@ -393,13 +427,28 @@ export default function ProfileSetup() {
 
             <div>
               <Label htmlFor="area">Περιοχή *</Label>
-              <Input
-                id="area"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                placeholder="π.χ. Κολωνάκι"
-                maxLength={100}
-              />
+              {availableAreas.length > 0 ? (
+                <Select value={area} onValueChange={setArea}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Επέλεξε περιοχή" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableAreas.map(areaName => (
+                      <SelectItem key={areaName} value={areaName}>
+                        {areaName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="area"
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  placeholder="π.χ. Κέντρο"
+                  maxLength={100}
+                />
+              )}
             </div>
           </div>
 

@@ -108,19 +108,19 @@ export default function AdminOverview() {
         .from("poll_votes")
         .select("*", { count: "exact", head: true });
 
-      // Users by area (top 10)
-      const { data: areaData } = await supabase
+      // Users by city (grouped)
+      const { data: cityData } = await supabase
         .from("profiles")
-        .select("area")
-        .not("area", "eq", "");
+        .select("city, area")
+        .not("city", "eq", "");
 
-      const areaCounts = areaData?.reduce((acc: any, curr) => {
-        const area = curr.area || "Χωρίς περιοχή";
-        acc[area] = (acc[area] || 0) + 1;
+      const cityCounts = cityData?.reduce((acc: any, curr) => {
+        const city = curr.city || "Χωρίς πόλη";
+        acc[city] = (acc[city] || 0) + 1;
         return acc;
       }, {});
 
-      const usersByArea = Object.entries(areaCounts || {})
+      const usersByArea = Object.entries(cityCounts || {})
         .map(([area, count]) => ({ area, count: count as number }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 10);
@@ -245,9 +245,9 @@ export default function AdminOverview() {
         </div>
       </Card>
 
-      {/* Top 10 Areas */}
+      {/* Top 10 Cities */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">🗺️ Top 10 Περιοχές</h3>
+        <h3 className="text-lg font-semibold mb-4">🗺️ Top 10 Πόλεις</h3>
         <div className="space-y-2">
           {stats.usersByArea.map((item, idx) => (
             <div key={idx} className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg">
