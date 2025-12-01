@@ -242,7 +242,7 @@ export default function Discover() {
 
   const profileImage = currentProfile.profile_photos_urls && currentProfile.profile_photos_urls.length > 0
     ? currentProfile.profile_photos_urls[0]
-    : currentProfile.profile_photo_url || "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400";
+    : currentProfile.profile_photo_url || `https://i.pravatar.cc/400?u=${currentProfile.id}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative">

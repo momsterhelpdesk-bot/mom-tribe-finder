@@ -454,16 +454,16 @@ export default function Auth() {
           <DialogHeader>
             <DialogTitle>Υπενθύμιση Email 🌷</DialogTitle>
             <DialogDescription>
-              Εισάγετε το email σας και θα σας το υπενθυμίσουμε.
+              Εισάγετε το username σας και θα σας στείλουμε το email σας.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="reminder-email">Email</Label>
+              <Label htmlFor="reminder-username">Username</Label>
               <Input
-                id="reminder-email"
-                type="email"
-                placeholder="you@example.com"
+                id="reminder-username"
+                type="text"
+                placeholder="το username σας"
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
               />
