@@ -80,7 +80,7 @@ const Index = () => {
                <img 
                  src={logo} 
                  alt="Momster Logo" 
-                 className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-cover rounded-full animate-scale-in drop-shadow-2xl" 
+                 className="w-48 h-48 sm:w-56 sm:h-56 md:w-72 md:h-72 object-cover rounded-full animate-scale-in drop-shadow-2xl"
                  style={{ 
                    opacity: 0.95,
                    maskImage: 'radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
