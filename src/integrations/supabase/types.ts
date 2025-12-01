@@ -114,6 +114,30 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_users: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -292,6 +316,54 @@ export type Database = {
           read?: boolean
           title?: string
           type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      photo_moderation_queue: {
+        Row: {
+          ai_confidence: number | null
+          ai_flags: Json | null
+          ai_status: string
+          created_at: string
+          id: string
+          manual_status: string | null
+          photo_type: string
+          photo_url: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_confidence?: number | null
+          ai_flags?: Json | null
+          ai_status?: string
+          created_at?: string
+          id?: string
+          manual_status?: string | null
+          photo_type: string
+          photo_url: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_confidence?: number | null
+          ai_flags?: Json | null
+          ai_status?: string
+          created_at?: string
+          id?: string
+          manual_status?: string | null
+          photo_type?: string
+          photo_url?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -955,6 +1027,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_user_blocked: {
+        Args: { _from_user_id: string; _to_user_id: string }
         Returns: boolean
       }
     }
