@@ -524,7 +524,7 @@ export default function ProfileSetup() {
 
           {/* Interests */}
           <div className="space-y-3">
-            <Label>Ενδιαφέροντα / Lifestyle * (επέλεξε τουλάχιστον 1)</Label>
+            <Label>Ενδιαφέροντα / Lifestyle * (επίλεξε τουλάχιστον 1)</Label>
             <div className="flex flex-wrap gap-2">
               {INTERESTS.map(interest => {
                 const interestId = interest.id;
