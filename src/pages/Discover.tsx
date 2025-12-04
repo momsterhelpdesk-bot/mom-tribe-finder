@@ -3,16 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, X, MapPin, User, Settings } from "lucide-react";
+import { Heart, X, MapPin, User, Settings, Percent } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import mascot from "@/assets/mascot.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import MomsterPopup from "@/components/MomsterPopup";
 import { useMascot } from "@/hooks/use-mascot";
-import { useMatching } from "@/hooks/use-matching";
+import { useMatching, ProfileMatch } from "@/hooks/use-matching";
+import { LocationPermissionDialog } from "@/components/LocationPermissionDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Demo profile for testing UI
-const demoProfile = {
+const demoProfile: ProfileMatch = {
   id: 'demo-123',
   full_name: 'Maria Papadopoulou',
   profile_photo_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
@@ -23,6 +25,11 @@ const demoProfile = {
   interests: ['Παιδική Ψυχολογία', 'Μαγείρεμα', 'Yoga', 'Ανάγνωση'],
   children: [{ name: 'Νίκος', ageGroup: '2-3 χρονών', gender: 'boy' }],
   distance: 3.5,
+  latitude: null,
+  longitude: null,
+  matchPercentage: 85,
+  commonInterestsCount: 3,
+  totalInterests: 5
 };
 
 export default function Discover() {
@@ -33,16 +40,18 @@ export default function Discover() {
   const [isDragging, setIsDragging] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showNoMomsPopup, setShowNoMomsPopup] = useState(false);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const { mascotConfig, visible, hideMascot, showMatch, showEmptyDiscover } = useMascot();
-  const { profiles, loading } = useMatching();
+  const { profiles, loading, currentUser } = useMatching();
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
-  // Check if current user is admin
+  // Check if current user is admin and request location
   useEffect(() => {
-    const checkAdminStatus = async () => {
+    const checkAdminAndLocation = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setCurrentUserId(user.id);
@@ -51,10 +60,55 @@ export default function Discover() {
           _role: "admin",
         });
         setIsUserAdmin(!!hasAdminRole);
+
+        // Check if we need to request location
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("latitude, longitude")
+          .eq("id", user.id)
+          .single();
+
+        // Show location dialog if no location is set
+        if (profile && !profile.latitude && !profile.longitude) {
+          const hasSeenLocationDialog = localStorage.getItem('location_dialog_shown');
+          if (!hasSeenLocationDialog) {
+            setShowLocationDialog(true);
+          }
+        }
       }
     };
-    checkAdminStatus();
+    checkAdminAndLocation();
   }, []);
+
+  // Handle location permission
+  const handleAllowLocation = async () => {
+    localStorage.setItem('location_dialog_shown', 'true');
+    setShowLocationDialog(false);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            await supabase
+              .from("profiles")
+              .update({ latitude, longitude })
+              .eq("id", user.id);
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    }
+  };
+
+  const handleDenyLocation = () => {
+    localStorage.setItem('location_dialog_shown', 'true');
+    setShowLocationDialog(false);
+  };
 
   // Check if tutorial has been shown before
   useEffect(() => {
@@ -78,7 +132,6 @@ export default function Discover() {
     const { data: { user } } = await supabase.auth.getUser();
     if (user && currentProfile && currentProfile.id !== 'demo-123') {
       try {
-        // Call edge function to check for mutual match
         const { data, error } = await supabase.functions.invoke('check-mutual-match', {
           body: {
             fromUserId: user.id,
@@ -90,7 +143,6 @@ export default function Discover() {
         if (error) {
           console.error('Error checking mutual match:', error);
         } else if (data?.mutualMatch) {
-          // Show match celebration
           setShowMatchVideo(true);
           setTimeout(() => {
             setShowMatchVideo(false);
@@ -103,7 +155,6 @@ export default function Discover() {
     }
     
     if (nextIndex >= allProfiles.length) {
-      // Show empty state
       setShowNoMomsPopup(true);
     } else {
       setCurrentIndex(nextIndex);
@@ -129,11 +180,9 @@ export default function Discover() {
     const swipeThreshold = 100;
     
     if (Math.abs(dragOffset.x) > swipeThreshold) {
-      // Swipe detected
       handleSwipe(dragOffset.x > 0);
     }
     
-    // Reset drag state
     setIsDragging(false);
     setDragOffset({ x: 0, y: 0 });
   };
@@ -177,7 +226,7 @@ export default function Discover() {
   };
 
   useEffect(() => {
-    if (!loading && allProfiles.length === 1) { // Only demo profile
+    if (!loading && allProfiles.length === 1) {
       showEmptyDiscover();
     }
   }, [allProfiles.length, loading, showEmptyDiscover]);
@@ -224,8 +273,8 @@ export default function Discover() {
   }
 
   const getLocationText = () => {
-    if (currentProfile.distance) {
-      return `${currentProfile.area}, ${currentProfile.city} - ${currentProfile.distance} km`;
+    if (currentProfile.distance && currentProfile.distance < 9999) {
+      return `${currentProfile.area}, ${currentProfile.city} - ${currentProfile.distance.toFixed(1)} km`;
     }
     return `${currentProfile.area}, ${currentProfile.city}`;
   };
@@ -236,7 +285,7 @@ export default function Discover() {
     }
     const childArray = currentProfile.children as any[];
     const count = childArray.length;
-    const ages = childArray.map(c => c.ageGroup).join(", ");
+    const ages = childArray.map(c => c.ageGroup || c.age).join(", ");
     return `${count} ${count === 1 ? 'παιδί' : 'παιδιά'} (${ages})`;
   };
 
@@ -244,8 +293,23 @@ export default function Discover() {
     ? currentProfile.profile_photos_urls[0]
     : currentProfile.profile_photo_url || `https://i.pravatar.cc/400?u=${currentProfile.id}`;
 
+  // Get match percentage color
+  const getMatchColor = (percentage: number) => {
+    if (percentage >= 90) return "text-green-500";
+    if (percentage >= 70) return "text-primary";
+    if (percentage >= 50) return "text-yellow-500";
+    return "text-muted-foreground";
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative">
+      {/* Location Permission Dialog */}
+      <LocationPermissionDialog
+        open={showLocationDialog}
+        onAllow={handleAllowLocation}
+        onDeny={handleDenyLocation}
+      />
+
       <img 
         src={mascot} 
         alt="Momster Mascot" 
@@ -287,6 +351,16 @@ export default function Discover() {
                 navigate(`/profile/${currentProfile.id}`);
               }}
             />
+            
+            {/* Match Percentage Badge */}
+            {currentProfile.matchPercentage && (
+              <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg flex items-center gap-1.5 border border-primary/20">
+                <Percent className={`w-4 h-4 ${getMatchColor(currentProfile.matchPercentage)}`} />
+                <span className={`font-bold text-sm ${getMatchColor(currentProfile.matchPercentage)}`}>
+                  {currentProfile.matchPercentage}%
+                </span>
+              </div>
+            )}
             
             {/* Swipe indicators */}
             {isDragging && (
@@ -352,6 +426,19 @@ export default function Discover() {
           </div>
 
           <div className="p-4 space-y-3">
+            {/* Match Stats */}
+            {(currentProfile.commonInterestsCount !== undefined) && (
+              <div className="flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 p-2 rounded-lg border border-pink-200">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-medium text-foreground">Κοινά ενδιαφέροντα:</span>
+                </div>
+                <Badge variant="secondary" className="bg-primary/20 text-primary font-bold">
+                  {currentProfile.commonInterestsCount}/{currentProfile.totalInterests || currentProfile.interests?.length || 0}
+                </Badge>
+              </div>
+            )}
+
             {/* Children Info with Icons */}
             {currentProfile.children && Array.isArray(currentProfile.children) && currentProfile.children.length > 0 && (
               <div className="bg-gradient-to-br from-pink-50 to-purple-50 p-2 rounded-lg border border-pink-200">
@@ -376,11 +463,16 @@ export default function Discover() {
 
             {currentProfile.interests && currentProfile.interests.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {currentProfile.interests.slice(0, 3).map((interest) => (
+                {currentProfile.interests.slice(0, 4).map((interest) => (
                   <Badge key={interest} variant="secondary" className="text-xs px-2 py-0.5">
                     {interest}
                   </Badge>
                 ))}
+                {currentProfile.interests.length > 4 && (
+                  <Badge variant="outline" className="text-xs px-2 py-0.5">
+                    +{currentProfile.interests.length - 4}
+                  </Badge>
+                )}
               </div>
             )}
           </div>
@@ -415,7 +507,6 @@ export default function Discover() {
           </div>
           <div className="w-full bg-white rounded-full h-3 relative">
             <div className="bg-gradient-to-r from-[#C8788D] to-[#B86B80] h-3 rounded-full w-full"></div>
-            {/* Mascot pushing the slider */}
             <div className="absolute -right-2 top-1/2 -translate-y-1/2 animate-bounce">
               <img src={mascot} alt="Mascot" className="w-8 h-8 object-contain" />
             </div>
@@ -443,140 +534,99 @@ export default function Discover() {
             onClick={() => handleSwipe(true)}
           >
             <div className="flex flex-col items-center gap-1 relative z-10">
-              <div className="text-3xl group-hover:animate-bounce">🌸</div>
-              <span className="text-xs font-bold text-white drop-shadow-md">Yes</span>
+              <div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                💕
+              </div>
+              <span className="text-xs font-semibold text-white drop-shadow-sm">Yes!</span>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl opacity-0 group-active:opacity-100 group-active:scale-150 transition-all pointer-events-none">
-              ✨
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </Button>
         </div>
       </div>
 
-      {/* Footer with Premium Message */}
-      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
-        <div className="max-w-md mx-auto text-center space-y-2">
-          <div className="flex items-center justify-center gap-2">
-            <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
-            <span className="text-sm font-medium text-foreground">Together, moms thrive!</span>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            *Momster Perks — free for now, Premium later.
-          </p>
+      {/* Footer */}
+      <footer className="fixed bottom-16 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
+        <div className="max-w-md mx-auto flex items-center justify-center gap-2">
+          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
+          <span className="text-sm text-muted-foreground">Together, moms thrive!</span>
         </div>
       </footer>
 
-      {mascotConfig && (
-        <MomsterMascot
-          state={mascotConfig.state}
-          message={mascotConfig.message}
-          visible={visible}
-          showButton={mascotConfig.showButton}
-          buttonText={mascotConfig.buttonText}
-          onButtonClick={mascotConfig.onButtonClick}
-          duration={mascotConfig.duration}
-          onHide={hideMascot}
-        />
-      )}
+      {/* Mascot */}
+      <MomsterMascot
+        message={mascotConfig.message}
+        state="happy"
+        visible={visible}
+        onHide={hideMascot}
+      />
 
-      {/* Swipe Tutorial Overlay */}
+      {/* Tutorial Overlay */}
       {showTutorial && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center animate-fade-in">
-          <div className="relative max-w-md w-full mx-4">
-            {/* Animated arrows */}
-            <div className="absolute left-8 top-1/2 -translate-y-1/2 animate-[pulse_1.5s_ease-in-out_infinite]">
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-6xl animate-[bounce_1s_ease-in-out_infinite]">←</span>
-                <span className="text-white text-sm font-bold bg-destructive/90 px-3 py-1 rounded-full shadow-lg">
-                  Swipe Left
-                </span>
-                <span className="text-white text-xs">Not my vibe</span>
+        <div 
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setShowTutorial(false);
+            localStorage.setItem('discover_tutorial_shown', 'true');
+          }}
+        >
+          <div className="bg-white rounded-[25px] p-6 max-w-sm text-center space-y-4">
+            <h2 className="text-2xl font-bold text-primary" style={{ fontFamily: "'Pacifico', cursive" }}>
+              Πώς λειτουργεί 💕
+            </h2>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-2xl">
+                  👈
+                </div>
+                <p className="text-left text-sm">Σύρε αριστερά για <strong>"Not my vibe"</strong></p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-2xl">
+                  👉
+                </div>
+                <p className="text-left text-sm">Σύρε δεξιά για <strong>"Yes!"</strong></p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-2xl">
+                  💕
+                </div>
+                <p className="text-left text-sm">Αν σας αρέσετε αμοιβαία, είναι <strong>Match!</strong></p>
               </div>
             </div>
-            
-            <div className="absolute right-8 top-1/2 -translate-y-1/2 animate-[pulse_1.5s_ease-in-out_infinite] delay-75">
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-6xl animate-[bounce_1s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }}>→</span>
-                <span className="text-white text-sm font-bold bg-pink-500/90 px-3 py-1 rounded-full shadow-lg">
-                  Swipe Right
-                </span>
-                <span className="text-white text-xs">Yes! 💕</span>
-              </div>
-            </div>
-
-            {/* Central instruction */}
-            <div className="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl text-center">
-              <div className="mb-4">
-                <span className="text-5xl">👆</span>
-              </div>
-              <h2 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: "'Pacifico', cursive" }}>
-                Πώς λειτουργεί;
-              </h2>
-              <p className="text-muted-foreground mb-6 text-sm">
-                Σύρε την κάρτα αριστερά ή δεξιά<br />
-                για να επιλέξεις!
-              </p>
-              <Button
-                onClick={() => {
-                  setShowTutorial(false);
-                  localStorage.setItem('discover_tutorial_shown', 'true');
-                }}
-                className="w-full bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white font-bold rounded-full"
-                size="lg"
-              >
-                Κατάλαβα! 🌸
-              </Button>
-            </div>
+            <Button className="w-full mt-4" onClick={() => {
+              setShowTutorial(false);
+              localStorage.setItem('discover_tutorial_shown', 'true');
+            }}>
+              Κατάλαβα! Ας ξεκινήσουμε 🌸
+            </Button>
           </div>
         </div>
       )}
 
       {/* Match Celebration Video */}
       {showMatchVideo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 animate-fade-in">
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
           <video
             autoPlay
             muted
             playsInline
-            className="max-w-xs max-h-[300px] rounded-lg"
-            onEnded={() => {
-              setShowMatchVideo(false);
-              showMatch(() => navigate("/chats"));
-            }}
+            className="max-w-sm w-full rounded-lg"
           >
             <source src="/videos/match-celebration.mp4" type="video/mp4" />
           </video>
         </div>
       )}
 
-      {mascotConfig && (
-        <MomsterMascot
-          state={mascotConfig.state}
-          message={mascotConfig.message}
-          visible={visible}
-          showButton={mascotConfig.showButton}
-          buttonText={mascotConfig.buttonText}
-          onButtonClick={mascotConfig.onButtonClick}
-          duration={mascotConfig.duration}
-          onHide={hideMascot}
-        />
-      )}
-
+      {/* No More Moms Popup */}
       <MomsterPopup
-        title="Δεν υπάρχουν νέες μαμάδες εδώ γύρω… ακόμα! 🌸"
-        subtitle="Η γειτονιά είναι λίγο ήσυχη αυτή τη στιγμή, αλλά οι μαμάδες εμφανίζονται συνέχεια! ✨"
-        bullets={[
-          "• Μείνε συντονισμένη — νέες μαμάδες μπαίνουν κάθε μέρα 💕",
-          "• Δοκίμασε ξανά σε λίγο!",
-          "• Φτιάξε το προφίλ σου ακόμη πιο όμορφο ✨"
-        ]}
-        buttonText="Μάλιστα! 💗"
+        visible={showNoMomsPopup}
+        title="Τέλος για σήμερα!"
+        subtitle="Είδες όλες τις διαθέσιμες μαμάδες! Έλα αύριο για νέες γνωριμίες ή δοκίμασε να αλλάξεις τα φίλτρα σου."
+        buttonText="Ρύθμιση Φίλτρων"
         onButtonClick={() => {
           setShowNoMomsPopup(false);
-          setCurrentIndex(0);
+          navigate("/matching-filters");
         }}
-        visible={showNoMomsPopup}
       />
     </div>
   );

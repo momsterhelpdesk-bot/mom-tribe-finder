@@ -38,13 +38,19 @@ export default function ChatView() {
   const [showQuickReplies, setShowQuickReplies] = useState(false);
   const [showSafetyTip, setShowSafetyTip] = useState(true);
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const [lastSeen, setLastSeen] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     loadChatData();
     const channel = setupRealtimeSubscription();
+    const presenceChannel = setupPresenceChannel();
+    
     return () => {
       supabase.removeChannel(channel);
+      if (presenceChannel) supabase.removeChannel(presenceChannel);
     };
   }, [matchId]);
 
@@ -53,7 +59,6 @@ export default function ChatView() {
   }, [messages]);
 
   useEffect(() => {
-    // Show quick replies if no messages exist
     if (messages.length === 0) {
       setShowQuickReplies(true);
     }
@@ -76,9 +81,13 @@ export default function ChatView() {
       .eq("id", matchId)
       .single();
 
-    if (!match) return;
+    if (!match) {
+      toast.error("Το chat δεν βρέθηκε");
+      navigate("/chats");
+      return;
+    }
 
-    // Get other user's profile - only need public info for chat header
+    // Get other user's profile
     const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
     const { data: profile } = await supabase
       .from("profiles_safe")
@@ -119,11 +128,66 @@ export default function ChatView() {
         },
         (payload) => {
           setMessages((prev) => [...prev, payload.new]);
+          // Reset typing indicator when message arrives
+          if (payload.new.sender_id !== currentUserId) {
+            setIsOtherUserTyping(false);
+          }
         }
       )
       .subscribe();
 
     return channel;
+  };
+
+  const setupPresenceChannel = () => {
+    if (!matchId || !currentUserId) return null;
+
+    const channel = supabase.channel(`presence:${matchId}`)
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const users = Object.values(state).flat();
+        const otherUserPresent = users.some((u: any) => u.user_id !== currentUserId);
+        setIsOnline(otherUserPresent);
+        if (!otherUserPresent) {
+          setLastSeen(new Date().toISOString());
+        }
+      })
+      .on('presence', { event: 'join' }, ({ newPresences }) => {
+        const isOther = newPresences.some((p: any) => p.user_id !== currentUserId);
+        if (isOther) setIsOnline(true);
+      })
+      .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+        const wasOther = leftPresences.some((p: any) => p.user_id !== currentUserId);
+        if (wasOther) {
+          setIsOnline(false);
+          setLastSeen(new Date().toISOString());
+        }
+      })
+      .on('broadcast', { event: 'typing' }, ({ payload }) => {
+        if (payload.user_id !== currentUserId) {
+          setIsOtherUserTyping(true);
+          // Clear typing after 3 seconds
+          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsOtherUserTyping(false);
+          }, 3000);
+        }
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ user_id: currentUserId, online_at: new Date().toISOString() });
+        }
+      });
+
+    return channel;
+  };
+
+  const broadcastTyping = () => {
+    supabase.channel(`presence:${matchId}`).send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: { user_id: currentUserId }
+    });
   };
 
   const sendMessage = async (content: string) => {
@@ -158,6 +222,11 @@ export default function ChatView() {
     setNewMessage(prev => prev + emoji);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewMessage(e.target.value);
+    broadcastTyping();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 flex flex-col">
       {/* Header */}
@@ -182,11 +251,23 @@ export default function ChatView() {
               {otherUser?.full_name?.[0] || "M"}
             </AvatarFallback>
           </Avatar>
+          {/* Online indicator */}
+          {isOnline && (
+            <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow-sm" />
+          )}
         </button>
 
         <div className="flex-1">
           <h2 className="font-bold text-base text-foreground">{otherUser?.full_name}</h2>
-          <p className="text-xs text-muted-foreground">{otherUser?.area}</p>
+          <p className="text-xs text-muted-foreground">
+            {isOnline ? (
+              <span className="text-green-500 font-medium">Online τώρα</span>
+            ) : lastSeen ? (
+              `Τελευταία σύνδεση ${formatDistanceToNow(new Date(lastSeen), { addSuffix: true, locale: el })}`
+            ) : (
+              otherUser?.area
+            )}
+          </p>
         </div>
 
         <Button
@@ -223,8 +304,8 @@ export default function ChatView() {
               className={`flex gap-2 ${isOwn ? "justify-end" : "justify-start"}`}
             >
               {!isOwn && (
-                <Avatar className="w-8 h-8 mt-1">
-                  <AvatarImage src={otherUser?.profile_photo_url} />
+                <Avatar className="w-8 h-8 mt-1 flex-shrink-0">
+                  <AvatarImage src={otherUser?.profile_photo_url} className="object-cover" />
                   <AvatarFallback>{otherUser?.full_name?.[0]}</AvatarFallback>
                 </Avatar>
               )}
@@ -256,17 +337,17 @@ export default function ChatView() {
         {/* Typing Indicator */}
         {isOtherUserTyping && (
           <div className="flex gap-2 justify-start">
-            <Avatar className="w-8 h-8 mt-1">
-              <AvatarImage src={otherUser?.profile_photo_url} />
+            <Avatar className="w-8 h-8 mt-1 flex-shrink-0">
+              <AvatarImage src={otherUser?.profile_photo_url} className="object-cover" />
               <AvatarFallback>{otherUser?.full_name?.[0]}</AvatarFallback>
             </Avatar>
             <Card className="bg-[#EAE2FF] border-[#EAE2FF] rounded-[18px] rounded-bl-sm px-4 py-3">
               <div className="flex items-center gap-1">
                 <span className="text-xs text-muted-foreground mr-2">μαμά πληκτρολογεί</span>
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-primary rounded-full typing-dot"></div>
-                  <div className="w-2 h-2 bg-primary rounded-full typing-dot"></div>
-                  <div className="w-2 h-2 bg-primary rounded-full typing-dot"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
               </div>
             </Card>
@@ -315,7 +396,7 @@ export default function ChatView() {
         <div className="flex gap-2">
           <Textarea
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={handleInputChange}
             placeholder="Γράψε το μήνυμά σου..."
             className="min-h-[44px] max-h-[120px] resize-none rounded-[22px] bg-background"
             onKeyDown={(e) => {
