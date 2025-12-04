@@ -37,7 +37,7 @@ export default function MatchingFilters() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("show_location_filter, distance_preference_km, match_age_filter, age_range_months, match_interests_filter, interests_threshold")
+        .select("*")
         .eq("id", user.id)
         .single();
 

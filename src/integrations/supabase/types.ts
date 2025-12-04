@@ -511,6 +511,7 @@ export type Database = {
           has_completed_onboarding: boolean | null
           id: string
           interests: string[] | null
+          interests_threshold: number | null
           is_blocked: boolean | null
           latitude: number | null
           longitude: number | null
@@ -548,6 +549,7 @@ export type Database = {
           has_completed_onboarding?: boolean | null
           id: string
           interests?: string[] | null
+          interests_threshold?: number | null
           is_blocked?: boolean | null
           latitude?: number | null
           longitude?: number | null
@@ -585,6 +587,7 @@ export type Database = {
           has_completed_onboarding?: boolean | null
           id?: string
           interests?: string[] | null
+          interests_threshold?: number | null
           is_blocked?: boolean | null
           latitude?: number | null
           longitude?: number | null

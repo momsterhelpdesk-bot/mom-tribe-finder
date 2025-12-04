@@ -42,6 +42,7 @@ export default function Discover() {
   const [showNoMomsPopup, setShowNoMomsPopup] = useState(false);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [showDailyMascot, setShowDailyMascot] = useState(false);
+  const [locationDenied, setLocationDenied] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -72,8 +73,11 @@ export default function Discover() {
         // Show location dialog if no location is set
         if (profile && !profile.latitude && !profile.longitude) {
           const hasSeenLocationDialog = localStorage.getItem('location_dialog_shown');
+          const locationWasDenied = localStorage.getItem('location_denied');
           if (!hasSeenLocationDialog) {
             setShowLocationDialog(true);
+          } else if (locationWasDenied) {
+            setLocationDenied(true);
           }
         }
       }
@@ -108,7 +112,9 @@ export default function Discover() {
 
   const handleDenyLocation = () => {
     localStorage.setItem('location_dialog_shown', 'true');
+    localStorage.setItem('location_denied', 'true');
     setShowLocationDialog(false);
+    setLocationDenied(true);
   };
 
   // Check if tutorial has been shown before
@@ -347,6 +353,29 @@ export default function Discover() {
         <h1 className="text-2xl font-bold text-center mb-2 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
           Ανακάλυψε Μαμάδες
         </h1>
+
+        {/* Location Denied Notice */}
+        {locationDenied && (
+          <Card className="p-4 bg-amber-50 border-amber-200 mb-4">
+            <div className="flex items-start gap-3">
+              <MapPin className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-amber-800 font-medium">
+                  {language === "el" 
+                    ? "Χωρίς τοποθεσία δεν μπορούμε να δείξουμε κοντινές μαμάδες."
+                    : "Without location we cannot show nearby moms."
+                  }
+                </p>
+                <p className="text-xs text-amber-700 mt-1">
+                  {language === "el"
+                    ? "Ενεργοποίησέ την από τις ρυθμίσεις του browser σου."
+                    : "Enable it from your browser settings."
+                  }
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         <Card 
           ref={cardRef}

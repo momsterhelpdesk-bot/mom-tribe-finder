@@ -34,6 +34,7 @@ interface MatchingFilters {
   matchAgeFilter: boolean;
   ageRangeMonths: number;
   matchInterestsFilter: boolean;
+  interestsThreshold: number;
 }
 
 export function useMatching() {
@@ -116,7 +117,8 @@ export function useMatching() {
         distancePreferenceKm: currentProfile.distance_preference_km || 10,
         matchAgeFilter: currentProfile.match_age_filter || false,
         ageRangeMonths: currentProfile.age_range_months || 6,
-        matchInterestsFilter: currentProfile.match_interests_filter || false
+        matchInterestsFilter: currentProfile.match_interests_filter || false,
+        interestsThreshold: (currentProfile as any).interests_threshold || 40
       };
       setFilters(userFilters);
 
@@ -206,10 +208,10 @@ export function useMatching() {
         };
       });
 
-      // APPLY INTERESTS FILTER (require at least 60% match = "good match")
+      // APPLY INTERESTS FILTER with user-selected threshold
       if (userFilters.matchInterestsFilter) {
         profilesWithInterestScore = profilesWithInterestScore.filter(profile => 
-          profile.interestsMatchScore >= 30 // At least some common interests
+          profile.interestsMatchScore >= userFilters.interestsThreshold
         );
       }
 
@@ -234,9 +236,18 @@ export function useMatching() {
         return { ...profile, matchPercentage };
       });
 
-      // SORT: by match percentage (highest first)
+      // SORT: 1) Most common interests, 2) Closest distance, 3) Closest kids ages
       profilesWithMatchPercentage.sort((a, b) => {
-        return (b.matchPercentage || 0) - (a.matchPercentage || 0);
+        // First: common interests (highest first)
+        const interestsDiff = (b.commonInterestsCount || 0) - (a.commonInterestsCount || 0);
+        if (interestsDiff !== 0) return interestsDiff;
+        
+        // Second: distance (closest first)
+        const distanceDiff = (a.distance || 9999) - (b.distance || 9999);
+        if (distanceDiff !== 0) return distanceDiff;
+        
+        // Third: kids age match score (highest first)
+        return (b.ageMatchScore || 0) - (a.ageMatchScore || 0);
       });
 
       setProfiles(profilesWithMatchPercentage);
