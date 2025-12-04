@@ -116,34 +116,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Events Banner */}
-      <section className="py-6 px-4" style={{ background: 'linear-gradient(135deg, #E9D4F0, #F5E8F0)' }}>
-        <div className="container mx-auto max-w-4xl">
-          <Link to="/auth">
-            <Card className="overflow-hidden hover:shadow-xl transition-all hover:scale-[1.01] border-2 border-purple-200 bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100">
-              <CardContent className="p-6 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-purple-200 rounded-full">
-                    <Calendar className="h-8 w-8 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <Sparkles className="h-4 w-4 text-purple-500" />
-                      <Badge className="bg-purple-500 text-white text-xs">Coming Soon</Badge>
-                    </div>
-                    <h3 className="text-lg font-bold text-purple-700">Momster Events & Workshops</h3>
-                    <p className="text-sm text-purple-600/80">Playdates, workshops & εκδηλώσεις για μαμάδες!</p>
-                  </div>
-                </div>
-                <Button variant="outline" className="border-purple-300 text-purple-600 hover:bg-purple-100 hidden sm:flex">
-                  {t('learnMore')}
-                </Button>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-      </section>
-
       {/* Features Section - Grid Layout */}
       <section id="features" className="py-16 px-4" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0, #F8E9EE)' }}>
         <div className="container mx-auto max-w-6xl">
@@ -267,6 +239,34 @@ const Index = () => {
               </Card>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Events Banner */}
+      <section className="py-6 px-4" style={{ background: 'linear-gradient(135deg, #E9D4F0, #F5E8F0)' }}>
+        <div className="container mx-auto max-w-4xl">
+          <Link to="/auth">
+            <Card className="overflow-hidden hover:shadow-xl transition-all hover:scale-[1.01] border-2 border-purple-200 bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100">
+              <CardContent className="p-6 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-purple-200 rounded-full">
+                    <Calendar className="h-8 w-8 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Sparkles className="h-4 w-4 text-purple-500" />
+                      <Badge className="bg-purple-500 text-white text-xs">Coming Soon</Badge>
+                    </div>
+                    <h3 className="text-lg font-bold text-purple-700">Momster Events & Workshops</h3>
+                    <p className="text-sm text-purple-600/80">Playdates, workshops & εκδηλώσεις για μαμάδες!</p>
+                  </div>
+                </div>
+                <Button variant="outline" className="border-purple-300 text-purple-600 hover:bg-purple-100 hidden sm:flex">
+                  {t('learnMore')}
+                </Button>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </section>
 
