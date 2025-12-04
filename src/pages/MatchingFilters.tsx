@@ -21,6 +21,7 @@ export default function MatchingFilters() {
   const [matchAgeFilter, setMatchAgeFilter] = useState(false);
   const [ageRangeMonths, setAgeRangeMonths] = useState(3);
   const [matchInterestsFilter, setMatchInterestsFilter] = useState(false);
+  const [interestsThreshold, setInterestsThreshold] = useState(40);
 
   useEffect(() => {
     loadFilters();
@@ -36,7 +37,7 @@ export default function MatchingFilters() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("show_location_filter, distance_preference_km, match_age_filter, age_range_months, match_interests_filter")
+        .select("show_location_filter, distance_preference_km, match_age_filter, age_range_months, match_interests_filter, interests_threshold")
         .eq("id", user.id)
         .single();
 
@@ -48,6 +49,7 @@ export default function MatchingFilters() {
         setMatchAgeFilter(data.match_age_filter || false);
         setAgeRangeMonths(data.age_range_months || 3);
         setMatchInterestsFilter(data.match_interests_filter || false);
+        setInterestsThreshold((data as any).interests_threshold || 40);
       }
     } catch (error) {
       console.error("Error loading filters:", error);
@@ -70,7 +72,8 @@ export default function MatchingFilters() {
           distance_preference_km: distancePreferenceKm,
           match_age_filter: matchAgeFilter,
           age_range_months: ageRangeMonths,
-          match_interests_filter: matchInterestsFilter
+          match_interests_filter: matchInterestsFilter,
+          interests_threshold: interestsThreshold
         })
         .eq("id", user.id);
 
@@ -178,7 +181,7 @@ export default function MatchingFilters() {
 
           {/* Interests Filter */}
           <Card className="p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5 text-primary" />
                 <div>
@@ -191,6 +194,28 @@ export default function MatchingFilters() {
                 onCheckedChange={setMatchInterestsFilter}
               />
             </div>
+
+            {matchInterestsFilter && (
+              <div className="space-y-3 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">Ελάχιστο ποσοστό κοινών:</Label>
+                  <span className="text-sm font-semibold text-primary">{interestsThreshold}%</span>
+                </div>
+                <Slider
+                  value={[interestsThreshold]}
+                  onValueChange={([value]) => setInterestsThreshold(value)}
+                  min={20}
+                  max={80}
+                  step={20}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>40%</span>
+                  <span>60%</span>
+                  <span>80%</span>
+                </div>
+              </div>
+            )}
           </Card>
         </div>
 

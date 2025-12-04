@@ -33,15 +33,13 @@ export function LocationPermissionDialog({
           </div>
           <DialogTitle className="text-center text-2xl font-bold text-primary">
             {language === "el"
-              ? "Θέλουμε την τοποθεσία σας"
+              ? "Χρειαζόμαστε την τοποθεσία σου"
               : "We Need Your Location"}
           </DialogTitle>
           <DialogDescription className="text-center text-base leading-relaxed text-foreground">
             {language === "el" ? (
               <>
-                Για να σας δείχνουμε μαμάδες κοντινές στην περιοχή σας και να
-                βελτιώσουμε τις προτάσεις γνωριμίας, η εφαρμογή χρειάζεται
-                πρόσβαση στην τοποθεσία σας.
+                Το Momster χρειάζεται την τοποθεσία σας για να βρει κοντινές μαμάδες.
                 <br />
                 <br />
                 <strong className="text-primary">
@@ -52,8 +50,7 @@ export function LocationPermissionDialog({
               </>
             ) : (
               <>
-                To show you nearby moms and improve matching suggestions, the
-                app needs access to your location.
+                Momster needs your location to find nearby moms.
                 <br />
                 <br />
                 <strong className="text-primary">
