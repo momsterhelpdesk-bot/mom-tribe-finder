@@ -8,7 +8,6 @@ import communityLogo from "@/assets/community-logo.jpg";
 import logo from "@/assets/logo-new.jpg";
 import mascot from "@/assets/mascot.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
-import ThisOrThat from "@/components/ThisOrThat";
 import MagicMatching from "@/components/MagicMatching";
 
 const Index = () => {
@@ -182,11 +181,6 @@ const Index = () => {
                 </p>
               </CardContent>
             </Card>
-
-            {/* This or That - spans 2 columns */}
-            <div className="md:col-span-2">
-              <ThisOrThat />
-            </div>
 
             {/* Marketplace */}
             <Card className="bg-gradient-to-br from-rose-50 to-pink-50 border-none hover:shadow-lg transition-all hover:scale-[1.02]">
