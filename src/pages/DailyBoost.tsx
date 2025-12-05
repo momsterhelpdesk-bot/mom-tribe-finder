@@ -157,6 +157,13 @@ const DID_YOU_KNOW_FACTS = {
   ],
 };
 
+// Helper function to get deterministic daily index
+const getDailyIndex = (arrayLength: number, offset: number = 0): number => {
+  const today = new Date();
+  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+  return (dayOfYear + offset) % arrayLength;
+};
+
 export default function DailyBoost() {
   const { language } = useLanguage();
   const { toast } = useToast();
@@ -203,9 +210,10 @@ export default function DailyBoost() {
     }
   };
 
-  const dailyQuote = DAILY_QUOTES[language][Math.floor(Math.random() * DAILY_QUOTES[language].length)];
-  const selfCareTip = SELF_CARE_TIPS[language][Math.floor(Math.random() * SELF_CARE_TIPS[language].length)];
-  const didYouKnowFact = DID_YOU_KNOW_FACTS[language][Math.floor(Math.random() * DID_YOU_KNOW_FACTS[language].length)];
+  // Get daily deterministic content (changes once per day)
+  const dailyQuote = DAILY_QUOTES[language][getDailyIndex(DAILY_QUOTES[language].length)];
+  const selfCareTip = SELF_CARE_TIPS[language][getDailyIndex(SELF_CARE_TIPS[language].length, 7)];
+  const didYouKnowFact = DID_YOU_KNOW_FACTS[language][getDailyIndex(DID_YOU_KNOW_FACTS[language].length, 14)];
 
   const handleMoodSelect = (moodValue: string) => {
     setSelectedMood(moodValue);
@@ -362,8 +370,8 @@ export default function DailyBoost() {
 
           {/* Events Banner */}
           <Card className="p-6 bg-gradient-to-br from-pink-100 to-rose-100 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
-            <div className="absolute top-3 right-3 bg-rose-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
-              *
+            <div className="absolute top-3 right-3 bg-rose-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
+              ⭐ Coming Soon
             </div>
             <div className="relative space-y-3">
               <div className="flex items-center gap-2">

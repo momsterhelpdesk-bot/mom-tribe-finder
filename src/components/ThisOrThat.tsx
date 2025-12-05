@@ -62,10 +62,22 @@ export default function ThisOrThat() {
             });
             setUserVotes(votesMap);
             
-            // Check if user already voted on initial poll
+            // Check if user already voted on initial poll - load results if so
             const initialPollVote = votesMap[pollsData[randomIndex].id];
             if (initialPollVote) {
               setSelectedOption(initialPollVote.toUpperCase() as 'A' | 'B');
+              // Fetch results for already voted poll
+              const { data: results } = await supabase
+                .from('poll_votes')
+                .select('choice')
+                .eq('poll_id', pollsData[randomIndex].id);
+              
+              if (results) {
+                const aVotes = results.filter(r => r.choice === 'a').length;
+                const bVotes = results.filter(r => r.choice === 'b').length;
+                setPollResults({ a: aVotes, b: bVotes });
+                setShowResults(true);
+              }
             }
           }
         }
@@ -145,35 +157,61 @@ export default function ThisOrThat() {
     }
   };
 
-  const navigateNext = () => {
+  const fetchPollResults = async (pollId: string) => {
+    const { data: results } = await supabase
+      .from('poll_votes')
+      .select('choice')
+      .eq('poll_id', pollId);
+
+    if (results) {
+      const aVotes = results.filter(r => r.choice === 'a').length;
+      const bVotes = results.filter(r => r.choice === 'b').length;
+      setPollResults({ a: aVotes, b: bVotes });
+      setShowResults(true);
+    }
+  };
+
+  const navigateNext = async () => {
     if (isAnimating || polls.length === 0) return;
     setIsAnimating(true);
     setSlideDirection('left');
-    setTimeout(() => {
+    setTimeout(async () => {
       const newIndex = (currentIndex + 1) % polls.length;
       setCurrentIndex(newIndex);
       const newPoll = polls[newIndex];
       const existingVote = userVotes[newPoll.id];
       setSelectedOption(existingVote ? existingVote.toUpperCase() as 'A' | 'B' : null);
-      setShowResults(false);
-      setPollResults(null);
+      
+      if (existingVote) {
+        await fetchPollResults(newPoll.id);
+      } else {
+        setShowResults(false);
+        setPollResults(null);
+      }
+      
       setSlideDirection(null);
       setIsAnimating(false);
     }, 300);
   };
 
-  const navigatePrev = () => {
+  const navigatePrev = async () => {
     if (isAnimating || polls.length === 0) return;
     setIsAnimating(true);
     setSlideDirection('right');
-    setTimeout(() => {
+    setTimeout(async () => {
       const newIndex = (currentIndex - 1 + polls.length) % polls.length;
       setCurrentIndex(newIndex);
       const newPoll = polls[newIndex];
       const existingVote = userVotes[newPoll.id];
       setSelectedOption(existingVote ? existingVote.toUpperCase() as 'A' | 'B' : null);
-      setShowResults(false);
-      setPollResults(null);
+      
+      if (existingVote) {
+        await fetchPollResults(newPoll.id);
+      } else {
+        setShowResults(false);
+        setPollResults(null);
+      }
+      
       setSlideDirection(null);
       setIsAnimating(false);
     }, 300);
