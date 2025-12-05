@@ -74,12 +74,12 @@ export default function Discover() {
 
           // Show location dialog if no location is set
           if (profile && !profile.latitude && !profile.longitude) {
-            const hasSeenLocationDialog = localStorage.getItem('location_dialog_shown');
             const locationWasDenied = localStorage.getItem('location_denied');
-            if (!hasSeenLocationDialog) {
-              setShowLocationDialog(true);
-            } else if (locationWasDenied) {
+            if (locationWasDenied) {
               setLocationDenied(true);
+            } else {
+              // Always show dialog if no location and not denied
+              setShowLocationDialog(true);
             }
           }
         }
