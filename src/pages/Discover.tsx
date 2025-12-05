@@ -55,32 +55,36 @@ export default function Discover() {
   // Check if current user is admin and request location
   useEffect(() => {
     const checkAdminAndLocation = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUserId(user.id);
-        const { data: hasAdminRole } = await supabase.rpc("has_role", {
-          _user_id: user.id,
-          _role: "admin",
-        });
-        setIsUserAdmin(!!hasAdminRole);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setCurrentUserId(user.id);
+          const { data: hasAdminRole } = await supabase.rpc("has_role", {
+            _user_id: user.id,
+            _role: "admin",
+          });
+          setIsUserAdmin(!!hasAdminRole);
 
-        // Check if we need to request location
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("latitude, longitude")
-          .eq("id", user.id)
-          .single();
+          // Check if we need to request location
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("latitude, longitude")
+            .eq("id", user.id)
+            .maybeSingle();
 
-        // Show location dialog if no location is set
-        if (profile && !profile.latitude && !profile.longitude) {
-          const hasSeenLocationDialog = localStorage.getItem('location_dialog_shown');
-          const locationWasDenied = localStorage.getItem('location_denied');
-          if (!hasSeenLocationDialog) {
-            setShowLocationDialog(true);
-          } else if (locationWasDenied) {
-            setLocationDenied(true);
+          // Show location dialog if no location is set
+          if (profile && !profile.latitude && !profile.longitude) {
+            const hasSeenLocationDialog = localStorage.getItem('location_dialog_shown');
+            const locationWasDenied = localStorage.getItem('location_denied');
+            if (!hasSeenLocationDialog) {
+              setShowLocationDialog(true);
+            } else if (locationWasDenied) {
+              setLocationDenied(true);
+            }
           }
         }
+      } catch (error) {
+        console.error("Error in checkAdminAndLocation:", error);
       }
     };
     checkAdminAndLocation();
@@ -256,6 +260,9 @@ export default function Discover() {
     }
   }, [allProfiles.length, loading, showEmptyDiscover]);
 
+  // Debug logging
+  console.log("Discover render - loading:", loading, "profiles:", profiles.length, "allProfiles:", allProfiles.length, "currentIndex:", currentIndex, "currentProfile:", currentProfile?.full_name);
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center relative" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)' }}>
@@ -269,6 +276,7 @@ export default function Discover() {
   }
 
   if (!currentProfile) {
+    console.log("No currentProfile - showing empty state");
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative flex items-center justify-center">
         <div className="max-w-md w-full text-center">

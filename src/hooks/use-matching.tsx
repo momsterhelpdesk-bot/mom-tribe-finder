@@ -110,9 +110,19 @@ export function useMatching() {
         .from("profiles")
         .select("*")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Error loading user profile:", profileError);
+        setLoading(false);
+        return;
+      }
+
+      if (!currentProfile) {
+        console.log("No profile found for user");
+        setLoading(false);
+        return;
+      }
       
       setCurrentUser(currentProfile);
 
