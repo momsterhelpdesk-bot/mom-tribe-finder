@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Ban, Search, MapPin, Calendar, Heart, AlertTriangle } from "lucide-react";
+import { Ban, Search, MapPin, Calendar, Heart, AlertTriangle, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -147,7 +148,14 @@ export default function UserManagement() {
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <CardTitle className="text-lg">{profile.full_name}</CardTitle>
+                    <Link 
+                      to={`/profile/${profile.id}`} 
+                      className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                      target="_blank"
+                    >
+                      <CardTitle className="text-lg hover:underline">{profile.full_name}</CardTitle>
+                      <ExternalLink className="w-4 h-4 opacity-50" />
+                    </Link>
                     {profile.verified_status && (
                       <Badge variant="default" className="bg-blue-500">Verified</Badge>
                     )}
