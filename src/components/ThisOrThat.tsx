@@ -30,24 +30,23 @@ export default function ThisOrThat() {
 
   useEffect(() => {
     const init = async () => {
-      // Get user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-        
-        // Load polls
-        const { data: pollsData, error: pollsError } = await supabase
-          .from('polls')
-          .select('*')
-          .order('created_at', { ascending: false });
+      // Load polls first (works without authentication)
+      const { data: pollsData, error: pollsError } = await supabase
+        .from('polls')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-        if (pollsError) {
-          console.error('Error loading polls:', pollsError);
-          toast.error("Σφάλμα φόρτωσης polls");
-        } else if (pollsData && pollsData.length > 0) {
-          setPolls(pollsData);
-          const randomIndex = Math.floor(Math.random() * pollsData.length);
-          setCurrentIndex(randomIndex);
+      if (pollsError) {
+        console.error('Error loading polls:', pollsError);
+      } else if (pollsData && pollsData.length > 0) {
+        setPolls(pollsData);
+        const randomIndex = Math.floor(Math.random() * pollsData.length);
+        setCurrentIndex(randomIndex);
+        
+        // Get user (optional - for voting)
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setUserId(user.id);
           
           // Load user's existing votes
           const { data: votes } = await supabase
