@@ -97,8 +97,13 @@ export function useMatching() {
 
   const loadMatchingProfiles = async () => {
     try {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.log("No user found, skipping profile load");
+        setLoading(false);
+        return;
+      }
 
       // Get current user's profile with filter preferences
       const { data: currentProfile, error: profileError } = await supabase

@@ -36,7 +36,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Momster <onboarding@resend.dev>",
       to: [email],
-      subject: "🌸 Καλωσήρθες στη λίστα αναμονής του Momster Marketplace!",
+      subject: "🎀 Καλωσόρισες στο Momster Marketplace!",
       html: `
         <!DOCTYPE html>
         <html>
@@ -46,37 +46,41 @@ const handler = async (req: Request): Promise<Response> => {
             body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #FFF5F7; margin: 0; padding: 20px; }
             .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 24px; padding: 32px; box-shadow: 0 4px 20px rgba(233, 180, 195, 0.3); }
             .header { text-align: center; margin-bottom: 24px; }
-            .title { color: #E9B4C3; font-size: 28px; margin: 0; font-family: 'Pacifico', cursive; }
+            .title { color: #E9B4C3; font-size: 28px; margin: 0; }
             .content { color: #5A4A52; line-height: 1.8; }
             .highlight { background: linear-gradient(135deg, #FFF5F7 0%, #FCE8EE 100%); padding: 20px; border-radius: 16px; margin: 20px 0; text-align: center; }
             .footer { text-align: center; margin-top: 24px; color: #9A8A92; font-size: 12px; }
             .emoji { font-size: 48px; margin-bottom: 16px; }
+            .features { text-align: left; padding-left: 20px; margin: 16px 0; }
+            .features li { margin-bottom: 8px; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <div class="emoji">🌸</div>
+              <div class="emoji">🎀</div>
               <h1 class="title">Momster Marketplace</h1>
             </div>
             
             <div class="content">
-              <p>Γεια σου, αγαπημένη μαμά! 💕</p>
+              <p>Μαμά, ευχαριστούμε που γράφτηκες στη λίστα ενημέρωσης του Marketplace! 💕</p>
               
-              <p>Η εγγραφή σου στη λίστα αναμονής του <strong>Momster Marketplace</strong> ολοκληρώθηκε με επιτυχία!</p>
+              <p>Είσαι πλέον από τις πρώτες που θα μάθεις πότε ανοίγει η νέα μας λειτουργία για να:</p>
               
               <div class="highlight">
-                <p style="margin: 0; font-size: 16px;">
-                  ✨ Θα είσαι από τις πρώτες που θα μάθουν<br/>
-                  όταν ανοίξει ο πιο γλυκός μαμαδο-χώρος<br/>
-                  αγοραπωλησίας & ανταλλαγών! ✨
+                <p style="margin: 0; font-size: 16px; text-align: left;">
+                  ✨ πουλάς<br/>
+                  ✨ ανταλλάζεις<br/>
+                  ✨ χαρίζεις<br/>
+                  ✨ βρίσκεις θησαυρούς για τα παιδάκια σου
                 </p>
               </div>
               
-              <p>Ετοιμαζόμαστε να φέρουμε κοντά μαμάδες που θέλουν να δώσουν δεύτερη ζωή σε αγαπημένα αντικείμενα 🧸</p>
+              <p>Θα λάβεις μέσα στις επόμενες μέρες το πρώτο update! 📬</p>
               
-              <p style="text-align: center; font-style: italic; color: #E9B4C3;">
-                Μαζί, οι μαμάδες ακμάζουμε! 🌷
+              <p style="text-align: center; margin-top: 24px;">
+                Με αγάπη,<br/>
+                <strong style="color: #E9B4C3;">Η ομάδα του Momster 🩷🦄</strong>
               </p>
             </div>
             
