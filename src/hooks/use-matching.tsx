@@ -132,20 +132,22 @@ export function useMatching() {
         .from("profiles")
         .select("id, full_name, profile_photo_url, profile_photos_urls, bio, city, area, interests, children, latitude, longitude")
         .neq("id", user.id)
-        .eq("profile_completed", true)
-        .not("profile_photo_url", "is", null)
-        .not("interests", "is", null)
-        .not("children", "is", null);
+        .eq("profile_completed", true);
 
       if (profilesError) throw profilesError;
 
+      console.log("Loaded profiles count:", allProfiles?.length || 0);
+
       let profilesWithScores: ProfileMatch[] = allProfiles || [];
 
-      // Filter out profiles with empty interests or children arrays
-      profilesWithScores = profilesWithScores.filter(profile => 
-        profile.interests && Array.isArray(profile.interests) && profile.interests.length > 0 &&
-        profile.children && Array.isArray(profile.children) && (profile.children as any[]).length > 0
-      );
+      // Filter out profiles with empty interests or children arrays (but keep if they have photo)
+      profilesWithScores = profilesWithScores.filter(profile => {
+        const hasInterests = profile.interests && Array.isArray(profile.interests) && profile.interests.length > 0;
+        const hasChildren = profile.children && Array.isArray(profile.children) && (profile.children as any[]).length > 0;
+        const hasPhoto = profile.profile_photo_url || (profile.profile_photos_urls && profile.profile_photos_urls.length > 0);
+        // Must have photo and at least one of interests/children
+        return hasPhoto && (hasInterests || hasChildren);
+      });
 
       // Calculate distance for all profiles
       const profilesWithDistance = await Promise.all(
