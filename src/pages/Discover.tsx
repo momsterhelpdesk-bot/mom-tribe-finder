@@ -406,12 +406,18 @@ export default function Discover() {
           Ανακάλυψε Μαμάδες
         </h1>
 
-        {/* Likes You Counter - Shows how many moms liked you */}
+        {/* Likes You Counter - Bubble style */}
         {!locationDenied && likesYouCount > 0 && (
-          <div className="flex justify-center mb-3">
-            <div className="bg-pink-100/80 text-pink-600 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-pink-200">
-              <span className="text-sm">💕</span>
-              <span className="text-xs font-medium">{likesYouCount} μαμάδες θα ήθελαν να σε γνωρίσουν!</span>
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <div className="bg-gradient-to-r from-pink-200 via-pink-100 to-purple-100 text-pink-700 px-5 py-2.5 rounded-full flex items-center gap-2 shadow-lg border-2 border-pink-300/50 backdrop-blur-sm animate-pulse-slow">
+                <span className="text-lg">🫧</span>
+                <span className="text-sm font-semibold">{likesYouCount} μαμάδες θα ήθελαν να σε γνωρίσουν!</span>
+                <span className="text-lg">💕</span>
+              </div>
+              {/* Decorative bubbles */}
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-pink-200 rounded-full opacity-60 animate-bounce" style={{ animationDelay: '0.1s' }} />
+              <div className="absolute -bottom-1 -left-2 w-2 h-2 bg-purple-200 rounded-full opacity-50 animate-bounce" style={{ animationDelay: '0.3s' }} />
             </div>
           </div>
         )}

@@ -35,11 +35,16 @@ export default function Chats() {
 
     setCurrentUserId(user.id);
 
-    // Get all matches
+    // Admin profile ID to always exclude
+    const ADMIN_PROFILE_ID = 'fb6eac18-8940-4f14-9cc7-8d828c21179a';
+
+    // Get all matches (excluding admin)
     const { data: matchesData } = await supabase
       .from("matches")
       .select("*")
       .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+      .neq("user1_id", ADMIN_PROFILE_ID)
+      .neq("user2_id", ADMIN_PROFILE_ID)
       .order("last_message_at", { ascending: false, nullsFirst: false });
 
     if (!matchesData) {

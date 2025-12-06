@@ -158,12 +158,15 @@ export function useMatching() {
       };
       setFilters(userFilters);
 
-      // Get profiles - when location filter is OFF, get ALL from Greece
-      // When location filter is ON, RLS will filter by same city/area
+      // Get profiles - exclude current user AND admin profiles
+      // Admin profile ID to always exclude
+      const ADMIN_PROFILE_ID = 'fb6eac18-8940-4f14-9cc7-8d828c21179a';
+      
       let profilesQuery = supabase
         .from("profiles")
         .select("id, full_name, profile_photo_url, profile_photos_urls, bio, city, area, interests, children, latitude, longitude")
         .neq("id", user.id)
+        .neq("id", ADMIN_PROFILE_ID) // Never show admin/Momster profile
         .eq("profile_completed", true);
 
       // Note: RLS policy filters by city/area, but when location filter is OFF
