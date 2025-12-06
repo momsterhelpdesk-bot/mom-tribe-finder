@@ -417,9 +417,19 @@ export default function Discover() {
                 onImageClick={() => navigate(`/profile/${currentProfile.id}`)}
               />
               
+              {/* "Liked You" Badge - Show if this user already swiped yes on current user */}
+              {currentProfile.hasLikedYou && (
+                <div className="absolute top-3 left-3 bg-gradient-to-r from-pink-500 to-primary rounded-full px-3 py-1.5 shadow-lg flex items-center gap-1.5 border border-white/50 animate-pulse">
+                  <Heart className="w-4 h-4 text-white fill-white" />
+                  <span className="font-semibold text-sm text-white">
+                    {language === "el" ? "Σε θέλει!" : "Likes you!"}
+                  </span>
+                </div>
+              )}
+              
               {/* Match Percentage Badge */}
               {currentProfile.matchPercentage && (
-                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg flex items-center gap-1.5 border border-primary/20">
+                <div className={`absolute top-3 ${currentProfile.hasLikedYou ? 'right-3' : 'right-3'} bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg flex items-center gap-1.5 border border-primary/20`}>
                   <Percent className={`w-4 h-4 ${getMatchColor(currentProfile.matchPercentage)}`} />
                   <span className={`font-bold text-sm ${getMatchColor(currentProfile.matchPercentage)}`}>
                     {currentProfile.matchPercentage}%

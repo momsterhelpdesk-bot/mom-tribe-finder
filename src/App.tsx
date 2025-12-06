@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useActivityTracker } from "./hooks/use-activity-tracker";
+import { useMatchNotifications } from "./hooks/use-push-notifications";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
@@ -35,10 +36,16 @@ function ActivityTracker() {
   return null;
 }
 
+function MatchNotificationsListener() {
+  useMatchNotifications();
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ActivityTracker />
+      <MatchNotificationsListener />
       <Toaster />
       <Sonner />
       <BrowserRouter>

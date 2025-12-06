@@ -37,6 +37,27 @@ interface MatchingFilters {
   interestsThreshold: number;
 }
 
+export interface ProfileMatch {
+  id: string;
+  full_name: string;
+  profile_photo_url: string | null;
+  profile_photos_urls: string[] | null;
+  bio: string | null;
+  city: string;
+  area: string;
+  interests: string[] | null;
+  children: Json | null;
+  latitude: number | null;
+  longitude: number | null;
+  distance?: number;
+  matchPercentage?: number;
+  commonInterestsCount?: number;
+  totalInterests?: number;
+  ageMatchScore?: number;
+  interestsMatchScore?: number;
+  hasLikedYou?: boolean; // NEW: indicates if this user already swiped yes
+}
+
 export function useMatching() {
   const [profiles, setProfiles] = useState<ProfileMatch[]>([]);
   const [loading, setLoading] = useState(true);
@@ -146,9 +167,26 @@ export function useMatching() {
 
       if (profilesError) throw profilesError;
 
+      // Get users who have already swiped "yes" on current user (they liked you!)
+      const { data: usersWhoLikedYou, error: likesError } = await supabase
+        .from("swipes")
+        .select("from_user_id")
+        .eq("to_user_id", user.id)
+        .eq("choice", "yes");
+
+      if (likesError) {
+        console.error("Error fetching users who liked you:", likesError);
+      }
+
+      const likedYouUserIds = new Set((usersWhoLikedYou || []).map(s => s.from_user_id));
+      console.log("Users who liked you:", likedYouUserIds.size);
+
       console.log("Loaded profiles count:", allProfiles?.length || 0);
 
-      let profilesWithScores: ProfileMatch[] = allProfiles || [];
+      let profilesWithScores: ProfileMatch[] = (allProfiles || []).map(profile => ({
+        ...profile,
+        hasLikedYou: likedYouUserIds.has(profile.id)
+      }));
 
       // Filter out profiles with empty interests or children arrays (but keep if they have photo)
       profilesWithScores = profilesWithScores.filter(profile => {
@@ -253,17 +291,21 @@ export function useMatching() {
         return { ...profile, matchPercentage };
       });
 
-      // SORT: 1) Most common interests, 2) Closest distance, 3) Closest kids ages
+      // SORT: 1) Users who liked you first! 2) Common interests, 3) Distance, 4) Kids ages
       profilesWithMatchPercentage.sort((a, b) => {
-        // First: common interests (highest first)
+        // FIRST PRIORITY: Users who liked you appear at the top!
+        if (a.hasLikedYou && !b.hasLikedYou) return -1;
+        if (!a.hasLikedYou && b.hasLikedYou) return 1;
+        
+        // Second: common interests (highest first)
         const interestsDiff = (b.commonInterestsCount || 0) - (a.commonInterestsCount || 0);
         if (interestsDiff !== 0) return interestsDiff;
         
-        // Second: distance (closest first)
+        // Third: distance (closest first)
         const distanceDiff = (a.distance || 9999) - (b.distance || 9999);
         if (distanceDiff !== 0) return distanceDiff;
         
-        // Third: kids age match score (highest first)
+        // Fourth: kids age match score (highest first)
         return (b.ageMatchScore || 0) - (a.ageMatchScore || 0);
       });
 
