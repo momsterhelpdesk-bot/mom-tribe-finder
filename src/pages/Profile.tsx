@@ -22,6 +22,7 @@ export default function ProfileNew() {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [hasMatch, setHasMatch] = useState(false);
   const [matchId, setMatchId] = useState<string | null>(null);
+  const [hasLikedYou, setHasLikedYou] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -82,6 +83,19 @@ export default function ProfileNew() {
         if (matchData) {
           setHasMatch(true);
           setMatchId(matchData.id);
+        }
+
+        // Check if this user has liked the current user
+        const { data: swipeData } = await supabase
+          .from("swipes")
+          .select("id")
+          .eq("from_user_id", profileId)
+          .eq("to_user_id", user.id)
+          .eq("choice", "yes")
+          .maybeSingle();
+
+        if (swipeData) {
+          setHasLikedYou(true);
         }
       }
 
@@ -309,6 +323,20 @@ export default function ProfileNew() {
             )}
           </div>
         </Card>
+
+        {/* "She said YES!" Banner - for profiles that liked you */}
+        {!isOwnProfile && hasLikedYou && !hasMatch && (
+          <Card className="p-4 bg-gradient-to-r from-pink-100 via-rose-100 to-pink-100 border-2 border-pink-300 rounded-[28px] shadow-lg">
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-2xl">🎀</span>
+              <div className="text-center">
+                <p className="font-bold text-pink-600">Αυτή η μαμά είπε ΝΑΙ για γνωριμία!</p>
+                <p className="text-xs text-pink-500 mt-1">Κάνε κι εσύ Like για να ξεκλειδώσεις το Chat!</p>
+              </div>
+              <span className="text-2xl">🎀</span>
+            </div>
+          </Card>
+        )}
 
         {/* Basic Info Card */}
         <Card className="p-8 bg-gradient-to-br from-white/90 to-[#FDF7F9] border-2 border-[#F3DCE5] rounded-[32px] shadow-md">
