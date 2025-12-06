@@ -162,10 +162,9 @@ Deno.serve(async (req) => {
 
       if (!userData.user) continue;
 
-      // Generate profile data
-      const city = getRandomElement(GREEK_CITIES);
-      const areas = city === 'Αθήνα' ? ATHENS_AREAS : city === 'Θεσσαλονίκη' ? THESSALONIKI_AREAS : ATHENS_AREAS;
-      const area = getRandomElement(areas);
+      // Generate profile data - ALL test accounts in same city/area so they can see each other
+      const city = 'Αθήνα'; // Fixed city for all test accounts
+      const area = 'Κολωνάκι'; // Fixed area for all test accounts
       const interests = getRandomElements(ALL_INTERESTS, Math.floor(Math.random() * 8) + 5);
       const childrenCount = Math.floor(Math.random() * 2) + 1;
       const children = generateChildren(childrenCount);
