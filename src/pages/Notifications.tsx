@@ -148,16 +148,16 @@ export default function Notifications() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pt-20 pb-24 px-4">
-      <div className="container max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Bell className="w-8 h-8 text-primary" />
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pt-20 pb-24 px-3">
+      <div className="container max-w-lg mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Bell className="w-6 h-6 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Mom Alerts 💞</h1>
+              <h1 className="text-xl font-bold text-foreground">Mom Alerts 💞</h1>
               {unreadCount > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  {unreadCount} unread alert{unreadCount !== 1 ? 's' : ''}
+                <p className="text-xs text-muted-foreground">
+                  {unreadCount} νέ{unreadCount === 1 ? 'α' : 'ες'}
                 </p>
               )}
             </div>
@@ -168,83 +168,82 @@ export default function Notifications() {
               variant="outline"
               size="sm"
               onClick={markAllAsRead}
-              className="gap-2"
+              className="gap-1 text-xs h-8"
             >
-              <Check className="w-4 h-4" />
-              Mark all as read
+              <Check className="w-3 h-3" />
+              Διαβάστηκαν
             </Button>
           )}
         </div>
 
-        <ScrollArea className="h-[calc(100vh-200px)]">
-          <div className="space-y-3">
+        <ScrollArea className="h-[calc(100vh-160px)]">
+          <div className="space-y-2">
             {loading ? (
               <Card className="p-6 text-center">
-                <p className="text-muted-foreground">Loading mom alerts...</p>
+                <div className="animate-spin text-4xl mb-2">🌸</div>
+                <p className="text-muted-foreground text-sm">Φόρτωση...</p>
               </Card>
             ) : notifications.length === 0 ? (
-              <Card className="p-12 text-center">
-                <Bell className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-xl font-semibold text-foreground mb-2">No mom alerts yet</h3>
-                <p className="text-muted-foreground">
-                  You'll see mom alerts here when you get matches, messages, and more!
+              <Card className="p-8 text-center">
+                <Bell className="w-12 h-12 mx-auto mb-3 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-semibold text-foreground mb-1">Καμία ειδοποίηση</h3>
+                <p className="text-sm text-muted-foreground">
+                  Θα δεις ειδοποιήσεις για matches, μηνύματα κ.ά.!
                 </p>
               </Card>
             ) : (
               notifications.map((notification) => (
                 <Card
                   key={notification.id}
-                  className={`p-4 transition-all hover:shadow-md ${
+                  className={`p-3 transition-all ${
                     !notification.read ? "bg-primary/5 border-primary/30" : ""
                   }`}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-secondary/50 flex items-center justify-center">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center">
                       {getIcon(notification.type)}
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="font-semibold text-foreground text-sm truncate">
                           {notification.title}
                         </h3>
                         {!notification.read && (
-                          <Badge variant="default" className="text-xs">New</Badge>
+                          <Badge variant="default" className="text-[10px] px-1.5 py-0">Νέο</Badge>
                         )}
                       </div>
                       
-                      <p className="text-sm text-muted-foreground mb-2">
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-1.5">
                         {notification.message}
                       </p>
                       
                       <div className="flex items-center justify-between">
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-[10px] text-muted-foreground">
                           {formatDistanceToNow(new Date(notification.created_at), {
                             addSuffix: true,
                             locale: el,
                           })}
                         </p>
                         
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                           {!notification.read && (
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => markAsRead(notification.id)}
-                              className="h-8 gap-1"
+                              className="h-7 px-2"
                             >
-                              <Check className="w-4 h-4" />
-                              <span className="text-xs">Mark as read</span>
+                              <Check className="w-3 h-3" />
                             </Button>
                           )}
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => deleteNotification(notification.id)}
-                            className="h-8 gap-1 text-destructive hover:text-destructive"
+                            className="h-7 px-2 text-destructive hover:text-destructive"
                           >
-                            <Trash2 className="w-4 h-4" />
-                            <span className="text-xs">Delete</span>
+                            <Trash2 className="w-3 h-3" />
                           </Button>
                         </div>
                       </div>

@@ -237,28 +237,32 @@ export function useMatching() {
         return hasPhoto && (hasInterests || hasChildren);
       });
 
-      // Calculate distance for all profiles
-      const profilesWithDistance = await Promise.all(
-        profilesWithScores.map(async (profile) => {
-          let distance = 9999;
-          
-          if (currentProfile.latitude && currentProfile.longitude && 
-              profile.latitude && profile.longitude) {
-            distance = await calculateDistance(
-              currentProfile.latitude,
-              currentProfile.longitude,
-              profile.latitude,
-              profile.longitude
-            );
-          } else if (profile.area === currentProfile.area) {
-            distance = 1;
-          } else if (profile.city === currentProfile.city) {
-            distance = 5;
-          }
-          
-          return { ...profile, distance };
-        })
-      );
+      // Calculate distance for all profiles - batch calculate to reduce latency
+      // Only calculate precise distance if user has location, otherwise use fallback
+      const hasUserLocation = currentProfile.latitude && currentProfile.longitude;
+      
+      const profilesWithDistance = profilesWithScores.map(profile => {
+        let distance = 9999;
+        
+        if (hasUserLocation && profile.latitude && profile.longitude) {
+          // Quick haversine calculation inline instead of edge function call
+          const R = 6371; // Earth's radius in km
+          const dLat = (profile.latitude - currentProfile.latitude!) * Math.PI / 180;
+          const dLon = (profile.longitude - currentProfile.longitude!) * Math.PI / 180;
+          const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(currentProfile.latitude! * Math.PI / 180) * Math.cos(profile.latitude * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          distance = R * c;
+        } else if (profile.area === currentProfile.area) {
+          distance = 1;
+        } else if (profile.city === currentProfile.city) {
+          distance = 5;
+        }
+        
+        return { ...profile, distance };
+      });
 
       // APPLY LOCATION FILTER
       let filteredProfiles = profilesWithDistance;

@@ -1,24 +1,31 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/hooks/use-notifications";
-import { Bell } from "lucide-react";
+import { Bell, X } from "lucide-react";
 
 export default function MomAlerts() {
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
+  const [bubbleDismissed, setBubbleDismissed] = useState(false);
 
   const go = () => navigate("/notifications");
 
+  const dismissBubble = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBubbleDismissed(true);
+  };
+
   return (
     <>
-      {/* Top-right pastel bell */}
+      {/* Top-right bell button */}
       <Button
         aria-label="Mom Alerts"
         onClick={go}
         variant="secondary"
         size="icon"
-        className="fixed top-4 right-4 z-50 rounded-full bg-card border border-border shadow-md hover:shadow-lg hover-scale"
+        className="fixed top-4 right-4 z-50 rounded-full bg-card border border-border shadow-md hover:shadow-lg transition-transform active:scale-95"
       >
         <div className="relative">
           <Bell className="w-5 h-5 text-foreground" />
@@ -33,28 +40,26 @@ export default function MomAlerts() {
         </div>
       </Button>
 
-      {/* Floating bottom-right bubble - only when there are alerts - with easy dismiss */}
-      {unreadCount > 0 && (
-        <button
-          onClick={go}
-          className="fixed bottom-24 right-4 z-50 rounded-full bg-secondary text-foreground border border-border shadow-lg pl-4 pr-2 py-2 flex items-center gap-2 animate-enter hover-scale group"
-        >
-          <span className="text-lg">🌸</span>
-          <span className="text-sm font-semibold">Mom Alerts</span>
-          <Badge variant="default" className="ml-1">{unreadCount}</Badge>
-          <span 
-            onClick={(e) => {
-              e.stopPropagation();
-              // Hide the bubble for this session
-              const bubble = e.currentTarget.closest('button');
-              if (bubble) bubble.style.display = 'none';
-            }}
-            className="ml-1 w-6 h-6 rounded-full bg-muted hover:bg-muted-foreground/20 flex items-center justify-center text-xs cursor-pointer"
-            aria-label="Dismiss"
+      {/* Floating bottom bubble - compact and easy to dismiss */}
+      {unreadCount > 0 && !bubbleDismissed && (
+        <div className="fixed bottom-24 right-3 left-3 z-50 flex justify-center pointer-events-none">
+          <button
+            onClick={go}
+            className="pointer-events-auto bg-card/95 backdrop-blur-sm text-foreground border border-border shadow-lg px-4 py-2.5 rounded-full flex items-center gap-2 animate-fade-in max-w-[280px]"
           >
-            ✕
-          </span>
-        </button>
+            <span className="text-base">🌸</span>
+            <span className="text-sm font-medium truncate">
+              {unreadCount} {unreadCount === 1 ? "ειδοποίηση" : "ειδοποιήσεις"}
+            </span>
+            <button
+              onClick={dismissBubble}
+              className="ml-1 w-7 h-7 rounded-full bg-muted hover:bg-destructive/20 flex items-center justify-center transition-colors flex-shrink-0"
+              aria-label="Dismiss"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </button>
+        </div>
       )}
     </>
   );
