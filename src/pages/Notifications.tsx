@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bell, Check, Trash2, Heart, MessageCircle, Users, ShoppingBag, Calendar } from "lucide-react";
+import { Bell, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+import SwipeableNotification from "@/components/SwipeableNotification";
 import { el } from "date-fns/locale";
 
 interface Notification {
@@ -130,20 +129,6 @@ export default function Notifications() {
     }
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "message":
-        return <MessageCircle className="w-5 h-5 text-primary" />;
-      case "match":
-        return <Heart className="w-5 h-5 text-primary" />;
-      case "playdate":
-        return <Calendar className="w-5 h-5 text-accent" />;
-      case "marketplace":
-        return <ShoppingBag className="w-5 h-5 text-accent" />;
-      default:
-        return <Bell className="w-5 h-5 text-muted-foreground" />;
-    }
-  };
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -193,63 +178,12 @@ export default function Notifications() {
               </Card>
             ) : (
               notifications.map((notification) => (
-                <Card
+                <SwipeableNotification
                   key={notification.id}
-                  className={`p-3 transition-all ${
-                    !notification.read ? "bg-primary/5 border-primary/30" : ""
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-secondary/50 flex items-center justify-center">
-                      {getIcon(notification.type)}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="font-semibold text-foreground text-sm truncate">
-                          {notification.title}
-                        </h3>
-                        {!notification.read && (
-                          <Badge variant="default" className="text-[10px] px-1.5 py-0">Νέο</Badge>
-                        )}
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-1.5">
-                        {notification.message}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <p className="text-[10px] text-muted-foreground">
-                          {formatDistanceToNow(new Date(notification.created_at), {
-                            addSuffix: true,
-                            locale: el,
-                          })}
-                        </p>
-                        
-                        <div className="flex gap-1">
-                          {!notification.read && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => markAsRead(notification.id)}
-                              className="h-7 px-2"
-                            >
-                              <Check className="w-3 h-3" />
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteNotification(notification.id)}
-                            className="h-7 px-2 text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
+                  notification={notification}
+                  onMarkAsRead={markAsRead}
+                  onDelete={deleteNotification}
+                />
               ))
             )}
           </div>
