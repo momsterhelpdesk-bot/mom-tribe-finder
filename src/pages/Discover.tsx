@@ -49,6 +49,7 @@ export default function Discover() {
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [showDailyMascot, setShowDailyMascot] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [likesYouCount, setLikesYouCount] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -57,7 +58,7 @@ export default function Discover() {
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
-  // Check if current user is admin and request location
+  // Check if current user is admin and request location + load likes count
   useEffect(() => {
     const checkAdminAndLocation = async () => {
       try {
@@ -69,6 +70,17 @@ export default function Discover() {
             _role: "admin",
           });
           setIsUserAdmin(!!hasAdminRole);
+
+          // Load count of users who liked you (independent query)
+          const { count, error: likesError } = await supabase
+            .from("swipes")
+            .select("*", { count: 'exact', head: true })
+            .eq("to_user_id", user.id)
+            .eq("choice", "yes");
+          
+          if (!likesError && count !== null) {
+            setLikesYouCount(count);
+          }
 
           // Check if we need to request location
           const { data: profile } = await supabase
@@ -395,17 +407,14 @@ export default function Discover() {
         </h1>
 
         {/* Likes You Counter - Shows how many moms liked you */}
-        {!locationDenied && (() => {
-          const likesCount = filteredProfiles.filter(p => p.hasLikedYou).length;
-          return likesCount > 0 ? (
-            <div className="flex justify-center mb-3">
-              <div className="bg-pink-100/80 text-pink-600 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-pink-200">
-                <span className="text-sm">💕</span>
-                <span className="text-xs font-medium">{likesCount} μαμάδες θα ήθελαν να σε γνωρίσουν!</span>
-              </div>
+        {!locationDenied && likesYouCount > 0 && (
+          <div className="flex justify-center mb-3">
+            <div className="bg-pink-100/80 text-pink-600 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-pink-200">
+              <span className="text-sm">💕</span>
+              <span className="text-xs font-medium">{likesYouCount} μαμάδες θα ήθελαν να σε γνωρίσουν!</span>
             </div>
-          ) : null;
-        })()}
+          </div>
+        )}
 
         {/* Location Denied - Show message and hide matches */}
         {locationDenied && (
