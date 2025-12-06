@@ -758,8 +758,8 @@ export default function Discover() {
       {/* No More Moms Popup */}
       <MomsterPopup
         visible={showNoMomsPopup}
-        title="Τέλος για σήμερα!"
-        subtitle="Είδες όλες τις διαθέσιμες μαμάδες! Έλα αύριο για νέες γνωριμίες ή δοκίμασε να αλλάξεις τα φίλτρα σου."
+        title="Τέλος για την ώρα! ✨"
+        subtitle="Έλεγξες όλες τις διαθέσιμες μαμάδες. Έλα ξανά σε λίγο ή δοκίμασε να αλλάξεις τα φίλτρα σου."
         buttonText="Ρύθμιση Φίλτρων"
         onButtonClick={() => {
           setShowNoMomsPopup(false);

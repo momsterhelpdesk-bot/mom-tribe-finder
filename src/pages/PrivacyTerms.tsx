@@ -164,15 +164,25 @@ export default function PrivacyTerms() {
             {/* Section 5 */}
             <div>
               <h2 className="text-3xl font-bold text-primary mb-4">5. Marketplace & Αποποίηση Ευθύνης</h2>
-              <p className="mb-2">Το Momster δεν είναι μέρος καμίας συναλλαγής. Δεν εγγυάται:</p>
-              <ul className="list-disc pl-6 mb-4 space-y-1">
-                <li>ποιότητα προϊόντων</li>
-                <li>γνησιότητα αγγελιών</li>
-                <li>πληρωμές ή επιστροφές</li>
-                <li>συναντήσεις μεταξύ χρηστών</li>
-              </ul>
               <p className="mb-4">
-                Οι συναλλαγές γίνονται αποκλειστικά με ευθύνη των χρηστών.
+                Το Momster Marketplace είναι ένας χώρος όπου οι μαμάδες μπορούν να ανταλλάσσουν, να πωλούν ή να δωρίζουν 
+                παιδικά είδη και άλλα προϊόντα. <strong>Το Momster δεν λειτουργεί ως μεσάζοντας, έμπορος ή 
+                εγγυητής οποιασδήποτε συναλλαγής.</strong>
+              </p>
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Αποποίηση Ευθύνης Marketplace</h3>
+              <p className="mb-2">Το Momster δεν φέρει καμία ευθύνη για:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Την ποιότητα, ασφάλεια ή καταλληλότητα οποιουδήποτε προϊόντος ή υπηρεσίας που προσφέρεται</li>
+                <li>Την ακρίβεια, πληρότητα ή γνησιότητα των αγγελιών και περιγραφών</li>
+                <li>Τυχόν ζημιές, απώλειες ή τραυματισμούς που προκύπτουν από τη χρήση προϊόντων</li>
+                <li>Τις πληρωμές, επιστροφές χρημάτων ή διαφορές μεταξύ χρηστών</li>
+                <li>Την παράδοση, αποστολή ή παραλαβή προϊόντων</li>
+                <li>Οποιαδήποτε απάτη, παραπλάνηση ή ψευδείς δηλώσεις από χρήστες</li>
+              </ul>
+              <p className="mb-4 font-medium bg-primary/10 p-4 rounded-lg">
+                ⚠️ <strong>Σημαντικό:</strong> Οι συναλλαγές γίνονται αποκλειστικά με ευθύνη των χρηστών. 
+                Συνιστούμε να επιθεωρείτε τα προϊόντα πριν την αγορά, να συναντιέστε σε δημόσιους χώρους 
+                και να μην κοινοποιείτε προσωπικά δεδομένα (διεύθυνση, τραπεζικά στοιχεία) πριν την ολοκλήρωση της συναλλαγής.
               </p>
             </div>
 
@@ -180,14 +190,33 @@ export default function PrivacyTerms() {
 
             {/* Section 6 */}
             <div>
-              <h2 className="text-3xl font-bold text-primary mb-4">6. Συναντήσεις & Ασφάλεια</h2>
+              <h2 className="text-3xl font-bold text-primary mb-4">6. Playdates, Συναντήσεις & Ασφάλεια</h2>
+              <p className="mb-4">
+                Το Momster διευκολύνει τη γνωριμία μεταξύ μαμάδων, αλλά <strong>δεν οργανώνει, δεν εποπτεύει 
+                και δεν φέρει ευθύνη για οποιαδήποτε offline συνάντηση, playdate ή δραστηριότητα</strong> 
+                που προκύπτει από τη χρήση της εφαρμογής.
+              </p>
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Αποποίηση Ευθύνης για Συναντήσεις</h3>
               <p className="mb-2">Το Momster δεν φέρει ευθύνη για:</p>
               <ul className="list-disc pl-6 mb-4 space-y-1">
-                <li>offline συναντήσεις χρηστών</li>
-                <li>περιστατικά, ζημιές, διαφορές</li>
+                <li>Τραυματισμούς, ατυχήματα ή ζημιές που μπορεί να προκύψουν κατά τη διάρκεια playdates ή συναντήσεων</li>
+                <li>Τη συμπεριφορά, τις ενέργειες ή τις παραλείψεις οποιουδήποτε χρήστη</li>
+                <li>Την επίβλεψη παιδιών κατά τη διάρκεια συναντήσεων</li>
+                <li>Οποιαδήποτε διαφορά, σύγκρουση ή παρεξήγηση μεταξύ χρηστών</li>
+                <li>Περιπτώσεις κλοπής, απάτης ή παραβατικής συμπεριφοράς</li>
               </ul>
-              <p className="mb-4">
-                Ο χρήστης οφείλει να ακολουθεί βασικές πρακτικές ασφάλειας.
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Συστάσεις Ασφαλείας</h3>
+              <p className="mb-2">Συνιστούμε ιδιαίτερα:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Να συναντιέστε πάντα σε δημόσιους χώρους τις πρώτες φορές</li>
+                <li>Να ενημερώνετε κάποιον οικείο σας για τη συνάντηση</li>
+                <li>Να μην αφήνετε παιδιά χωρίς επίβλεψη σε συναντήσεις με άγνωστα άτομα</li>
+                <li>Να εμπιστεύεστε το ένστικτό σας - αν κάτι δεν σας φαίνεται σωστό, αποχωρήστε</li>
+                <li>Να αναφέρετε οποιαδήποτε ύποπτη ή ανησυχητική συμπεριφορά</li>
+              </ul>
+              <p className="mb-4 font-medium bg-primary/10 p-4 rounded-lg">
+                💡 <strong>Θυμηθείτε:</strong> Η ασφάλεια δική σας και των παιδιών σας είναι αποκλειστικά 
+                δική σας ευθύνη. Το Momster παρέχει μόνο την πλατφόρμα γνωριμίας.
               </p>
             </div>
 
@@ -398,7 +427,23 @@ export default function PrivacyTerms() {
             <div>
               <h2 className="text-3xl font-bold text-primary mb-4">5. Marketplace Disclaimer</h2>
               <p className="mb-4">
-                Momster is not responsible for transactions, product quality, payments or meetings. All interactions occur at users' own risk.
+                Momster Marketplace is a space where moms can exchange, sell or donate children's items and other products. 
+                <strong> Momster does not act as intermediary, merchant or guarantor of any transaction.</strong>
+              </p>
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Marketplace Liability Disclaimer</h3>
+              <p className="mb-2">Momster is not responsible for:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>The quality, safety or suitability of any product or service offered</li>
+                <li>The accuracy, completeness or authenticity of listings and descriptions</li>
+                <li>Any damages, losses or injuries resulting from product use</li>
+                <li>Payments, refunds or disputes between users</li>
+                <li>Delivery, shipping or receipt of products</li>
+                <li>Any fraud, deception or false statements by users</li>
+              </ul>
+              <p className="mb-4 font-medium bg-primary/10 p-4 rounded-lg">
+                ⚠️ <strong>Important:</strong> All transactions are solely at users' own risk. 
+                We recommend inspecting products before purchase, meeting in public places, 
+                and not sharing personal data (address, bank details) before completing transactions.
               </p>
             </div>
 
@@ -406,9 +451,32 @@ export default function PrivacyTerms() {
 
             {/* Section 6 */}
             <div>
-              <h2 className="text-3xl font-bold text-primary mb-4">6. Safety Notice</h2>
+              <h2 className="text-3xl font-bold text-primary mb-4">6. Playdates, Meetings & Safety</h2>
               <p className="mb-4">
-                Momster is not liable for incidents related to offline meetings.
+                Momster facilitates connections between moms, but <strong>does not organize, supervise or bear 
+                responsibility for any offline meeting, playdate or activity</strong> resulting from app use.
+              </p>
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Meeting Liability Disclaimer</h3>
+              <p className="mb-2">Momster is not responsible for:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Injuries, accidents or damages during playdates or meetings</li>
+                <li>The behavior, actions or omissions of any user</li>
+                <li>Child supervision during meetings</li>
+                <li>Any disputes, conflicts or misunderstandings between users</li>
+                <li>Cases of theft, fraud or criminal behavior</li>
+              </ul>
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Safety Recommendations</h3>
+              <p className="mb-2">We strongly recommend:</p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Always meet in public places for initial meetings</li>
+                <li>Inform someone close about your meeting plans</li>
+                <li>Never leave children unsupervised with unfamiliar people</li>
+                <li>Trust your instincts - if something feels wrong, leave</li>
+                <li>Report any suspicious or concerning behavior</li>
+              </ul>
+              <p className="mb-4 font-medium bg-primary/10 p-4 rounded-lg">
+                💡 <strong>Remember:</strong> Your safety and your children's safety is solely your responsibility. 
+                Momster only provides the connection platform.
               </p>
             </div>
 

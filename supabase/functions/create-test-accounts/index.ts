@@ -199,12 +199,50 @@ Deno.serve(async (req) => {
       }
 
       createdAccounts.push({
+        id: userData.user.id,
         email,
         password,
         name,
         city,
         area
       });
+    }
+
+    // Create mutual swipes between all test accounts so they can match
+    if (createdAccounts.length >= 2) {
+      console.log('Creating mutual swipes between test accounts...');
+      for (let i = 0; i < createdAccounts.length; i++) {
+        for (let j = i + 1; j < createdAccounts.length; j++) {
+          // User i swipes yes on user j
+          await supabaseAdmin.from('swipes').upsert({
+            from_user_id: createdAccounts[i].id,
+            to_user_id: createdAccounts[j].id,
+            choice: 'yes'
+          }, { onConflict: 'from_user_id,to_user_id' });
+
+          // User j swipes yes on user i - this creates a mutual match!
+          await supabaseAdmin.from('swipes').upsert({
+            from_user_id: createdAccounts[j].id,
+            to_user_id: createdAccounts[i].id,
+            choice: 'yes'
+          }, { onConflict: 'from_user_id,to_user_id' });
+
+          // Create the match
+          const existingMatch = await supabaseAdmin
+            .from('matches')
+            .select('id')
+            .or(`and(user1_id.eq.${createdAccounts[i].id},user2_id.eq.${createdAccounts[j].id}),and(user1_id.eq.${createdAccounts[j].id},user2_id.eq.${createdAccounts[i].id})`)
+            .maybeSingle();
+
+          if (!existingMatch.data) {
+            await supabaseAdmin.from('matches').insert({
+              user1_id: createdAccounts[i].id,
+              user2_id: createdAccounts[j].id
+            });
+          }
+        }
+      }
+      console.log('Mutual swipes and matches created!');
     }
 
     return new Response(

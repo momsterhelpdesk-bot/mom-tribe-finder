@@ -33,16 +33,27 @@ export default function MomAlerts() {
         </div>
       </Button>
 
-      {/* Floating bottom-right bubble - only when there are alerts */}
+      {/* Floating bottom-right bubble - only when there are alerts - with easy dismiss */}
       {unreadCount > 0 && (
         <button
           onClick={go}
-          className="fixed bottom-24 right-4 z-50 rounded-full bg-secondary text-foreground border border-border shadow-lg px-4 py-3 flex items-center gap-2 animate-enter hover-scale"
+          className="fixed bottom-24 right-4 z-50 rounded-full bg-secondary text-foreground border border-border shadow-lg pl-4 pr-2 py-2 flex items-center gap-2 animate-enter hover-scale group"
         >
-          <span className="text-xl">🌸</span>
-          <span className="text-sm font-semibold">Mom Alerts 💞</span>
+          <span className="text-lg">🌸</span>
+          <span className="text-sm font-semibold">Mom Alerts</span>
           <Badge variant="default" className="ml-1">{unreadCount}</Badge>
-          <span className="ml-1">✨</span>
+          <span 
+            onClick={(e) => {
+              e.stopPropagation();
+              // Hide the bubble for this session
+              const bubble = e.currentTarget.closest('button');
+              if (bubble) bubble.style.display = 'none';
+            }}
+            className="ml-1 w-6 h-6 rounded-full bg-muted hover:bg-muted-foreground/20 flex items-center justify-center text-xs cursor-pointer"
+            aria-label="Dismiss"
+          >
+            ✕
+          </span>
         </button>
       )}
     </>
