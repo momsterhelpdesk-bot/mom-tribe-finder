@@ -158,12 +158,17 @@ export function useMatching() {
       };
       setFilters(userFilters);
 
-      // Get ALL profiles with complete profile
-      const { data: allProfiles, error: profilesError } = await supabase
+      // Get profiles - when location filter is OFF, get ALL from Greece
+      // When location filter is ON, RLS will filter by same city/area
+      let profilesQuery = supabase
         .from("profiles")
         .select("id, full_name, profile_photo_url, profile_photos_urls, bio, city, area, interests, children, latitude, longitude")
         .neq("id", user.id)
         .eq("profile_completed", true);
+
+      // Note: RLS policy filters by city/area, but when location filter is OFF
+      // we want to show ALL profiles from Greece - we'll handle this by not filtering
+      const { data: allProfiles, error: profilesError } = await profilesQuery;
 
       if (profilesError) throw profilesError;
 

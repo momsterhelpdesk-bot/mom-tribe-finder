@@ -384,10 +384,10 @@ export default function Discover() {
         {!locationDenied && (() => {
           const likesCount = filteredProfiles.filter(p => p.hasLikedYou).length;
           return likesCount > 0 ? (
-            <div className="flex justify-center mb-4">
-              <div className="bg-gradient-to-r from-pink-400 to-rose-400 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 animate-pulse">
-                <span className="text-lg">❤️</span>
-                <span className="font-bold">{likesCount} {likesCount === 1 ? 'μαμά σε θέλει' : 'μαμάδες σε θέλουν'}!</span>
+            <div className="flex justify-center mb-3">
+              <div className="bg-pink-100/80 text-pink-600 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-pink-200">
+                <span className="text-sm">💕</span>
+                <span className="text-xs font-medium">{likesCount} μαμάδες θα ήθελαν να σε γνωρίσουν!</span>
               </div>
             </div>
           ) : null;
@@ -443,22 +443,6 @@ export default function Discover() {
                 onImageClick={() => navigate(`/profile/${currentProfile.id}`)}
               />
               
-              {/* "Likes You" Badge - Animated badge with hearts */}
-              {currentProfile.hasLikedYou && (
-                <div className="absolute top-3 left-3 z-10">
-                  <div className="bg-gradient-to-r from-pink-500 via-rose-400 to-pink-500 text-white rounded-full px-4 py-2 shadow-xl flex items-center gap-2 border-2 border-white/60 animate-bounce">
-                    <span className="text-base animate-pulse">💕</span>
-                    <span className="font-bold text-sm drop-shadow-sm">Likes you!</span>
-                  </div>
-                  {/* Floating hearts animation */}
-                  <div className="absolute -top-2 -right-1 animate-ping">
-                    <span className="text-xs">💗</span>
-                  </div>
-                  <div className="absolute -top-1 left-0 animate-ping delay-150">
-                    <span className="text-xs">💕</span>
-                  </div>
-                </div>
-              )}
               
               {/* Match Percentage Badge */}
               {currentProfile.matchPercentage && (
@@ -525,7 +509,12 @@ export default function Discover() {
                 </div>
               )}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-                <h2 className="text-xl font-bold">{currentProfile.full_name}</h2>
+                <h2 
+                  className="text-xl font-bold cursor-pointer hover:underline"
+                  onClick={() => navigate(`/profile/${currentProfile.id}`)}
+                >
+                  {currentProfile.full_name}
+                </h2>
                 <div className="flex items-center gap-2 mt-1">
                   <MapPin className="w-4 h-4" />
                   <span className="text-sm font-semibold">{getLocationText()}</span>
@@ -534,18 +523,6 @@ export default function Discover() {
             </div>
 
             <div className="p-4 space-y-3">
-              {/* "She said YES!" Banner - Show before bio if this mom liked you */}
-              {currentProfile.hasLikedYou && (
-                <div className="bg-gradient-to-r from-pink-100 via-rose-100 to-pink-100 border-2 border-pink-300 rounded-xl p-3 text-center shadow-md">
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-xl">🎀</span>
-                    <span className="font-bold text-pink-600 text-sm">Αυτή η μαμά είπε ΝΑΙ για γνωριμία!</span>
-                    <span className="text-xl">🎀</span>
-                  </div>
-                  <p className="text-xs text-pink-500 mt-1">Κάνε κι εσύ Like για να ανοίξει το Chat!</p>
-                </div>
-              )}
-
               {/* Match Stats */}
               {(currentProfile.commonInterestsCount !== undefined) && (
                 <div className="flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 p-2 rounded-lg border border-pink-200">
