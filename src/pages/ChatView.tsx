@@ -4,11 +4,28 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Send, Flag, Heart, Coffee, Baby } from "lucide-react";
+import { ArrowLeft, Send, Flag, Heart, Coffee, Baby, MoreVertical, UserX, Ban } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { el } from "date-fns/locale";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const QUICK_REPLIES = [
   "Γεια σου μανούλα! Πώς είσαι σήμερα; 😊",
@@ -40,6 +57,8 @@ export default function ChatView() {
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
+  const [showUnmatchDialog, setShowUnmatchDialog] = useState(false);
+  const [showBlockDialog, setShowBlockDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -218,6 +237,59 @@ export default function ChatView() {
     toast.success("Αναφορά καταχωρήθηκε. Θα εξεταστεί από την ομάδα μας.");
   };
 
+  const handleUnmatch = async () => {
+    if (!matchId || !otherUser) return;
+    
+    try {
+      // Delete all messages first
+      await supabase
+        .from("chat_messages")
+        .delete()
+        .eq("match_id", matchId);
+      
+      // Delete the match
+      await supabase
+        .from("matches")
+        .delete()
+        .eq("id", matchId);
+      
+      // Delete the swipes (both directions)
+      await supabase
+        .from("swipes")
+        .delete()
+        .or(`and(from_user_id.eq.${currentUserId},to_user_id.eq.${otherUser.id}),and(from_user_id.eq.${otherUser.id},to_user_id.eq.${currentUserId})`);
+      
+      toast.success("Το match διαγράφηκε");
+      navigate("/chats");
+    } catch (error) {
+      console.error("Unmatch error:", error);
+      toast.error("Σφάλμα κατά την αφαίρεση του match");
+    }
+  };
+
+  const handleBlock = async () => {
+    if (!otherUser) return;
+    
+    try {
+      // Add to blocked users
+      await supabase
+        .from("blocked_users")
+        .insert({
+          blocker_id: currentUserId,
+          blocked_id: otherUser.id,
+          reason: "Blocked from chat"
+        });
+      
+      // Also unmatch
+      await handleUnmatch();
+      
+      toast.success(`Η ${otherUser.full_name} αποκλείστηκε`);
+    } catch (error) {
+      console.error("Block error:", error);
+      toast.error("Σφάλμα κατά τον αποκλεισμό");
+    }
+  };
+
   const addEmoji = (emoji: string) => {
     setNewMessage(prev => prev + emoji);
   };
@@ -270,14 +342,67 @@ export default function ChatView() {
           </p>
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleReport}
-        >
-          <Flag className="w-5 h-5 text-destructive" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="w-5 h-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={handleReport} className="text-amber-600">
+              <Flag className="w-4 h-4 mr-2" />
+              Αναφορά
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setShowUnmatchDialog(true)} className="text-orange-600">
+              <UserX className="w-4 h-4 mr-2" />
+              Unmatch
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowBlockDialog(true)} className="text-destructive">
+              <Ban className="w-4 h-4 mr-2" />
+              Αποκλεισμός
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
+      {/* Unmatch Dialog */}
+      <AlertDialog open={showUnmatchDialog} onOpenChange={setShowUnmatchDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Αφαίρεση Match;</AlertDialogTitle>
+            <AlertDialogDescription>
+              Θα διαγραφεί το match και όλα τα μηνύματα με την {otherUser?.full_name}. 
+              Η ενέργεια δεν αναιρείται.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Ακύρωση</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUnmatch} className="bg-orange-600 hover:bg-orange-700">
+              Unmatch
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Block Dialog */}
+      <AlertDialog open={showBlockDialog} onOpenChange={setShowBlockDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Αποκλεισμός Χρήστη;</AlertDialogTitle>
+            <AlertDialogDescription>
+              Η {otherUser?.full_name} δεν θα μπορεί να σε δει ή να επικοινωνήσει μαζί σου. 
+              Θα διαγραφεί επίσης το match και τα μηνύματα.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Ακύρωση</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBlock} className="bg-destructive hover:bg-destructive/90">
+              Αποκλεισμός
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Safety Tip */}
       {showSafetyTip && (
