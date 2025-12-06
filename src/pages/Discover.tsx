@@ -74,13 +74,8 @@ export default function Discover() {
 
           // Show location dialog if no location is set
           if (profile && !profile.latitude && !profile.longitude) {
-            const locationWasDenied = localStorage.getItem('location_denied');
-            if (locationWasDenied) {
-              setLocationDenied(true);
-            } else {
-              // Always show dialog if no location and not denied
-              setShowLocationDialog(true);
-            }
+            // Always show dialog if no location - user must accept to see matches
+            setShowLocationDialog(true);
           }
         }
       } catch (error) {
@@ -116,8 +111,7 @@ export default function Discover() {
   };
 
   const handleDenyLocation = () => {
-    localStorage.setItem('location_dialog_shown', 'true');
-    localStorage.setItem('location_denied', 'true');
+    // Don't save to localStorage - dialog will show again next visit
     setShowLocationDialog(false);
     setLocationDenied(true);
   };
@@ -373,238 +367,252 @@ export default function Discover() {
           Ανακάλυψε Μαμάδες
         </h1>
 
-        {/* Location Denied Notice */}
+        {/* Location Denied - Show message and hide matches */}
         {locationDenied && (
-          <Card className="p-4 bg-amber-50 border-amber-200 mb-4">
-            <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm text-amber-800 font-medium">
-                  {language === "el" 
-                    ? "Χωρίς τοποθεσία δεν μπορούμε να δείξουμε κοντινές μαμάδες."
-                    : "Without location we cannot show nearby moms."
-                  }
-                </p>
-                <p className="text-xs text-amber-700 mt-1">
-                  {language === "el"
-                    ? "Ενεργοποίησέ την από τις ρυθμίσεις του browser σου."
-                    : "Enable it from your browser settings."
-                  }
-                </p>
+          <Card className="p-6 bg-gradient-to-br from-primary/10 via-background to-secondary/20 border-2 border-primary/30 text-center">
+            <MapPin className="w-12 h-12 text-primary mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2 text-foreground">
+              {language === "el" 
+                ? "Χρειαζόμαστε την τοποθεσία σου"
+                : "We need your location"
+              }
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              {language === "el"
+                ? "Χωρίς πρόσβαση στην τοποθεσία δεν μπορούμε να σου δείξουμε κοντινές μαμάδες."
+                : "Without location access we cannot show you nearby moms."
+              }
+            </p>
+            <Button 
+              onClick={() => {
+                setLocationDenied(false);
+                setShowLocationDialog(true);
+              }}
+              className="w-full"
+            >
+              <MapPin className="w-4 h-4 mr-2" />
+              {language === "el" ? "Ενεργοποίηση τοποθεσίας" : "Enable location"}
+            </Button>
+          </Card>
+        )}
+
+        {/* Only show profile cards if location is allowed */}
+        {!locationDenied && (
+          <Card 
+            ref={cardRef}
+            className="overflow-hidden shadow-xl select-none rounded-[25px] border-2 border-[#F3DCE5]"
+            style={getCardStyle()}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseUp}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
+            <div className="relative">
+              <ProfilePhotoCarousel
+                photos={profilePhotos}
+                profileName={currentProfile.full_name}
+                onImageClick={() => navigate(`/profile/${currentProfile.id}`)}
+              />
+              
+              {/* Match Percentage Badge */}
+              {currentProfile.matchPercentage && (
+                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg flex items-center gap-1.5 border border-primary/20">
+                  <Percent className={`w-4 h-4 ${getMatchColor(currentProfile.matchPercentage)}`} />
+                  <span className={`font-bold text-sm ${getMatchColor(currentProfile.matchPercentage)}`}>
+                    {currentProfile.matchPercentage}%
+                  </span>
+                </div>
+              )}
+              
+              {/* Swipe indicators */}
+              {isDragging && (
+                <>
+                  <div 
+                    className="absolute top-1/2 left-8 -translate-y-1/2 transition-opacity"
+                    style={{ opacity: Math.max(0, -dragOffset.x / 100) }}
+                  >
+                    <div className="bg-destructive text-destructive-foreground px-6 py-3 rounded-lg text-2xl font-bold rotate-[-20deg] border-4 border-destructive">
+                      NOPE
+                    </div>
+                  </div>
+                  <div 
+                    className="absolute top-1/2 right-8 -translate-y-1/2 transition-opacity"
+                    style={{ opacity: Math.max(0, dragOffset.x / 100) }}
+                  >
+                    <div className="bg-primary text-primary-foreground px-6 py-3 rounded-lg text-2xl font-bold rotate-[20deg] border-4 border-primary">
+                      LIKE
+                    </div>
+                  </div>
+                </>
+              )}
+              
+              {/* Mascot pushing effect */}
+              {isDragging && dragOffset.x < -50 && (
+                <div 
+                  className="fixed top-1/2 -translate-y-1/2 transition-all duration-200 z-50"
+                  style={{ 
+                    right: `${Math.min(80, Math.abs(dragOffset.x) / 2)}px`,
+                    opacity: Math.min(1, Math.abs(dragOffset.x) / 100)
+                  }}
+                >
+                  <img 
+                    src={mascot} 
+                    alt="Pushing left" 
+                    className="w-24 h-24 object-contain animate-[bounce_0.5s_ease-in-out_infinite] -scale-x-100"
+                  />
+                </div>
+              )}
+              
+              {isDragging && dragOffset.x > 50 && (
+                <div 
+                  className="fixed top-1/2 -translate-y-1/2 transition-all duration-200 z-50"
+                  style={{ 
+                    left: `${Math.min(80, dragOffset.x / 2)}px`,
+                    opacity: Math.min(1, dragOffset.x / 100)
+                  }}
+                >
+                  <img 
+                    src={mascot} 
+                    alt="Pushing right" 
+                    className="w-24 h-24 object-contain animate-[bounce_0.5s_ease-in-out_infinite]"
+                  />
+                </div>
+              )}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+                <h2 className="text-xl font-bold">{currentProfile.full_name}</h2>
+                <div className="flex items-center gap-2 mt-1">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm font-semibold">{getLocationText()}</span>
+                </div>
               </div>
+            </div>
+
+            <div className="p-4 space-y-3">
+              {/* Match Stats */}
+              {(currentProfile.commonInterestsCount !== undefined) && (
+                <div className="flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 p-2 rounded-lg border border-pink-200">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-primary" />
+                    <span className="text-xs font-medium text-foreground">Κοινά ενδιαφέροντα:</span>
+                  </div>
+                  <Badge variant="secondary" className="bg-primary/20 text-primary font-bold">
+                    {currentProfile.commonInterestsCount}/{currentProfile.totalInterests || currentProfile.interests?.length || 0}
+                  </Badge>
+                </div>
+              )}
+
+              {/* Children Info with Icons */}
+              {currentProfile.children && Array.isArray(currentProfile.children) && currentProfile.children.length > 0 && (
+                <div className="bg-gradient-to-br from-pink-50 to-purple-50 p-2 rounded-lg border border-pink-200">
+                  <div className="flex items-center gap-2 text-xs mb-1">
+                    <User className="w-3 h-3 text-primary" />
+                    <span className="font-bold text-foreground">Παιδιά:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {currentProfile.children.map((child: any, idx: number) => (
+                      <div key={idx} className="flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-full text-xs">
+                        <span>{child.gender === 'boy' ? '👦' : child.gender === 'girl' ? '👧' : '👶'}</span>
+                        <span className="font-medium">{child.ageGroup || child.age}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {currentProfile.bio && (
+                <p className="text-xs text-foreground/90 font-medium line-clamp-2">{currentProfile.bio}</p>
+              )}
+
+              {currentProfile.interests && currentProfile.interests.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {currentProfile.interests.slice(0, 4).map((interest) => (
+                    <Badge key={interest} variant="secondary" className="text-xs px-2 py-0.5">
+                      {interest}
+                    </Badge>
+                  ))}
+                  {currentProfile.interests.length > 4 && (
+                    <Badge variant="outline" className="text-xs px-2 py-0.5">
+                      +{currentProfile.interests.length - 4}
+                    </Badge>
+                  )}
+                </div>
+              )}
             </div>
           </Card>
         )}
 
-        <Card 
-          ref={cardRef}
-          className="overflow-hidden shadow-xl select-none rounded-[25px] border-2 border-[#F3DCE5]"
-          style={getCardStyle()}
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseUp}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
-          <div className="relative">
-            <ProfilePhotoCarousel
-              photos={profilePhotos}
-              profileName={currentProfile.full_name}
-              onImageClick={() => navigate(`/profile/${currentProfile.id}`)}
-            />
-            
-            {/* Match Percentage Badge */}
-            {currentProfile.matchPercentage && (
-              <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg flex items-center gap-1.5 border border-primary/20">
-                <Percent className={`w-4 h-4 ${getMatchColor(currentProfile.matchPercentage)}`} />
-                <span className={`font-bold text-sm ${getMatchColor(currentProfile.matchPercentage)}`}>
-                  {currentProfile.matchPercentage}%
-                </span>
-              </div>
-            )}
-            
-            {/* Swipe indicators */}
-            {isDragging && (
-              <>
-                <div 
-                  className="absolute top-1/2 left-8 -translate-y-1/2 transition-opacity"
-                  style={{ opacity: Math.max(0, -dragOffset.x / 100) }}
-                >
-                  <div className="bg-destructive text-destructive-foreground px-6 py-3 rounded-lg text-2xl font-bold rotate-[-20deg] border-4 border-destructive">
-                    NOPE
-                  </div>
-                </div>
-                <div 
-                  className="absolute top-1/2 right-8 -translate-y-1/2 transition-opacity"
-                  style={{ opacity: Math.max(0, dragOffset.x / 100) }}
-                >
-                  <div className="bg-primary text-primary-foreground px-6 py-3 rounded-lg text-2xl font-bold rotate-[20deg] border-4 border-primary">
-                    LIKE
-                  </div>
-                </div>
-              </>
-            )}
-            
-            {/* Mascot pushing effect */}
-            {isDragging && dragOffset.x < -50 && (
-              <div 
-                className="fixed top-1/2 -translate-y-1/2 transition-all duration-200 z-50"
-                style={{ 
-                  right: `${Math.min(80, Math.abs(dragOffset.x) / 2)}px`,
-                  opacity: Math.min(1, Math.abs(dragOffset.x) / 100)
-                }}
+        {/* Only show actions if location is allowed */}
+        {!locationDenied && (
+          <>
+            {/* Premium Actions */}
+            <div className="flex justify-center gap-4 mt-4">
+              <Button
+                disabled
+                size="sm"
+                variant="outline"
+                className="rounded-full border-2 border-[#F3DCE5] opacity-50 cursor-not-allowed"
               >
-                <img 
-                  src={mascot} 
-                  alt="Pushing left" 
-                  className="w-24 h-24 object-contain animate-[bounce_0.5s_ease-in-out_infinite] -scale-x-100"
-                />
-              </div>
-            )}
-            
-            {isDragging && dragOffset.x > 50 && (
-              <div 
-                className="fixed top-1/2 -translate-y-1/2 transition-all duration-200 z-50"
-                style={{ 
-                  left: `${Math.min(80, dragOffset.x / 2)}px`,
-                  opacity: Math.min(1, dragOffset.x / 100)
-                }}
+                <Heart className="w-4 h-4 mr-1" />
+                Super Yes*
+              </Button>
+              <Button
+                disabled
+                size="sm"
+                variant="outline"
+                className="rounded-full border-2 border-[#F3DCE5] opacity-50 cursor-not-allowed"
               >
-                <img 
-                  src={mascot} 
-                  alt="Pushing right" 
-                  className="w-24 h-24 object-contain animate-[bounce_0.5s_ease-in-out_infinite]"
-                />
-              </div>
-            )}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-              <h2 className="text-xl font-bold">{currentProfile.full_name}</h2>
-              <div className="flex items-center gap-2 mt-1">
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm font-semibold">{getLocationText()}</span>
-              </div>
+                🔄 Second Chance*
+              </Button>
             </div>
-          </div>
 
-          <div className="p-4 space-y-3">
-            {/* Match Stats */}
-            {(currentProfile.commonInterestsCount !== undefined) && (
-              <div className="flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 p-2 rounded-lg border border-pink-200">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-medium text-foreground">Κοινά ενδιαφέροντα:</span>
-                </div>
-                <Badge variant="secondary" className="bg-primary/20 text-primary font-bold">
-                  {currentProfile.commonInterestsCount}/{currentProfile.totalInterests || currentProfile.interests?.length || 0}
-                </Badge>
+            {/* Daily Swipes Slider with Mascot */}
+            <div className="mt-4 bg-gradient-to-br from-[#F8E9EE] to-[#F5E8F0] p-4 rounded-[20px] border border-[#F3DCE5] relative overflow-visible">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold text-foreground">Daily Swipes:</span>
+                <span className="text-sm font-bold text-primary">∞/15</span>
               </div>
-            )}
-
-            {/* Children Info with Icons */}
-            {currentProfile.children && Array.isArray(currentProfile.children) && currentProfile.children.length > 0 && (
-              <div className="bg-gradient-to-br from-pink-50 to-purple-50 p-2 rounded-lg border border-pink-200">
-                <div className="flex items-center gap-2 text-xs mb-1">
-                  <User className="w-3 h-3 text-primary" />
-                  <span className="font-bold text-foreground">Παιδιά:</span>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {currentProfile.children.map((child: any, idx: number) => (
-                    <div key={idx} className="flex items-center gap-1 bg-white/80 px-2 py-0.5 rounded-full text-xs">
-                      <span>{child.gender === 'boy' ? '👦' : child.gender === 'girl' ? '👧' : '👶'}</span>
-                      <span className="font-medium">{child.ageGroup || child.age}</span>
-                    </div>
-                  ))}
+              <div className="w-full bg-white rounded-full h-3 relative">
+                <div className="bg-gradient-to-r from-[#C8788D] to-[#B86B80] h-3 rounded-full w-full"></div>
+                <div className="absolute -right-2 top-1/2 -translate-y-1/2 animate-bounce">
+                  <img src={mascot} alt="Mascot" className="w-8 h-8 object-contain" />
                 </div>
               </div>
-            )}
-
-            {currentProfile.bio && (
-              <p className="text-xs text-foreground/90 font-medium line-clamp-2">{currentProfile.bio}</p>
-            )}
-
-            {currentProfile.interests && currentProfile.interests.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {currentProfile.interests.slice(0, 4).map((interest) => (
-                  <Badge key={interest} variant="secondary" className="text-xs px-2 py-0.5">
-                    {interest}
-                  </Badge>
-                ))}
-                {currentProfile.interests.length > 4 && (
-                  <Badge variant="outline" className="text-xs px-2 py-0.5">
-                    +{currentProfile.interests.length - 4}
-                  </Badge>
-                )}
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {/* Premium Actions */}
-        <div className="flex justify-center gap-4 mt-4">
-          <Button
-            disabled
-            size="sm"
-            variant="outline"
-            className="rounded-full border-2 border-[#F3DCE5] opacity-50 cursor-not-allowed"
-          >
-            <Heart className="w-4 h-4 mr-1" />
-            Super Yes*
-          </Button>
-          <Button
-            disabled
-            size="sm"
-            variant="outline"
-            className="rounded-full border-2 border-[#F3DCE5] opacity-50 cursor-not-allowed"
-          >
-            🔄 Second Chance*
-          </Button>
-        </div>
-
-        {/* Daily Swipes Slider with Mascot */}
-        <div className="mt-4 bg-gradient-to-br from-[#F8E9EE] to-[#F5E8F0] p-4 rounded-[20px] border border-[#F3DCE5] relative overflow-visible">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-bold text-foreground">Daily Swipes:</span>
-            <span className="text-sm font-bold text-primary">∞/15</span>
-          </div>
-          <div className="w-full bg-white rounded-full h-3 relative">
-            <div className="bg-gradient-to-r from-[#C8788D] to-[#B86B80] h-3 rounded-full w-full"></div>
-            <div className="absolute -right-2 top-1/2 -translate-y-1/2 animate-bounce">
-              <img src={mascot} alt="Mascot" className="w-8 h-8 object-contain" />
+              <p className="text-xs text-muted-foreground text-center mt-2">Unlimited για αρχή!</p>
             </div>
-          </div>
-          <p className="text-xs text-muted-foreground text-center mt-2">Unlimited για αρχή!</p>
-        </div>
 
-        <div className="flex justify-center gap-6 mt-6 mb-6">
-          <Button
-            size="lg"
-            variant="outline"
-            className="rounded-full h-16 px-6 border-4 border-muted hover:border-muted-foreground transition-all hover:scale-105 active:scale-95 bg-background/80 backdrop-blur-sm shadow-lg hover:shadow-xl"
-            onClick={() => handleSwipe(false)}
-          >
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl">
-                🙅‍♀️
-              </div>
-              <span className="text-xs font-semibold text-muted-foreground">Not my vibe</span>
+            <div className="flex justify-center gap-6 mt-6 mb-6">
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full h-16 px-6 border-4 border-muted hover:border-muted-foreground transition-all hover:scale-105 active:scale-95 bg-background/80 backdrop-blur-sm shadow-lg hover:shadow-xl"
+                onClick={() => handleSwipe(false)}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xl">
+                    🙅‍♀️
+                  </div>
+                  <span className="text-xs font-semibold text-muted-foreground">Not my vibe</span>
+                </div>
+              </Button>
+              <Button
+                size="lg"
+                className="rounded-full h-16 px-6 bg-gradient-to-br from-pink-300 via-rose-300 to-pink-400 hover:from-pink-400 hover:via-rose-400 hover:to-pink-500 border-4 border-pink-200 transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl relative overflow-hidden group"
+                onClick={() => handleSwipe(true)}
+              >
+                <div className="flex flex-col items-center gap-1 relative z-10">
+                  <div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    💕
+                  </div>
+                  <span className="text-xs font-semibold text-white drop-shadow-sm">Yes!</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Button>
             </div>
-          </Button>
-          <Button
-            size="lg"
-            className="rounded-full h-16 px-6 bg-gradient-to-br from-pink-300 via-rose-300 to-pink-400 hover:from-pink-400 hover:via-rose-400 hover:to-pink-500 border-4 border-pink-200 transition-all hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl relative overflow-hidden group"
-            onClick={() => handleSwipe(true)}
-          >
-            <div className="flex flex-col items-center gap-1 relative z-10">
-              <div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                💕
-              </div>
-              <span className="text-xs font-semibold text-white drop-shadow-sm">Yes!</span>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-          </Button>
-        </div>
+          </>
+        )}
       </div>
 
       {/* Footer */}
