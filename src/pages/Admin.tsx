@@ -20,6 +20,7 @@ import SystemLogs from "@/components/admin/SystemLogs";
 import NotificationsPanel from "@/components/admin/NotificationsPanel";
 import { TestAccountsManager } from "@/components/admin/TestAccountsManager";
 import RecipesManagement from "@/components/admin/RecipesManagement";
+import PhotoModeration from "@/components/admin/PhotoModeration";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -269,9 +270,10 @@ export default function Admin() {
         </Card>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2 h-auto">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-11 gap-2 h-auto">
             <TabsTrigger value="overview">Επισκόπηση</TabsTrigger>
             <TabsTrigger value="users">Χρήστες</TabsTrigger>
+            <TabsTrigger value="photos">📸 Photos</TabsTrigger>
             <TabsTrigger value="moderation">Forum</TabsTrigger>
             <TabsTrigger value="verifications">
               Επαληθεύσεις
@@ -303,6 +305,10 @@ export default function Admin() {
 
           <TabsContent value="overview">
             <AdminOverview />
+          </TabsContent>
+
+          <TabsContent value="photos">
+            <PhotoModeration />
           </TabsContent>
 
           <TabsContent value="users">

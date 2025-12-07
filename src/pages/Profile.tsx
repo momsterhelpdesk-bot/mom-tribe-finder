@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Settings, LogOut, Sparkles, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
+import { Settings, LogOut, Sparkles, ChevronLeft, ChevronRight, MessageCircle, Flag } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import logo from "@/assets/logo-full.jpg";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { PhotoUploadWithDelete } from "@/components/PhotoUploadWithDelete";
+import { ReportProfileModal } from "@/components/ReportProfileModal";
+import { PhotoModerationNotification } from "@/components/PhotoModerationNotification";
 
 export default function ProfileNew() {
   const { language } = useLanguage();
@@ -23,6 +25,8 @@ export default function ProfileNew() {
   const [hasMatch, setHasMatch] = useState(false);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [hasLikedYou, setHasLikedYou] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProfile();
@@ -36,6 +40,7 @@ export default function ProfileNew() {
         return;
       }
 
+      setCurrentUserId(user.id);
       const profileId = userId || user.id;
       const isOwn = !userId || userId === user.id;
       setIsOwnProfile(isOwn);
@@ -218,14 +223,38 @@ export default function ProfileNew() {
     <div className="min-h-screen pt-20 pb-48 px-4" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)' }}>
       {/* Back button for viewing other profiles */}
       {!isOwnProfile && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="fixed top-20 left-4 z-10 bg-white/80 backdrop-blur-sm rounded-full shadow-md"
-          onClick={() => navigate(-1)}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
+        <div className="fixed top-20 left-4 right-4 z-10 flex justify-between">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="bg-white/80 backdrop-blur-sm rounded-full shadow-md"
+            onClick={() => navigate(-1)}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="bg-white/80 backdrop-blur-sm rounded-full shadow-md"
+            onClick={() => setShowReportModal(true)}
+          >
+            <Flag className="w-4 h-4 text-muted-foreground" />
+          </Button>
+        </div>
+      )}
+
+      {/* Photo Moderation Notification */}
+      {currentUserId && isOwnProfile && (
+        <PhotoModerationNotification userId={currentUserId} />
+      )}
+
+      {/* Report Modal */}
+      {userId && (
+        <ReportProfileModal
+          open={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          reportedUserId={userId}
+        />
       )}
 
       <div className="max-w-3xl mx-auto space-y-6 mb-8">

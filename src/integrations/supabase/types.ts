@@ -326,6 +326,7 @@ export type Database = {
           ai_flags: Json | null
           ai_status: string
           created_at: string
+          detection_tags: string[] | null
           id: string
           manual_status: string | null
           photo_type: string
@@ -341,6 +342,7 @@ export type Database = {
           ai_flags?: Json | null
           ai_status?: string
           created_at?: string
+          detection_tags?: string[] | null
           id?: string
           manual_status?: string | null
           photo_type: string
@@ -356,6 +358,7 @@ export type Database = {
           ai_flags?: Json | null
           ai_status?: string
           created_at?: string
+          detection_tags?: string[] | null
           id?: string
           manual_status?: string | null
           photo_type?: string
@@ -365,6 +368,30 @@ export type Database = {
           reviewed_by?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      photo_rejection_reasons: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          message_el: string
+          message_en: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          message_el: string
+          message_en: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          message_el?: string
+          message_en?: string
         }
         Relationships: []
       }
@@ -521,6 +548,7 @@ export type Database = {
           match_preference: string
           mom_badge: string | null
           notification_settings: Json | null
+          photo_rules_seen: boolean | null
           privacy_settings: Json | null
           profile_completed: boolean | null
           profile_photo_url: string | null
@@ -559,6 +587,7 @@ export type Database = {
           match_preference: string
           mom_badge?: string | null
           notification_settings?: Json | null
+          photo_rules_seen?: boolean | null
           privacy_settings?: Json | null
           profile_completed?: boolean | null
           profile_photo_url?: string | null
@@ -597,6 +626,7 @@ export type Database = {
           match_preference?: string
           mom_badge?: string | null
           notification_settings?: Json | null
+          photo_rules_seen?: boolean | null
           privacy_settings?: Json | null
           profile_completed?: boolean | null
           profile_photo_url?: string | null
