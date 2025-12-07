@@ -258,6 +258,59 @@ export default function PrivacyTerms() {
 
             <hr className="my-6 border-border" />
 
+            {/* Section 7.2 - Photo Safety & Moderation */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">7.2 Ασφάλεια Φωτογραφιών & Έλεγχος</h2>
+              <p className="mb-4">
+                Οι φωτογραφίες που ανεβάζουν οι χρήστριες ελέγχονται για να προστατεύσουμε την κοινότητα 
+                από ψεύτικους λογαριασμούς και ακατάλληλο περιεχόμενο.
+              </p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Ο έλεγχος γίνεται με αυτοματοποιημένες διαδικασίες και manual review, μόνο για σκοπούς ασφάλειας.</li>
+                <li>Δεν κοινοποιούμε φωτογραφίες και δεν χρησιμοποιούμε αυτές τις εικόνες για άλλους σκοπούς.</li>
+                <li>Οι φωτογραφίες πρέπει να δείχνουν πραγματικές μαμάδες — χωρίς παιδιά, χωρίς τρίτα άτομα και χωρίς ακατάλληλο περιεχόμενο.</li>
+              </ul>
+              
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Αποτροπή Ψεύτικων Προφίλ</h3>
+              <p className="mb-4">
+                Το Momster μπορεί να περιορίσει ή να απενεργοποιήσει λογαριασμούς που φαίνονται ψεύτικοι 
+                ή παραβιάζουν τους κανόνες ασφάλειας.
+              </p>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Αποποίηση Ευθύνης</h3>
+              <p className="mb-4">
+                Το Momster δεν ευθύνεται για τις πληροφορίες που δηλώνουν οι χρήστριες, αλλά παρέχει 
+                εργαλεία αναφοράς και αποκλεισμού για την ασφάλεια της κοινότητας.
+              </p>
+
+              <p className="mb-4 font-medium bg-primary/10 p-4 rounded-lg">
+                📷 <strong>Κανόνες Φωτογραφιών:</strong> Οι φωτογραφίες πρέπει να είναι καθαρές, φυσικές 
+                και να δείχνουν το πρόσωπό σου. Αποφύγε πολύ έντονα φίλτρα, φωτογραφίες από Google/internet, 
+                ή εικόνες που δημιουργήθηκαν με AI. Φωτογραφίες με παιδιά δεν γίνονται δεκτές για λόγους ασφαλείας.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 7.3 - Profile Reporting */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">7.3 Αναφορά Προφίλ</h2>
+              <p className="mb-4">
+                Η εφαρμογή παρέχει ένα περιβάλλον γνωριμίας μεταξύ χρηστών. Δεν εγγυόμαστε για την ταυτότητα, 
+                την ακρίβεια στοιχείων ή τη συμπεριφορά των χρηστών.
+              </p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Οι αναφορές είναι ανώνυμες και μας βοηθούν να κρατήσουμε την κοινότητα ασφαλή.</li>
+                <li>Οι αναφορές εξετάζονται κατά την κρίση της ομάδας μας και μπορεί να οδηγήσουν ή όχι σε ενέργειες.</li>
+                <li>Ο χρήστης που αναφέρθηκε δεν ειδοποιείται για την αναφορά.</li>
+              </ul>
+              <p className="mb-4">
+                Αν δεις κάτι ύποπτο ή ανησυχητικό, μπορείς να το αναφέρεις μέσω του κουμπιού αναφοράς στο προφίλ του χρήστη.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
             {/* Section 8 */}
             <div>
               <h2 className="text-3xl font-bold text-primary mb-4">8. Αποποίηση Ευθύνης (Full Disclaimer)</h2>
@@ -487,6 +540,58 @@ export default function PrivacyTerms() {
               <h2 className="text-3xl font-bold text-primary mb-4">7. Prohibited Content</h2>
               <p className="mb-4">
                 Includes harassment, scams, illegal content, explicit material.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 7.1 - Photo Safety & Moderation */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">7.1 Photo Safety & Moderation</h2>
+              <p className="mb-4">
+                Photos uploaded by users are reviewed to protect our community from fake accounts 
+                and inappropriate content.
+              </p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Review is done through automated processes and manual review, for safety purposes only.</li>
+                <li>We do not share photos or use these images for any other purposes.</li>
+                <li>Photos must show real moms — no children, no third parties, and no inappropriate content.</li>
+              </ul>
+              
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Fake Profile Prevention</h3>
+              <p className="mb-4">
+                Momster may restrict or disable accounts that appear fake or violate safety rules.
+              </p>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Disclaimer</h3>
+              <p className="mb-4">
+                Momster is not responsible for the information provided by users, but provides 
+                reporting and blocking tools for community safety.
+              </p>
+
+              <p className="mb-4 font-medium bg-primary/10 p-4 rounded-lg">
+                📷 <strong>Photo Rules:</strong> Photos must be clear, natural and show your face. 
+                Avoid heavy filters, photos from Google/internet, or AI-generated images. 
+                Photos with children are not accepted for safety reasons.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 7.2 - Profile Reporting */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">7.2 Profile Reporting</h2>
+              <p className="mb-4">
+                The app provides a social environment for users. We do not guarantee the identity, 
+                accuracy of information, or behavior of users.
+              </p>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Reports are anonymous and help us keep the community safe.</li>
+                <li>Reports are reviewed at our team's discretion and may or may not result in action.</li>
+                <li>The reported user is not notified about the report.</li>
+              </ul>
+              <p className="mb-4">
+                If you see something suspicious or concerning, you can report it via the report button on the user's profile.
               </p>
             </div>
 
