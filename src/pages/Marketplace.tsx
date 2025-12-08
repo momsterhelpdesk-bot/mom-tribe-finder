@@ -93,7 +93,10 @@ export default function Marketplace() {
         setIsSubscribed(true);
         localStorage.setItem(MARKETPLACE_SUBSCRIBED_KEY, "true");
         setShowWaitlistForm(false);
-        setShowSuccessPopup(true);
+        toast({
+          title: "Είσαι ήδη στη λίστα μας! 💕",
+          description: "Μόλις ανοίξει το Marketplace θα είσαι από τις πρώτες που θα το μάθουν ✨",
+        });
         trackEvent("market_subscribe_success", { already_subscribed: true });
         return;
       }
