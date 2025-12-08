@@ -25,7 +25,7 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import PrivacyTerms from "./pages/PrivacyTerms";
 import NotFound from "./pages/NotFound";
-import Screenshots from "./pages/Screenshots";
+
 import Onboarding from "./pages/Onboarding";
 import BottomNav from "./components/BottomNav";
 import AuthGuard from "./components/AuthGuard";
@@ -73,7 +73,7 @@ const App = () => (
           <Route path="/profile" element={<AuthGuard><><Profile /><MomAlerts /><BottomNav /></></AuthGuard>} />
           <Route path="/profile/:userId" element={<AuthGuard><><Profile /><MomAlerts /><BottomNav /></></AuthGuard>} />
           <Route path="/privacy-terms" element={<PrivacyTerms />} />
-          <Route path="/screenshots" element={<Screenshots />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
