@@ -1,5 +1,11 @@
 project_id = "unjmflimsliqjnstmtrg"
 
+[functions.send-admin-alert]
+verify_jwt = false
+
+[functions.send-account-restricted]
+verify_jwt = false
+
 [functions.send-welcome-email]
 verify_jwt = false
 
