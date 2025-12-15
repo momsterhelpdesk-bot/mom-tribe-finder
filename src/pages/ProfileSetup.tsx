@@ -195,7 +195,18 @@ export default function ProfileSetup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!userId) return;
+    // Prevent double submission
+    if (loading) {
+      console.log('Already submitting, ignoring...');
+      return;
+    }
+    
+    if (!userId) {
+      console.error('No userId found during submit');
+      toast.error("Σφάλμα: Δεν βρέθηκε ο χρήστης. Παρακαλώ ξανασυνδέσου.");
+      navigate("/auth");
+      return;
+    }
 
     if (photos.length === 0) {
       toast.error("Πρέπει να ανεβάσεις τουλάχιστον 1 φωτογραφία");
@@ -214,10 +225,12 @@ export default function ProfileSetup() {
 
     if (!validation.success) {
       const firstError = validation.error.errors[0];
+      console.error('Validation error:', validation.error.errors);
       toast.error(firstError.message);
       return;
     }
 
+    console.log('Starting profile submission for user:', userId);
     // Submit profile directly without location - location will be requested in Discover
     await submitProfile(null, null);
   };
@@ -225,7 +238,11 @@ export default function ProfileSetup() {
   // Location handlers removed - location is now requested only in Discover page
 
   const submitProfile = async (lat: number | null, lng: number | null) => {
-    if (!userId) return;
+    if (!userId) {
+      console.error('No userId in submitProfile');
+      toast.error("Σφάλμα: Δεν βρέθηκε ο χρήστης");
+      return;
+    }
 
     // Re-validate before submission
     const validation = profileSetupSchema.safeParse({
@@ -238,22 +255,27 @@ export default function ProfileSetup() {
     });
 
     if (!validation.success) {
+      console.error('Validation failed in submitProfile:', validation.error);
       toast.error("Σφάλμα επικύρωσης δεδομένων");
       return;
     }
 
     setLoading(true);
+    console.log('Profile submission started, uploading photos...');
 
     try {
       const photoUrls: string[] = [];
 
       // Upload new photos
-      for (const photo of photos) {
+      for (let i = 0; i < photos.length; i++) {
+        const photo = photos[i];
         if (photo.url) {
           // Existing photo, keep the URL
+          console.log(`Photo ${i + 1}: Using existing URL`);
           photoUrls.push(photo.url);
         } else if (photo.file) {
           // New photo, upload it
+          console.log(`Photo ${i + 1}: Uploading new file...`);
           const fileExt = photo.file.name.split('.').pop();
           const fileName = `${userId}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
           const filePath = `${userId}/${fileName}`;
@@ -262,37 +284,71 @@ export default function ProfileSetup() {
             .from('profile-photos')
             .upload(filePath, photo.file, { upsert: true });
 
-          if (uploadError) throw uploadError;
+          if (uploadError) {
+            console.error(`Photo ${i + 1} upload failed:`, uploadError);
+            throw new Error(`Αποτυχία ανεβάσματος φωτογραφίας: ${uploadError.message}`);
+          }
 
           const { data: { publicUrl } } = supabase.storage
             .from('profile-photos')
             .getPublicUrl(filePath);
 
+          console.log(`Photo ${i + 1}: Uploaded successfully`);
           photoUrls.push(publicUrl);
         }
       }
 
+      if (photoUrls.length === 0) {
+        throw new Error("Δεν ανέβηκε καμία φωτογραφία");
+      }
+
+      console.log(`All ${photoUrls.length} photos uploaded, updating profile...`);
+
       // Update profile
       const validData = validation.data;
-      const { error: updateError } = await supabase
+      const profileData = {
+        username: validData.username,
+        city: validData.city,
+        area: validData.area,
+        children: validData.children,
+        child_age_group: validData.children[0]?.ageGroup || '',
+        match_preference: validData.matchPreference,
+        interests: validData.interests,
+        profile_photo_url: photoUrls[0],
+        profile_photos_urls: photoUrls,
+        profile_completed: true,
+        latitude: lat,
+        longitude: lng
+      };
+      
+      console.log('Updating profile with data:', JSON.stringify(profileData, null, 2));
+      
+      const { error: updateError, data: updateData } = await supabase
         .from('profiles')
-        .update({
-          username: validData.username,
-          city: validData.city,
-          area: validData.area,
-          children: validData.children,
-          child_age_group: validData.children[0]?.ageGroup || '',
-          match_preference: validData.matchPreference,
-          interests: validData.interests,
-          profile_photo_url: photoUrls[0], // Keep first photo as main
-          profile_photos_urls: photoUrls,
-          profile_completed: true,
-          latitude: lat,
-          longitude: lng
-        })
-        .eq('id', userId);
+        .update(profileData)
+        .eq('id', userId)
+        .select();
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+        throw new Error(`Αποτυχία αποθήκευσης προφίλ: ${updateError.message}`);
+      }
+
+      console.log('Profile updated successfully:', updateData);
+
+      // Verify the update was successful
+      const { data: verifyProfile, error: verifyError } = await supabase
+        .from('profiles')
+        .select('profile_completed, username, city, area')
+        .eq('id', userId)
+        .single();
+
+      if (verifyError || !verifyProfile?.profile_completed) {
+        console.error('Profile verification failed:', verifyError, verifyProfile);
+        throw new Error("Η αποθήκευση του προφίλ δεν επιβεβαιώθηκε");
+      }
+
+      console.log('Profile verified:', verifyProfile);
 
       // Check if onboarding has been completed
       const { data: updatedProfile } = await supabase
@@ -303,14 +359,17 @@ export default function ProfileSetup() {
 
       // Show success screen before navigating
       const destination = !updatedProfile?.has_completed_onboarding ? "/onboarding" : "/discover";
+      console.log('Navigation destination:', destination);
       setPendingNavigation(destination);
       setShowSuccessScreen(true);
+      toast.success("Το προφίλ αποθηκεύτηκε επιτυχώς! 🎉");
       
     } catch (error: any) {
+      console.error('Profile submission error:', error);
       toast.error(error.message || "Σφάλμα κατά την ενημέρωση του προφίλ");
-    } finally {
       setLoading(false);
     }
+    // Note: Don't setLoading(false) on success - keep it until navigation
   };
 
   const handleSuccessContinue = () => {
