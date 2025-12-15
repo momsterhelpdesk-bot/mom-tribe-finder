@@ -243,6 +243,7 @@ export function useMatching() {
       // Calculate distance for all profiles - batch calculate to reduce latency
       // Only calculate precise distance if user has location, otherwise use fallback
       const hasUserLocation = currentProfile.latitude && currentProfile.longitude;
+      const manualDistancePref = userFilters.distancePreferenceKm;
       
       const profilesWithDistance = profilesWithScores.map(profile => {
         let distance = 9999;
@@ -258,10 +259,17 @@ export function useMatching() {
             Math.sin(dLon/2) * Math.sin(dLon/2);
           const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
           distance = R * c;
-        } else if (profile.area === currentProfile.area) {
-          distance = 1;
-        } else if (profile.city === currentProfile.city) {
-          distance = 5;
+        } else {
+          // No GPS - use city/area based distance estimation
+          if (profile.area === currentProfile.area) {
+            distance = 1; // Same area = very close
+          } else if (profile.city === currentProfile.city) {
+            distance = 10; // Same city = close
+          } else {
+            // Different city - estimate based on whether user wants all of Greece
+            // For manual distance selection: 500km means show everyone
+            distance = manualDistancePref >= 500 ? 100 : 200;
+          }
         }
         
         return { ...profile, distance };
@@ -270,9 +278,21 @@ export function useMatching() {
       // APPLY LOCATION FILTER
       let filteredProfiles = profilesWithDistance;
       if (userFilters.showLocationFilter) {
-        filteredProfiles = filteredProfiles.filter(profile => 
-          profile.distance <= userFilters.distancePreferenceKm
-        );
+        // When no GPS and manual distance is 500km (all Greece), show everyone
+        if (!hasUserLocation && manualDistancePref >= 500) {
+          // Show all profiles from Greece - no distance filtering
+          filteredProfiles = profilesWithDistance;
+        } else if (!hasUserLocation && manualDistancePref >= 100) {
+          // Show profiles from same city only
+          filteredProfiles = profilesWithDistance.filter(profile => 
+            profile.city === currentProfile.city
+          );
+        } else {
+          // Standard distance filtering (works with GPS or area-based estimation)
+          filteredProfiles = filteredProfiles.filter(profile => 
+            profile.distance <= manualDistancePref
+          );
+        }
       }
 
       // Calculate kids age match score and APPLY AGE FILTER
