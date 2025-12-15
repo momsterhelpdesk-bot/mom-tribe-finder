@@ -3,7 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, MessageSquare, Heart, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 
-export default function AdminOverview() {
+interface AdminOverviewProps {
+  onNavigateToTab?: (tab: string) => void;
+}
+
+export default function AdminOverview({ onNavigateToTab }: AdminOverviewProps) {
   const [stats, setStats] = useState({
     totalUsers: 0,
     newUsersToday: 0,
@@ -151,7 +155,10 @@ export default function AdminOverview() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card 
+          className="cursor-pointer hover:border-primary/50 transition-colors"
+          onClick={() => onNavigateToTab?.("users")}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Σύνολο Μαμάδων</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />

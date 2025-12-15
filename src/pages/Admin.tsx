@@ -31,6 +31,7 @@ export default function Admin() {
   const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
   const [editingTemplate, setEditingTemplate] = useState<any | null>(null);
   const [marketplaceNotifications, setMarketplaceNotifications] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     checkAdminStatus();
@@ -269,7 +270,7 @@ export default function Admin() {
           </CardHeader>
         </Card>
 
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs defaultValue="overview" className="w-full" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-11 gap-2 h-auto">
             <TabsTrigger value="overview">Επισκόπηση</TabsTrigger>
             <TabsTrigger value="users">Χρήστες</TabsTrigger>
@@ -304,7 +305,7 @@ export default function Admin() {
           </TabsList>
 
           <TabsContent value="overview">
-            <AdminOverview />
+            <AdminOverview onNavigateToTab={setActiveTab} />
           </TabsContent>
 
           <TabsContent value="photos">
