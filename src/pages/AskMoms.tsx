@@ -466,10 +466,10 @@ export default function AskMoms() {
             <div>
               <p className="text-xs font-medium mb-2">Post as:</p>
               <Tabs value={displayMode} onValueChange={(v) => setDisplayMode(v as any)}>
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="name">Δείξε το όνομα μου</TabsTrigger>
-                  <TabsTrigger value="pseudonym">Με ψευδώνυμο</TabsTrigger>
-                  <TabsTrigger value="anonymous">Ανώνυμα 🌸</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 h-auto">
+                  <TabsTrigger value="name" className="text-[10px] sm:text-xs px-1 py-2 leading-tight">Όνομα</TabsTrigger>
+                  <TabsTrigger value="pseudonym" className="text-[10px] sm:text-xs px-1 py-2 leading-tight">Ψευδώνυμο</TabsTrigger>
+                  <TabsTrigger value="anonymous" className="text-[10px] sm:text-xs px-1 py-2 leading-tight">Ανώνυμα 🌸</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
