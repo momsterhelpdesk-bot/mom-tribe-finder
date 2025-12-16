@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Upload, Eye, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 import type { Json } from "@/integrations/supabase/types";
 
@@ -74,6 +75,8 @@ export default function RecipesManagement() {
   const [reheatingInstructions, setReheatingInstructions] = useState("");
   const [momTip, setMomTip] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchRecipes();
@@ -260,6 +263,44 @@ export default function RecipesManagement() {
     }
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 3 * 1024 * 1024) {
+      toast.error("Η φωτογραφία πρέπει να είναι μέχρι 3MB");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `recipe-${Date.now()}.${fileExt}`;
+      const filePath = `recipes/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-photos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-photos')
+        .getPublicUrl(filePath);
+
+      setPhotoUrl(publicUrl);
+      toast.success("Η φωτογραφία ανέβηκε!");
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error("Σφάλμα ανεβάσματος φωτογραφίας");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const validIngredients = ingredients.filter(i => i.name.trim());
+  const validInstructions = instructions.filter(i => i.trim());
+
   if (loading) {
     return <div className="text-center py-8">Φόρτωση...</div>;
   }
@@ -312,12 +353,41 @@ export default function RecipesManagement() {
                     </div>
 
                     <div>
-                      <Label htmlFor="photoUrl">URL Εικόνας</Label>
+                      <Label>Φωτογραφία Συνταγής</Label>
+                      <div className="flex gap-2 items-center mt-2">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                          disabled={uploading}
+                          className="flex-1"
+                        />
+                        {uploading && <span className="text-sm text-muted-foreground">Ανέβασμα...</span>}
+                      </div>
+                      {photoUrl && (
+                        <div className="mt-2 relative">
+                          <img 
+                            src={photoUrl} 
+                            alt="Preview" 
+                            className="w-32 h-32 object-cover rounded-lg"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-0 right-0"
+                            onClick={() => setPhotoUrl("")}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">Ή χρησιμοποιήστε URL:</p>
                       <Input
-                        id="photoUrl"
                         value={photoUrl}
                         onChange={(e) => setPhotoUrl(e.target.value)}
                         placeholder="https://example.com/image.jpg"
+                        className="mt-1"
                       />
                     </div>
                   </div>
@@ -505,10 +575,82 @@ export default function RecipesManagement() {
                     <Button variant="outline" onClick={() => setDialogOpen(false)}>
                       Ακύρωση
                     </Button>
+                    <Button variant="secondary" onClick={() => setShowPreview(true)}>
+                      <Eye className="w-4 h-4 mr-2" />
+                      Preview
+                    </Button>
                     <Button onClick={handleSave}>
                       {editingRecipe ? "Αποθήκευση" : "Δημιουργία"}
                     </Button>
                   </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Preview Dialog */}
+            <Dialog open={showPreview} onOpenChange={setShowPreview}>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>📖 Preview Συνταγής</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  {photoUrl && (
+                    <img 
+                      src={photoUrl} 
+                      alt={title} 
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  )}
+                  <h2 className="text-2xl font-bold">{title || "Χωρίς τίτλο"}</h2>
+                  {description && <p className="text-muted-foreground">{description}</p>}
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <Badge key={tag}>{tag}</Badge>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {prepTime + cookTime} λεπτά
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      {baseServings} μερίδες
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold mb-2">📝 Υλικά</h3>
+                    <ul className="list-disc list-inside space-y-1">
+                      {validIngredients.map((ing, i) => (
+                        <li key={i}>
+                          {ing.amount} {ing.unit} {ing.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold mb-2">👩‍🍳 Εκτέλεση</h3>
+                    <ol className="list-decimal list-inside space-y-2">
+                      {validInstructions.map((step, i) => (
+                        <li key={i}>{step}</li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {momTip && (
+                    <div className="bg-primary/10 p-4 rounded-lg">
+                      <h3 className="font-semibold mb-1">💡 Tip μαμάς</h3>
+                      <p>{momTip}</p>
+                    </div>
+                  )}
+
+                  <Button onClick={() => setShowPreview(false)} className="w-full">
+                    Κλείσιμο Preview
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>

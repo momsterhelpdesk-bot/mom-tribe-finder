@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle, XCircle, Trash2, Clock, Pin, Archive } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { CheckCircle, XCircle, Trash2, Clock, Pencil, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -17,6 +19,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Question {
   id: string;
@@ -44,12 +59,28 @@ interface Answer {
   likes_count: number;
 }
 
+const CATEGORIES = [
+  "Υγεία & Ανάπτυξη",
+  "Διατροφή",
+  "Ύπνος",
+  "Συμπεριφορά",
+  "Σχολείο & Εκπαίδευση",
+  "Δραστηριότητες",
+  "Σχέσεις & Οικογένεια",
+  "Άλλο"
+];
+
 export default function ForumModeration() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [loading, setLoading] = useState(true);
   const [rejectionReason, setRejectionReason] = useState("");
   const [selectedItem, setSelectedItem] = useState<{ id: string; type: "question" | "answer" } | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [editingAnswer, setEditingAnswer] = useState<Answer | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editStatus, setEditStatus] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -166,6 +197,10 @@ export default function ForumModeration() {
   };
 
   const handleDelete = async (id: string, type: "question" | "answer") => {
+    if (!confirm(`Είστε σίγουροι ότι θέλετε να διαγράψετε αυτή ${type === "question" ? "την ερώτηση" : "την απάντηση"};`)) {
+      return;
+    }
+    
     try {
       const table = type === "question" ? "questions" : "answers";
       
@@ -176,7 +211,6 @@ export default function ForumModeration() {
 
       if (error) throw error;
 
-      // Log the action
       await supabase.from("moderation_logs").insert({
         action: "delete",
         target_type: type,
@@ -194,6 +228,96 @@ export default function ForumModeration() {
       toast({
         title: "Σφάλμα",
         description: "Αποτυχία διαγραφής",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const openEditQuestion = (question: Question) => {
+    setEditingQuestion(question);
+    setEditContent(question.content);
+    setEditCategory(question.category || "");
+    setEditStatus(question.status || "pending");
+  };
+
+  const openEditAnswer = (answer: Answer) => {
+    setEditingAnswer(answer);
+    setEditContent(answer.content);
+    setEditStatus(answer.status || "pending");
+  };
+
+  const handleSaveQuestion = async () => {
+    if (!editingQuestion) return;
+    
+    try {
+      const { error } = await supabase
+        .from("questions")
+        .update({
+          content: editContent,
+          category: editCategory || null,
+          status: editStatus,
+        })
+        .eq("id", editingQuestion.id);
+
+      if (error) throw error;
+
+      await supabase.from("moderation_logs").insert({
+        action: "edit",
+        target_type: "question",
+        target_id: editingQuestion.id,
+        details: { content: editContent, category: editCategory, status: editStatus },
+      });
+
+      toast({
+        title: "Επιτυχία",
+        description: "Η ερώτηση ενημερώθηκε",
+      });
+
+      setEditingQuestion(null);
+      fetchData();
+    } catch (error) {
+      console.error("Error saving question:", error);
+      toast({
+        title: "Σφάλμα",
+        description: "Αποτυχία αποθήκευσης",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveAnswer = async () => {
+    if (!editingAnswer) return;
+    
+    try {
+      const { error } = await supabase
+        .from("answers")
+        .update({
+          content: editContent,
+          status: editStatus,
+        })
+        .eq("id", editingAnswer.id);
+
+      if (error) throw error;
+
+      await supabase.from("moderation_logs").insert({
+        action: "edit",
+        target_type: "answer",
+        target_id: editingAnswer.id,
+        details: { content: editContent, status: editStatus },
+      });
+
+      toast({
+        title: "Επιτυχία",
+        description: "Η απάντηση ενημερώθηκε",
+      });
+
+      setEditingAnswer(null);
+      fetchData();
+    } catch (error) {
+      console.error("Error saving answer:", error);
+      toast({
+        title: "Σφάλμα",
+        description: "Αποτυχία αποθήκευσης",
         variant: "destructive",
       });
     }
@@ -273,7 +397,7 @@ export default function ForumModeration() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       size="sm"
                       variant="default"
@@ -282,6 +406,14 @@ export default function ForumModeration() {
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Έγκριση
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => openEditQuestion(question)}
+                    >
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Επεξεργασία
                     </Button>
                     <Button
                       size="sm"
@@ -328,7 +460,7 @@ export default function ForumModeration() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       size="sm"
                       variant="default"
@@ -337,6 +469,14 @@ export default function ForumModeration() {
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Έγκριση
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => openEditAnswer(answer)}
+                    >
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Επεξεργασία
                     </Button>
                     <Button
                       size="sm"
@@ -387,14 +527,24 @@ export default function ForumModeration() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleDelete(question.id, "question")}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Διαγραφή
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => openEditQuestion(question)}
+                  >
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Επεξεργασία
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDelete(question.id, "question")}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Διαγραφή
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -421,14 +571,24 @@ export default function ForumModeration() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleDelete(answer.id, "answer")}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Διαγραφή
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => openEditAnswer(answer)}
+                  >
+                    <Pencil className="w-4 h-4 mr-2" />
+                    Επεξεργασία
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDelete(answer.id, "answer")}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Διαγραφή
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -462,6 +622,103 @@ export default function ForumModeration() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Question Dialog */}
+      <Dialog open={!!editingQuestion} onOpenChange={() => setEditingQuestion(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>✏️ Επεξεργασία Ερώτησης</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="edit-content">Περιεχόμενο</Label>
+              <Textarea
+                id="edit-content"
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-category">Κατηγορία</Label>
+              <Select value={editCategory} onValueChange={setEditCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Επιλέξτε κατηγορία" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="edit-status">Κατάσταση</Label>
+              <Select value={editStatus} onValueChange={setEditStatus}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Εκκρεμής</SelectItem>
+                  <SelectItem value="approved">Εγκεκριμένο</SelectItem>
+                  <SelectItem value="rejected">Απορριφθέν</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditingQuestion(null)}>
+                Ακύρωση
+              </Button>
+              <Button onClick={handleSaveQuestion}>
+                <Save className="w-4 h-4 mr-2" />
+                Αποθήκευση
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Answer Dialog */}
+      <Dialog open={!!editingAnswer} onOpenChange={() => setEditingAnswer(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>✏️ Επεξεργασία Απάντησης</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="edit-answer-content">Περιεχόμενο</Label>
+              <Textarea
+                id="edit-answer-content"
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-answer-status">Κατάσταση</Label>
+              <Select value={editStatus} onValueChange={setEditStatus}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Εκκρεμής</SelectItem>
+                  <SelectItem value="approved">Εγκεκριμένο</SelectItem>
+                  <SelectItem value="rejected">Απορριφθέν</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditingAnswer(null)}>
+                Ακύρωση
+              </Button>
+              <Button onClick={handleSaveAnswer}>
+                <Save className="w-4 h-4 mr-2" />
+                Αποθήκευση
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
