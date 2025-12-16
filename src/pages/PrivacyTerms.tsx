@@ -311,6 +311,57 @@ export default function PrivacyTerms() {
 
             <hr className="my-6 border-border" />
 
+            {/* Section 7.4 - Recipe Disclaimer */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">7.4 🍽️ Αποποίηση Ευθύνης για Συνταγές & Διατροφικό Περιεχόμενο</h2>
+              <p className="mb-4">
+                Στη Momster μοιραζόμαστε ιδέες, εμπειρίες και έμπνευση μεταξύ μαμάδων, με αγάπη και φροντίδα. 💗
+              </p>
+              <p className="mb-4">
+                Παρ' όλα αυτά, κάθε παιδί είναι διαφορετικό και γι' αυτό είναι σημαντικό να λαμβάνονται πάντα εξατομικευμένες 
+                συμβουλές από ειδικούς. Οι συνταγές και οι διατροφικές πληροφορίες που παρέχονται στην εφαρμογή Momster έχουν 
+                αποκλειστικά ενημερωτικό και υποστηρικτικό χαρακτήρα και βασίζονται σε εμπειρίες μαμάδων και γενικές πρακτικές διατροφής.
+              </p>
+              
+              <p className="mb-4 font-medium bg-amber-50 p-4 rounded-lg border border-amber-200">
+                ⚠️ <strong>Δεν αποτελούν ιατρική, διατροφική ή επαγγελματική συμβουλή</strong> και δεν υποκαθιστούν 
+                τη γνώμη παιδιάτρου, διατροφολόγου ή άλλου επαγγελματία υγείας.
+              </p>
+              
+              <p className="mb-4">
+                <strong>Κάθε παιδί είναι μοναδικό.</strong> Οι ανάγκες, οι αλλεργίες, οι δυσανεξίες και τα στάδια 
+                ανάπτυξης διαφέρουν από παιδί σε παιδί.
+              </p>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Ο γονέας ή κηδεμόνας φέρει την αποκλειστική ευθύνη για:</h3>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Την επιλογή των τροφών</li>
+                <li>Τον τρόπο παρασκευής</li>
+                <li>Τον έλεγχο των υλικών</li>
+                <li>Την ασφάλεια, την υφή και την καταλληλότητα των γευμάτων</li>
+              </ul>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Η εφαρμογή Momster, οι δημιουργοί της και οι συντάκτες του περιεχομένου δεν φέρουν καμία ευθύνη για:</h3>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Αλλεργικές αντιδράσεις</li>
+                <li>Πνιγμό</li>
+                <li>Δυσανεξίες</li>
+                <li>Προβλήματα υγείας</li>
+                <li>Οποιαδήποτε άμεση ή έμμεση ζημία που μπορεί να προκύψει από τη χρήση των συνταγών</li>
+              </ul>
+
+              <p className="mb-4 font-medium bg-primary/10 p-4 rounded-lg">
+                💗 <strong>Πριν εισάγετε νέες τροφές</strong> ή ακολουθήσετε μεθόδους όπως Baby-Led Weaning, 
+                συμβουλευτείτε πάντα τον παιδίατρό σας.
+              </p>
+
+              <p className="text-center text-muted-foreground italic mt-6">
+                Με αγάπη, η ομάδα του Momster 🐷🌸
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
             {/* Section 8 */}
             <div>
               <h2 className="text-3xl font-bold text-primary mb-4">8. Αποποίηση Ευθύνης (Full Disclaimer)</h2>
@@ -592,6 +643,57 @@ export default function PrivacyTerms() {
               </ul>
               <p className="mb-4">
                 If you see something suspicious or concerning, you can report it via the report button on the user's profile.
+              </p>
+            </div>
+
+            <hr className="my-6 border-border" />
+
+            {/* Section 7.3 - Recipe Disclaimer */}
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-4">7.3 🍽️ Recipe & Nutritional Content Disclaimer</h2>
+              <p className="mb-4">
+                At Momster, we share ideas, experiences and inspiration among moms, with love and care. 💗
+              </p>
+              <p className="mb-4">
+                However, every child is different and therefore it's important to always seek personalized advice 
+                from professionals. The recipes and nutritional information provided in the Momster app are purely 
+                informational and supportive in nature, based on mom experiences and general dietary practices.
+              </p>
+              
+              <p className="mb-4 font-medium bg-amber-50 p-4 rounded-lg border border-amber-200">
+                ⚠️ <strong>This does not constitute medical, nutritional or professional advice</strong> and does 
+                not substitute the opinion of a pediatrician, nutritionist or other healthcare professional.
+              </p>
+              
+              <p className="mb-4">
+                <strong>Every child is unique.</strong> Needs, allergies, intolerances and developmental stages 
+                vary from child to child.
+              </p>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">The parent or guardian bears sole responsibility for:</h3>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Food selection</li>
+                <li>Preparation method</li>
+                <li>Ingredient checking</li>
+                <li>Safety, texture and meal suitability</li>
+              </ul>
+
+              <h3 className="text-2xl font-semibold text-foreground mt-4 mb-3">Momster app, its creators and content authors bear no responsibility for:</h3>
+              <ul className="list-disc pl-6 mb-4 space-y-1">
+                <li>Allergic reactions</li>
+                <li>Choking</li>
+                <li>Intolerances</li>
+                <li>Health problems</li>
+                <li>Any direct or indirect damage that may result from using the recipes</li>
+              </ul>
+
+              <p className="mb-4 font-medium bg-primary/10 p-4 rounded-lg">
+                💗 <strong>Before introducing new foods</strong> or following methods like Baby-Led Weaning, 
+                always consult your pediatrician.
+              </p>
+
+              <p className="text-center text-muted-foreground italic mt-6">
+                With love, the Momster team 🐷🌸
               </p>
             </div>
 
