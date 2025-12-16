@@ -27,7 +27,7 @@ import type { Json } from "@/integrations/supabase/types";
 
 interface Ingredient {
   name: string;
-  amount: number;
+  amount: string;
   unit: string;
 }
 
@@ -67,7 +67,7 @@ export default function RecipesManagement() {
   const [prepTime, setPrepTime] = useState(10);
   const [cookTime, setCookTime] = useState(0);
   const [baseServings, setBaseServings] = useState(2);
-  const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: "", amount: 0, unit: "" }]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: "", amount: "", unit: "" }]);
   const [instructions, setInstructions] = useState<string[]>([""]);
   const [storageFridge, setStorageFridge] = useState<number | null>(null);
   const [storageFreezer, setStorageFreezer] = useState<number | null>(null);
@@ -106,7 +106,7 @@ export default function RecipesManagement() {
     setPrepTime(10);
     setCookTime(0);
     setBaseServings(2);
-    setIngredients([{ name: "", amount: 0, unit: "" }]);
+    setIngredients([{ name: "", amount: "", unit: "" }]);
     setInstructions([""]);
     setStorageFridge(null);
     setStorageFreezer(null);
@@ -124,7 +124,7 @@ export default function RecipesManagement() {
     setPrepTime(recipe.prep_time_minutes);
     setCookTime(recipe.cook_time_minutes || 0);
     setBaseServings(recipe.base_servings);
-    setIngredients(recipe.ingredients.length > 0 ? recipe.ingredients : [{ name: "", amount: 0, unit: "" }]);
+    setIngredients(recipe.ingredients.length > 0 ? recipe.ingredients.map(i => ({ ...i, amount: String(i.amount) })) : [{ name: "", amount: "", unit: "" }]);
     setInstructions(recipe.instructions.length > 0 ? recipe.instructions : [""]);
     setStorageFridge(recipe.storage_fridge_days);
     setStorageFreezer(recipe.storage_freezer_months);
@@ -225,7 +225,7 @@ export default function RecipesManagement() {
   };
 
   const addIngredient = () => {
-    setIngredients([...ingredients, { name: "", amount: 0, unit: "" }]);
+    setIngredients([...ingredients, { name: "", amount: "", unit: "" }]);
   };
 
   const removeIngredient = (index: number) => {
@@ -392,10 +392,10 @@ export default function RecipesManagement() {
                             className="flex-1"
                           />
                           <Input
-                            type="number"
+                            type="text"
                             placeholder="Ποσότητα"
                             value={ingredient.amount || ""}
-                            onChange={(e) => updateIngredient(index, "amount", Number(e.target.value))}
+                            onChange={(e) => updateIngredient(index, "amount", e.target.value)}
                             className="w-24"
                           />
                           <Input
