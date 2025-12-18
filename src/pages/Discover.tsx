@@ -86,16 +86,11 @@ export default function Discover() {
             setLikesYouCount(count);
           }
 
-          // Check if we need to request location
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("latitude, longitude")
-            .eq("id", user.id)
-            .maybeSingle();
-
-          // Show location dialog if no location is set
-          if (profile && !profile.latitude && !profile.longitude) {
-            // Always show dialog if no location - user must accept to see matches
+          // Check if location dialog has been shown before (one-time only)
+          const locationDialogShown = localStorage.getItem('location_permission_shown');
+          
+          if (!locationDialogShown) {
+            // First time - show location dialog
             setShowLocationDialog(true);
           }
         }
@@ -106,67 +101,17 @@ export default function Discover() {
     checkAdminAndLocation();
   }, []);
 
-  // Handle location permission
+  // Handle location permission - using profile area only (no GPS)
   const handleAllowLocation = async () => {
-    localStorage.setItem('location_dialog_shown', 'true');
+    localStorage.setItem('location_permission_shown', 'true');
     setShowLocationDialog(false);
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          setGeolocationFailed(false);
-          setShowManualDistance(false);
-          
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            await supabase
-              .from("profiles")
-              .update({ latitude, longitude })
-              .eq("id", user.id);
-          }
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          // Show manual distance fallback instead of blocking user
-          setGeolocationFailed(true);
-          setShowManualDistance(true);
-        },
-        { timeout: 10000, enableHighAccuracy: false }
-      );
-    } else {
-      // Browser doesn't support geolocation
-      setGeolocationFailed(true);
-      setShowManualDistance(true);
-    }
+    // No GPS - just use profile area for matching
   };
 
   const handleDenyLocation = () => {
-    // Don't save to localStorage - dialog will show again next visit
+    localStorage.setItem('location_permission_shown', 'true');
     setShowLocationDialog(false);
     setLocationDenied(true);
-  };
-
-  // Handle manual distance selection when geolocation fails
-  const handleManualDistanceConfirm = async () => {
-    if (!selectedManualDistance) return;
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      // Save the manual distance preference
-      await supabase
-        .from("profiles")
-        .update({ 
-          distance_preference_km: parseInt(selectedManualDistance),
-          show_location_filter: true
-        })
-        .eq("id", user.id);
-      
-      setShowManualDistance(false);
-      setGeolocationFailed(false);
-      // Reload the page to apply new distance filter
-      window.location.reload();
-    }
   };
 
   // Check if tutorial has been shown before
@@ -176,23 +121,6 @@ export default function Discover() {
       setShowTutorial(true);
     }
   }, [loading]);
-
-  // Show daily mascot popup (once per day)
-  useEffect(() => {
-    if (!loading) {
-      const lastShown = localStorage.getItem('daily_mascot_shown');
-      const today = new Date().toDateString();
-      
-      if (lastShown !== today) {
-        // Delay popup so it doesn't overlap with other dialogs
-        setTimeout(() => {
-          if (!showLocationDialog && !showTutorial) {
-            setShowDailyMascot(true);
-          }
-        }, 1500);
-      }
-    }
-  }, [loading, showLocationDialog, showTutorial]);
 
   // Filter out current user and add demo profile
   const filteredProfiles = profiles.filter(profile => profile.id !== currentUserId);
@@ -458,98 +386,19 @@ export default function Discover() {
           </div>
         )}
 
-        {/* Manual Distance Fallback when geolocation fails */}
-        {showManualDistance && (
-          <Card className="p-6 bg-gradient-to-br from-amber-50 via-background to-orange-50 border-2 border-amber-200 text-center">
-            <Navigation className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2 text-foreground">
+        {/* Location Info Message - shown after permission denied */}
+        {locationDenied && (
+          <Card className="p-4 bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-primary/30 rounded-2xl shadow-sm mb-4">
+            <p className="text-sm text-muted-foreground text-center">
               {language === "el" 
-                ? "Δεν μπορέσαμε να βρούμε την τοποθεσία σου"
-                : "Couldn't detect your location"
-              }
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              {language === "el"
-                ? "Επέλεξε χειροκίνητα πόσο μακριά θέλεις να ψάχνεις:"
-                : "Manually select how far you want to search:"
-              }
+                ? "Η περιοχή που έχεις δηλώσει στο προφίλ σου θα χρησιμοποιηθεί για να βρίσκεις μαμάδες κοντά σου."
+                : "The area you declared in your profile will be used to find moms near you."}
             </p>
-            
-            <Select value={selectedManualDistance} onValueChange={setSelectedManualDistance}>
-              <SelectTrigger className="w-full mb-4">
-                <SelectValue placeholder={language === "el" ? "Επέλεξε απόσταση..." : "Select distance..."} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">5 km</SelectItem>
-                <SelectItem value="10">10 km</SelectItem>
-                <SelectItem value="20">20 km</SelectItem>
-                <SelectItem value="50">50 km</SelectItem>
-                <SelectItem value="100">100 km - {language === "el" ? "Ολόκληρη η πόλη" : "Whole city"}</SelectItem>
-                <SelectItem value="500">{language === "el" ? "Ολόκληρη η Ελλάδα" : "All of Greece"}</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Button 
-              onClick={handleManualDistanceConfirm}
-              disabled={!selectedManualDistance}
-              className="w-full"
-            >
-              <MapPin className="w-4 h-4 mr-2" />
-              {language === "el" ? "Συνέχεια" : "Continue"}
-            </Button>
-            
-            <Button 
-              variant="ghost"
-              onClick={() => setShowLocationDialog(true)}
-              className="w-full mt-2 text-sm"
-            >
-              {language === "el" ? "Δοκίμασε ξανά με GPS" : "Try again with GPS"}
-            </Button>
           </Card>
         )}
 
-        {/* Location Denied - Show message and hide matches */}
-        {locationDenied && !showManualDistance && (
-          <Card className="p-6 bg-gradient-to-br from-primary/10 via-background to-secondary/20 border-2 border-primary/30 text-center">
-            <MapPin className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2 text-foreground">
-              {language === "el" 
-                ? "Χρειαζόμαστε την τοποθεσία σου"
-                : "We need your location"
-              }
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              {language === "el"
-                ? "Χωρίς πρόσβαση στην τοποθεσία δεν μπορούμε να σου δείξουμε κοντινές μαμάδες."
-                : "Without location access we cannot show you nearby moms."
-              }
-            </p>
-            <Button 
-              onClick={() => {
-                setLocationDenied(false);
-                setShowLocationDialog(true);
-              }}
-              className="w-full mb-2"
-            >
-              <MapPin className="w-4 h-4 mr-2" />
-              {language === "el" ? "Ενεργοποίηση τοποθεσίας" : "Enable location"}
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => {
-                setLocationDenied(false);
-                setShowManualDistance(true);
-              }}
-              className="w-full"
-            >
-              <Navigation className="w-4 h-4 mr-2" />
-              {language === "el" ? "Επέλεξε χειροκίνητα" : "Select manually"}
-            </Button>
-          </Card>
-        )}
-
-        {/* Only show profile cards if location is allowed and not showing manual fallback */}
-        {!locationDenied && !showManualDistance && (
+        {/* Profile cards - always show based on profile area */}
+        {(
           <Card 
             ref={cardRef}
             className="overflow-hidden shadow-xl select-none rounded-[25px] border-2 border-[#F3DCE5]"

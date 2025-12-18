@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Settings, LogOut, Sparkles, ChevronLeft, ChevronRight, MessageCircle, Flag } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Settings, LogOut, Sparkles, ChevronLeft, ChevronRight, MessageCircle, Flag, Bell, Trash2 } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import logo from "@/assets/logo-full.jpg";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +14,17 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { PhotoUploadWithDelete } from "@/components/PhotoUploadWithDelete";
 import { ReportProfileModal } from "@/components/ReportProfileModal";
 import { PhotoModerationNotification } from "@/components/PhotoModerationNotification";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function ProfileNew() {
   const { language } = useLanguage();
@@ -141,6 +154,49 @@ export default function ProfileNew() {
       navigate("/auth");
     } catch (error) {
       toast.error(language === "el" ? "Αποτυχία αποσύνδεσης" : "Sign out failed");
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Delete profile data (cascade will handle related data)
+      const { error: deleteError } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", user.id);
+
+      if (deleteError) throw deleteError;
+
+      // Sign out
+      await supabase.auth.signOut();
+      
+      toast.success(language === "el" ? "Ο λογαριασμός σου διαγράφηκε" : "Your account has been deleted");
+      navigate("/auth");
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error(language === "el" ? "Σφάλμα κατά τη διαγραφή" : "Error deleting account");
+    }
+  };
+
+  const handleNotificationChange = async (key: string, value: boolean) => {
+    if (!profile) return;
+    
+    const updatedSettings = {
+      ...profile.notification_settings,
+      [key]: value
+    };
+    
+    const { error } = await supabase
+      .from("profiles")
+      .update({ notification_settings: updatedSettings })
+      .eq("id", profile.id);
+
+    if (!error) {
+      setProfile({ ...profile, notification_settings: updatedSettings });
+      toast.success(language === "el" ? "Αποθηκεύτηκε" : "Saved");
     }
   };
 
@@ -448,6 +504,58 @@ export default function ProfileNew() {
           </Card>
         )}
 
+        {/* Notification Settings (own profile only) */}
+        {isOwnProfile && (
+          <Card className="p-6 bg-gradient-to-br from-white/90 to-[#FDF7F9] border-2 border-[#F3DCE5] rounded-[28px] shadow-md">
+            <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+              <Bell className="w-5 h-5 text-primary" />
+              {language === "el" ? "Ρυθμίσεις Ειδοποιήσεων" : "Notification Settings"}
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="push" className="text-sm font-medium">
+                  🔔 Push notifications
+                </Label>
+                <Switch
+                  id="push"
+                  checked={profile?.notification_settings?.push ?? true}
+                  onCheckedChange={(checked) => handleNotificationChange('push', checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  📧 Email notifications
+                </Label>
+                <Switch
+                  id="email"
+                  checked={profile?.notification_settings?.email ?? true}
+                  onCheckedChange={(checked) => handleNotificationChange('email', checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="matches" className="text-sm font-medium">
+                  💕 {language === "el" ? "Ειδοποιήσεις για matches" : "Match notifications"}
+                </Label>
+                <Switch
+                  id="matches"
+                  checked={profile?.notification_settings?.matches ?? true}
+                  onCheckedChange={(checked) => handleNotificationChange('matches', checked)}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="messages" className="text-sm font-medium">
+                  💬 {language === "el" ? "Ειδοποιήσεις μηνυμάτων" : "Message notifications"}
+                </Label>
+                <Switch
+                  id="messages"
+                  checked={profile?.notification_settings?.messages ?? true}
+                  onCheckedChange={(checked) => handleNotificationChange('messages', checked)}
+                />
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Profile Actions Card (own profile only) */}
         {isOwnProfile && (
           <Card className="p-6 bg-gradient-to-br from-white/90 to-[#FCF0F5] border-2 border-[#F3DCE5] rounded-[28px] shadow-lg">
@@ -495,6 +603,51 @@ export default function ProfileNew() {
                   </div>
                 </Button>
               </div>
+
+              <div className="h-[1px] bg-destructive/20 my-4" />
+
+              {/* Delete Account Button */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-destructive/70 hover:text-destructive hover:bg-destructive/10 text-sm"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {language === "el" ? "Διαγραφή λογαριασμού" : "Delete account"}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="rounded-[25px]">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-destructive">
+                      ⚠️ {language === "el" ? "Διαγραφή Λογαριασμού" : "Delete Account"}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-3">
+                      <p>
+                        {language === "el" 
+                          ? "Είσαι σίγουρη ότι θέλεις να διαγράψεις τον λογαριασμό σου;"
+                          : "Are you sure you want to delete your account?"}
+                      </p>
+                      <ul className="list-disc pl-5 space-y-1 text-sm">
+                        <li>{language === "el" ? "Όλα τα δεδομένα σου θα διαγραφούν οριστικά" : "All your data will be permanently deleted"}</li>
+                        <li>{language === "el" ? "Δεν θα μπορείς να ανακτήσεις τον λογαριασμό σου" : "You won't be able to recover your account"}</li>
+                        <li>{language === "el" ? "Τα μηνύματα και τα matches θα χαθούν" : "Messages and matches will be lost"}</li>
+                      </ul>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="rounded-full">
+                      {language === "el" ? "Ακύρωση" : "Cancel"}
+                    </AlertDialogCancel>
+                    <AlertDialogAction 
+                      onClick={handleDeleteAccount}
+                      className="bg-destructive hover:bg-destructive/90 rounded-full"
+                    >
+                      {language === "el" ? "Ναι, διέγραψε τον λογαριασμό" : "Yes, delete my account"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </Card>
         )}
