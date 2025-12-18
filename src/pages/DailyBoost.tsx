@@ -176,10 +176,16 @@ export default function DailyBoost() {
 
   useEffect(() => {
     fetchProfile();
-    // Check if welcome popup has been shown before
+  }, []);
+
+  // Show welcome popup only once - on first ever visit
+  useEffect(() => {
     const hasSeenWelcome = localStorage.getItem('momster_home_welcome_shown');
     
     if (!hasSeenWelcome) {
+      // Mark as shown immediately to prevent any race conditions
+      localStorage.setItem('momster_home_welcome_shown', 'true');
+      
       showMascot({
         state: "happy",
         message: language === 'el' 
@@ -187,11 +193,9 @@ export default function DailyBoost() {
           : "Welcome to Momster! 🌸\nThe perfect community for moms like you.\nLet's find your next match! ✨",
         duration: 4000,
       });
-      
-      // Mark as shown
-      localStorage.setItem('momster_home_welcome_shown', 'true');
     }
-  }, [language, showMascot]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchProfile = async () => {
     try {
@@ -480,7 +484,7 @@ export default function DailyBoost() {
       )}
       
       {/* Footer with Premium Message */}
-      <footer className="fixed bottom-20 left-0 right-0 py-4 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
+      <footer className="fixed bottom-24 left-0 right-0 py-3 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
         <div className="max-w-7xl mx-auto text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
             <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
