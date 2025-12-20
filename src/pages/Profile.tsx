@@ -14,6 +14,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { PhotoUploadWithDelete } from "@/components/PhotoUploadWithDelete";
 import { ReportProfileModal } from "@/components/ReportProfileModal";
 import { PhotoModerationNotification } from "@/components/PhotoModerationNotification";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { NotificationSettingsCard } from "@/components/NotificationSettingsCard";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -506,54 +508,11 @@ export default function ProfileNew() {
 
         {/* Notification Settings (own profile only) */}
         {isOwnProfile && (
-          <Card className="p-6 bg-gradient-to-br from-white/90 to-[#FDF7F9] border-2 border-[#F3DCE5] rounded-[28px] shadow-md">
-            <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-              <Bell className="w-5 h-5 text-primary" />
-              {language === "el" ? "Ρυθμίσεις Ειδοποιήσεων" : "Notification Settings"}
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="push" className="text-sm font-medium">
-                  🔔 Push notifications
-                </Label>
-                <Switch
-                  id="push"
-                  checked={profile?.notification_settings?.push ?? true}
-                  onCheckedChange={(checked) => handleNotificationChange('push', checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  📧 Email notifications
-                </Label>
-                <Switch
-                  id="email"
-                  checked={profile?.notification_settings?.email ?? true}
-                  onCheckedChange={(checked) => handleNotificationChange('email', checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="matches" className="text-sm font-medium">
-                  💕 {language === "el" ? "Ειδοποιήσεις για matches" : "Match notifications"}
-                </Label>
-                <Switch
-                  id="matches"
-                  checked={profile?.notification_settings?.matches ?? true}
-                  onCheckedChange={(checked) => handleNotificationChange('matches', checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="messages" className="text-sm font-medium">
-                  💬 {language === "el" ? "Ειδοποιήσεις μηνυμάτων" : "Message notifications"}
-                </Label>
-                <Switch
-                  id="messages"
-                  checked={profile?.notification_settings?.messages ?? true}
-                  onCheckedChange={(checked) => handleNotificationChange('messages', checked)}
-                />
-              </div>
-            </div>
-          </Card>
+          <NotificationSettingsCard 
+            profile={profile} 
+            language={language}
+            onNotificationChange={handleNotificationChange}
+          />
         )}
 
         {/* Profile Actions Card (own profile only) */}
