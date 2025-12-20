@@ -1,6 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+
+// Notification sound - using a soft chime sound
+const NOTIFICATION_SOUND_URL = "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3";
 
 export function usePushNotifications() {
   const [permission, setPermission] = useState<NotificationPermission>("default");
@@ -111,6 +114,28 @@ export function usePushNotifications() {
 // Hook to listen for new notifications in real-time
 export function useMatchNotifications() {
   const { showNotification, permission, requestPermission, supported } = usePushNotifications();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio(NOTIFICATION_SOUND_URL);
+    audioRef.current.volume = 0.5;
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const playNotificationSound = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch((e) => {
+        console.log("[Push] Could not play notification sound:", e);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel> | null = null;
@@ -139,6 +164,11 @@ export function useMatchNotifications() {
               metadata?: { url?: string };
             };
             
+            // Play sound for match notifications
+            if (notification.type === 'match') {
+              playNotificationSound();
+            }
+
             // Show push notification if permitted
             if (permission === "granted") {
               const url = notification.type === 'match' 
@@ -172,7 +202,7 @@ export function useMatchNotifications() {
         supabase.removeChannel(channel);
       }
     };
-  }, [permission, showNotification]);
+  }, [permission, showNotification, playNotificationSound]);
 
-  return { requestPermission, supported, permission };
+  return { requestPermission, supported, permission, playNotificationSound };
 }
