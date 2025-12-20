@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell, Send, Check, AlertCircle } from "lucide-react";
-import { usePushNotifications } from "@/hooks/use-push-notifications";
+import { Bell, Send, Check, AlertCircle, Volume2 } from "lucide-react";
+import { usePushNotifications, useMatchNotifications } from "@/hooks/use-push-notifications";
 import { toast } from "sonner";
 
 interface NotificationSettingsCardProps {
@@ -24,6 +24,7 @@ export function NotificationSettingsCard({
     requestPermission, 
     showNotification 
   } = usePushNotifications();
+  const { playNotificationSound } = useMatchNotifications();
   const [testing, setTesting] = useState(false);
 
   const handleEnablePush = async () => {
@@ -44,7 +45,9 @@ export function NotificationSettingsCard({
 
     setTesting(true);
     
-    // Small delay for better UX
+    // Play sound and show notification
+    playNotificationSound();
+    
     setTimeout(() => {
       showNotification("🎉 Test Notification!", {
         body: language === "el" 
@@ -56,7 +59,12 @@ export function NotificationSettingsCard({
       
       toast.success(language === "el" ? "Test notification στάλθηκε!" : "Test notification sent!");
       setTesting(false);
-    }, 500);
+    }, 300);
+  };
+
+  const handleTestSound = () => {
+    playNotificationSound();
+    toast.success(language === "el" ? "Ήχος ειδοποίησης!" : "Notification sound!");
   };
 
   const getPushStatusIcon = () => {
@@ -119,18 +127,28 @@ export function NotificationSettingsCard({
           )}
 
           {permission === "granted" && (
-            <Button
-              onClick={handleTestNotification}
-              disabled={testing}
-              variant="outline"
-              className="w-full rounded-full border-primary/30 hover:bg-primary/5"
-              size="sm"
-            >
-              <Send className="w-4 h-4 mr-2" />
-              {testing 
-                ? (language === "el" ? "Αποστολή..." : "Sending...") 
-                : (language === "el" ? "Δοκιμαστική Ειδοποίηση" : "Test Notification")}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleTestNotification}
+                disabled={testing}
+                variant="outline"
+                className="flex-1 rounded-full border-primary/30 hover:bg-primary/5"
+                size="sm"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                {testing 
+                  ? (language === "el" ? "..." : "...") 
+                  : (language === "el" ? "Test" : "Test")}
+              </Button>
+              <Button
+                onClick={handleTestSound}
+                variant="outline"
+                className="rounded-full border-primary/30 hover:bg-primary/5"
+                size="sm"
+              >
+                <Volume2 className="w-4 h-4" />
+              </Button>
+            </div>
           )}
         </div>
 
