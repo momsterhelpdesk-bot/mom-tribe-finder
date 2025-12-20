@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 export function usePushNotifications() {
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [supported, setSupported] = useState(false);
+  const [serviceWorkerReady, setServiceWorkerReady] = useState(false);
 
   useEffect(() => {
     // Check if browser supports notifications
@@ -12,73 +13,115 @@ export function usePushNotifications() {
       setSupported(true);
       setPermission(Notification.permission);
     }
+
+    // Register service worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js")
+        .then((registration) => {
+          console.log("[Push] Service Worker registered:", registration.scope);
+          setServiceWorkerReady(true);
+        })
+        .catch((error) => {
+          console.error("[Push] Service Worker registration failed:", error);
+        });
+    }
   }, []);
 
-  const requestPermission = async (): Promise<boolean> => {
+  const requestPermission = useCallback(async (): Promise<boolean> => {
     if (!supported) {
-      console.log("Browser doesn't support notifications");
+      console.log("[Push] Browser doesn't support notifications");
       return false;
     }
 
     try {
       const result = await Notification.requestPermission();
       setPermission(result);
-      return result === "granted";
+      
+      if (result === "granted") {
+        console.log("[Push] Permission granted");
+        // Save preference to user profile
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from("profiles")
+            .update({ 
+              notification_settings: { 
+                push_enabled: true,
+                granted_at: new Date().toISOString()
+              }
+            })
+            .eq("id", user.id);
+        }
+        return true;
+      }
+      return false;
     } catch (error) {
-      console.error("Error requesting notification permission:", error);
+      console.error("[Push] Error requesting permission:", error);
       return false;
     }
-  };
+  }, [supported]);
 
-  const showNotification = (title: string, options?: NotificationOptions) => {
+  const showNotification = useCallback((title: string, options?: NotificationOptions & { url?: string }) => {
     if (!supported || permission !== "granted") {
-      console.log("Notifications not permitted");
+      console.log("[Push] Notifications not permitted");
       return;
     }
 
     try {
-      const notification = new Notification(title, {
-        icon: "/app-icons/icon-192.png",
-        badge: "/app-icons/icon-96.png",
-        ...options,
-      });
+      // Use service worker for better notification handling
+      if (serviceWorkerReady && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.showNotification(title, {
+            icon: "/app-icons/icon-192.png",
+            badge: "/app-icons/icon-96.png",
+            data: { url: options?.url || "/" },
+            ...options,
+          });
+        });
+      } else {
+        // Fallback to native Notification API
+        const notification = new Notification(title, {
+          icon: "/app-icons/icon-192.png",
+          badge: "/app-icons/icon-96.png",
+          ...options,
+        });
 
-      notification.onclick = () => {
-        window.focus();
-        notification.close();
-      };
+        notification.onclick = () => {
+          window.focus();
+          if (options?.url) {
+            window.location.href = options.url;
+          }
+          notification.close();
+        };
+      }
     } catch (error) {
-      console.error("Error showing notification:", error);
+      console.error("[Push] Error showing notification:", error);
     }
-  };
+  }, [supported, permission, serviceWorkerReady]);
 
   return {
     supported,
     permission,
+    serviceWorkerReady,
     requestPermission,
     showNotification,
   };
 }
 
-// Hook to listen for new match notifications in real-time
+// Hook to listen for new notifications in real-time
 export function useMatchNotifications() {
   const { showNotification, permission, requestPermission, supported } = usePushNotifications();
 
   useEffect(() => {
-    let channel: any = null;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
     const setupNotificationListener = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Request permission on mount if not already granted
-      if (supported && permission === "default") {
-        requestPermission();
-      }
-
       // Listen for new notifications
       channel = supabase
-        .channel('match-notifications')
+        .channel('user-notifications')
         .on(
           'postgres_changes',
           {
@@ -88,14 +131,27 @@ export function useMatchNotifications() {
             filter: `user_id=eq.${user.id}`
           },
           (payload) => {
-            const notification = payload.new as any;
+            const notification = payload.new as {
+              id: string;
+              type: string;
+              title: string;
+              message: string;
+              metadata?: { url?: string };
+            };
             
-            // Show push notification for match type
-            if (notification.type === 'match' && permission === "granted") {
-              showNotification(notification.title || "Νέο Match! 💕", {
+            // Show push notification if permitted
+            if (permission === "granted") {
+              const url = notification.type === 'match' 
+                ? '/chats' 
+                : notification.type === 'message' 
+                  ? notification.metadata?.url || '/chats'
+                  : '/notifications';
+
+              showNotification(notification.title || "Νέα ειδοποίηση! 💕", {
                 body: notification.message,
-                tag: `match-${notification.id}`,
-                requireInteraction: true,
+                tag: `notification-${notification.id}`,
+                requireInteraction: notification.type === 'match',
+                url,
               });
             }
 
@@ -116,5 +172,7 @@ export function useMatchNotifications() {
         supabase.removeChannel(channel);
       }
     };
-  }, [permission, supported]);
+  }, [permission, showNotification]);
+
+  return { requestPermission, supported, permission };
 }

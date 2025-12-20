@@ -30,6 +30,7 @@ import Onboarding from "./pages/Onboarding";
 import BottomNav from "./components/BottomNav";
 import AuthGuard from "./components/AuthGuard";
 import MomAlerts from "./components/MomAlerts";
+import { NotificationPermissionBanner } from "./components/NotificationPermissionBanner";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
       <TooltipProvider>
         <ActivityTracker />
         <MatchNotificationsListener />
+        <NotificationPermissionBanner />
         <Toaster />
         <Sonner />
         <BrowserRouter>
