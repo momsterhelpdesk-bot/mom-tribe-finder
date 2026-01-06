@@ -15,6 +15,9 @@ import { useMatching, ProfileMatch } from "@/hooks/use-matching";
 import { LocationPermissionDialog } from "@/components/LocationPermissionDialog";
 import { ProfilePhotoCarousel } from "@/components/ProfilePhotoCarousel";
 import { useLanguage } from "@/contexts/LanguageContext";
+import AgeMigrationPopup from "@/components/AgeMigrationPopup";
+import { needsAgeMigration } from "@/lib/childAges";
+import { toast } from "sonner";
 
 // Demo profile for testing UI
 const demoProfile: ProfileMatch = {
@@ -54,15 +57,17 @@ export default function Discover() {
   const [showManualDistance, setShowManualDistance] = useState(false);
   const [selectedManualDistance, setSelectedManualDistance] = useState<string>("");
   const [likesYouCount, setLikesYouCount] = useState(0);
+  const [showAgeMigration, setShowAgeMigration] = useState(false);
+  const [currentChildren, setCurrentChildren] = useState<Array<{ name?: string; ageGroup: string; gender?: 'boy' | 'girl' | 'baby' }>>([]);
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { mascotConfig, visible, hideMascot, showMatch, showEmptyDiscover } = useMascot();
-  const { profiles, loading, currentUser } = useMatching();
+  const { profiles, loading, currentUser, reloadProfiles } = useMatching();
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
-  // Check if current user is admin and request location + load likes count
+  // Check if current user is admin and request location + load likes count + check age migration
   useEffect(() => {
     const checkAdminAndLocation = async () => {
       try {
@@ -89,13 +94,26 @@ export default function Discover() {
           // Check if location dialog has been shown before (tied to user account)
           const { data: profileData } = await supabase
             .from("profiles")
-            .select("location_popup_shown")
+            .select("location_popup_shown, children, age_migration_done")
             .eq("id", user.id)
             .single();
           
           if (profileData && !profileData.location_popup_shown) {
             // First time - show location dialog
             setShowLocationDialog(true);
+          }
+
+          // Check if age migration is needed
+          if (profileData && !profileData.age_migration_done) {
+            const children = profileData.children as Array<{ name?: string; ageGroup: string; gender?: 'boy' | 'girl' | 'baby' }> | null;
+            if (children && Array.isArray(children) && children.length > 0) {
+              // Check if any child has old age format
+              const needsMigration = children.some(child => needsAgeMigration(child.ageGroup));
+              if (needsMigration) {
+                setCurrentChildren(children);
+                setShowAgeMigration(true);
+              }
+            }
           }
         }
       } catch (error) {

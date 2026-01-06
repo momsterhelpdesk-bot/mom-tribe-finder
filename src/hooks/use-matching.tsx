@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import { getMonthsFromAgeValue, ALL_AGE_OPTIONS } from "@/lib/childAges";
 
 interface ChildInfo {
   name: string;
@@ -74,10 +75,12 @@ export function useMatching() {
     return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
   };
 
+  // Enhanced age calculation supporting new age format
   const getAverageChildAge = (children: Json): number => {
     if (!children || !Array.isArray(children) || children.length === 0) return 0;
     
-    const ageGroupMap: { [key: string]: number } = {
+    // Legacy age group mappings for backward compatibility
+    const legacyAgeGroupMap: { [key: string]: number } = {
       "0-6 months": 3,
       "6-12 months": 9,
       "1-2 years": 18,
@@ -91,12 +94,28 @@ export function useMatching() {
       "2-3 χρονών": 30,
       "3-4 χρονών": 42,
       "4-5 χρονών": 54,
-      "5+ χρονών": 72
+      "5+ χρονών": 72,
+      "Είμαι έγκυος 🤰": 0,
+      "0-6 μήνες": 3,
+      "6-12 μήνες": 9,
+      "1-2 χρόνια": 18,
+      "2-3 χρόνια": 30,
+      "3-5 χρόνια": 48,
+      "5+ χρόνια": 72,
     };
 
     const childArray = children as any[];
     const totalMonths = childArray.reduce((sum, child) => {
-      return sum + (ageGroupMap[child.ageGroup] || ageGroupMap[child.age] || 24);
+      const ageGroup = child.ageGroup || child.age;
+      
+      // First try new format
+      const newFormatMonths = getMonthsFromAgeValue(ageGroup);
+      if (newFormatMonths !== 24 || ALL_AGE_OPTIONS.some(opt => opt.value === ageGroup)) {
+        return sum + newFormatMonths;
+      }
+      
+      // Fall back to legacy mapping
+      return sum + (legacyAgeGroupMap[ageGroup] || 24);
     }, 0);
 
     return Math.round(totalMonths / childArray.length);
