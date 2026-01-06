@@ -9,9 +9,23 @@ import logo from "@/assets/logo-new.jpg";
 import mascot from "@/assets/mascot.jpg";
 import { useLanguage } from "@/contexts/LanguageContext";
 import MagicMatching from "@/components/MagicMatching";
+import { useOnlineMoms } from "@/hooks/use-online-moms";
 
 const Index = () => {
   const { t } = useLanguage();
+  const { onlineCount, loading } = useOnlineMoms();
+  
+  // Community indicator text logic
+  const getCommunityText = () => {
+    if (loading) return null;
+    if (onlineCount >= 5) {
+      return `🤍 Δεν είσαι μόνη — ${onlineCount} μαμάδες είναι εδώ τώρα`;
+    }
+    if (onlineCount >= 1) {
+      return "🤍 Υπάρχουν μαμάδες εδώ τώρα";
+    }
+    return "🤍 Η κοινότητα σε περιμένει";
+  };
   
   const features = [
     {
@@ -93,9 +107,20 @@ const Index = () => {
             {t('heroTagline')}
           </p>
           
-          <p className="text-base text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-base text-muted-foreground mb-6 max-w-2xl mx-auto">
             {t('heroDescription')}
           </p>
+
+          {/* Community Indicator */}
+          {getCommunityText() && (
+            <div className="mb-8 flex justify-center">
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/60 backdrop-blur-sm border border-pink-200/50 shadow-sm">
+                <span className="text-sm text-foreground/80 font-medium">
+                  {getCommunityText()}
+                </span>
+              </div>
+            </div>
+          )}
           
           <div className="flex gap-4 justify-center">
             <Link to="/auth">
