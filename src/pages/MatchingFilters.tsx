@@ -177,8 +177,8 @@ export default function MatchingFilters() {
               <div className="flex items-center gap-3">
                 <Baby className="w-5 h-5 text-primary" />
                 <div>
-                  <Label className="text-base font-semibold">Φίλτρο Ηλικίας Παιδιού</Label>
-                  <p className="text-sm text-muted-foreground">Παρόμοιες ηλικίες παιδιών</p>
+                  <Label className="text-base font-semibold">Ηλικία παιδιού</Label>
+                  <p className="text-sm text-muted-foreground">Για να βρεις μαμάδες που ζουν παρόμοιες στιγμές με εσένα</p>
                 </div>
               </div>
               <Switch
@@ -190,17 +190,22 @@ export default function MatchingFilters() {
             {matchAgeFilter && (
               <div className="space-y-3 pt-4 border-t">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm">Διαφορά ηλικίας:</Label>
-                  <span className="text-sm font-semibold text-primary">±{ageRangeMonths} μήνες</span>
+                  <Label className="text-sm">Διαφορά ηλικίας (±):</Label>
+                  <span className="text-sm font-semibold text-primary">
+                    {ageRangeMonths <= 12 ? `${ageRangeMonths} μήνες` : `${Math.round(ageRangeMonths / 12)} έτος/η`}
+                  </span>
                 </div>
                 <Slider
                   value={[ageRangeMonths]}
                   onValueChange={([value]) => setAgeRangeMonths(value)}
                   min={3}
-                  max={12}
-                  step={1}
+                  max={24}
+                  step={3}
                   className="w-full"
                 />
+                <p className="text-xs text-muted-foreground">
+                  ✨ Μαμά με παιδί ίδιας ηλικίας → Στο ίδιο στάδιο με εσένα
+                </p>
               </div>
             )}
           </Card>
