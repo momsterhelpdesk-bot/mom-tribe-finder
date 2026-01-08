@@ -8,15 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, X, AlertCircle, Plus, Trash2 } from "lucide-react";
+import { Upload, X, AlertCircle } from "lucide-react";
 import { z } from "zod";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 // Location permission is now only requested in Discover page
 import { INTERESTS } from "@/lib/interests";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProfileSuccessScreen from "@/components/ProfileSuccessScreen";
-import ChildAgeSelector from "@/components/ChildAgeSelector";
-import { ALL_AGE_OPTIONS } from "@/lib/childAges";
+import ChildrenManager from "@/components/ChildrenManager";
 const profileSetupSchema = z.object({
   username: z.string().trim().min(3, { message: "Το username πρέπει να είναι τουλάχιστον 3 χαρακτήρες" }).max(20, { message: "Το username πρέπει να είναι μικρότερο από 20 χαρακτήρες" }).regex(/^[a-zA-Z0-9_]+$/, { message: "Το username μπορεί να περιέχει μόνο γράμματα, αριθμούς και _" }),
   city: z.string().trim().min(1, { message: "Η πόλη είναι υποχρεωτική" }).max(100, { message: "Η πόλη πρέπει να είναι μικρότερη από 100 χαρακτήρες" }),
@@ -95,7 +94,6 @@ export default function ProfileSetup() {
   const [area, setArea] = useState("");
   const [availableAreas, setAvailableAreas] = useState<string[]>([]);
   const [children, setChildren] = useState<Array<{ name?: string; ageGroup: string; gender?: 'boy' | 'girl' | 'baby' }>>([{ ageGroup: "", gender: 'baby' }]);
-  const [activeChildIndex, setActiveChildIndex] = useState(0);
   const [matchPreference, setMatchPreference] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
@@ -526,152 +524,11 @@ export default function ProfileSetup() {
             </div>
           </div>
 
-          {/* Children Section - Redesigned */}
-          <div className="space-y-4">
-            <div>
-              <Label className="text-lg font-semibold">Πες μας λίγα για το παιδάκι σου 🤍</Label>
-              <p className="text-sm text-muted-foreground mt-1">
-                Η ηλικία μας βοηθά να σου δείχνουμε μαμάδες που βρίσκονται στο ίδιο στάδιο με εσένα.
-              </p>
-              <p className="text-xs text-muted-foreground mt-1 italic">
-                Κάθε στάδιο είναι διαφορετικό — και καμία μαμά δεν είναι μόνη της.
-              </p>
-            </div>
-
-            {/* Children tabs */}
-            {children.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {children.map((child, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => setActiveChildIndex(index)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
-                      activeChildIndex === index
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-secondary-foreground"
-                    }`}
-                  >
-                    <span>{child.name || `Παιδί ${index + 1}`}</span>
-                    {children.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const newChildren = children.filter((_, i) => i !== index);
-                          setChildren(newChildren);
-                          if (activeChildIndex >= newChildren.length) {
-                            setActiveChildIndex(newChildren.length - 1);
-                          }
-                        }}
-                        className="hover:text-destructive"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Active child editor */}
-            {children[activeChildIndex] && (
-              <div className="space-y-4 p-4 border border-border rounded-xl bg-secondary/10">
-                {/* Name input */}
-                <div>
-                  <Label className="text-sm">Όνομα (προαιρετικό)</Label>
-                  <Input
-                    placeholder="π.χ. Μαριάννα"
-                    value={children[activeChildIndex].name || ""}
-                    onChange={(e) => {
-                      const newChildren = [...children];
-                      newChildren[activeChildIndex].name = e.target.value;
-                      setChildren(newChildren);
-                    }}
-                    maxLength={50}
-                    className="mt-1"
-                  />
-                </div>
-
-                {/* Gender selection */}
-                <div>
-                  <Label className="text-sm">Φύλο</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Button
-                      type="button"
-                      variant={children[activeChildIndex].gender === 'boy' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => {
-                        const newChildren = [...children];
-                        newChildren[activeChildIndex].gender = 'boy';
-                        setChildren(newChildren);
-                      }}
-                    >
-                      👦 Αγόρι
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={children[activeChildIndex].gender === 'girl' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => {
-                        const newChildren = [...children];
-                        newChildren[activeChildIndex].gender = 'girl';
-                        setChildren(newChildren);
-                      }}
-                    >
-                      👧 Κορίτσι
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={children[activeChildIndex].gender === 'baby' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => {
-                        const newChildren = [...children];
-                        newChildren[activeChildIndex].gender = 'baby';
-                        setChildren(newChildren);
-                      }}
-                    >
-                      👶 Μωρό
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Age selector */}
-                <div>
-                  <Label className="text-sm">Ηλικία *</Label>
-                  <div className="mt-2">
-                    <ChildAgeSelector
-                      selectedAge={children[activeChildIndex].ageGroup}
-                      onSelect={(ageValue) => {
-                        const newChildren = [...children];
-                        newChildren[activeChildIndex].ageGroup = ageValue;
-                        setChildren(newChildren);
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Add child button */}
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground text-center">
-                Μπορείς να διαλέξεις περισσότερες ηλικίες, αν έχεις περισσότερα από ένα παιδάκια 🤍
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setChildren([...children, { ageGroup: "", gender: 'baby' }]);
-                  setActiveChildIndex(children.length);
-                }}
-                className="w-full"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Προσθήκη Παιδιού
-              </Button>
-            </div>
-          </div>
+          {/* Children Section */}
+          <ChildrenManager
+            children={children}
+            onChange={setChildren}
+          />
 
           {/* Match Preference */}
           <div>
@@ -712,6 +569,11 @@ export default function ProfileSetup() {
                   </button>
                 );
               })}
+            </div>
+            <div className="text-sm text-muted-foreground space-y-1 pt-2">
+              <p>Διάλεξε ό,τι νιώθεις ότι σε εκφράζει 🤍</p>
+              <p className="text-xs">Είμαστε εδώ για να βρεις μαμάδες που σε καταλαβαίνουν.</p>
+              <p className="text-xs italic">Μπορείς να αλλάξεις αυτές τις επιλογές όποτε θέλεις 🌸</p>
             </div>
           </div>
 

@@ -11,15 +11,22 @@ export const INTERESTS = [
   { id: "formula_feeding", label: { el: "🍼 Formula feeding", en: "🍼 Formula feeding" } },
   { id: "co_sleeping", label: { el: "🌙 Co-sleeping", en: "🌙 Co-sleeping" } },
 
-  // Mom Types
+  // Mom Types & Life Situations
   { id: "twin_mom", label: { el: "👯 Twin Mom / Multiples", en: "👯 Twin Mom / Multiples" } },
+  { id: "single_mom", label: { el: "👩‍👧 Single mom", en: "👩‍👧 Single mom" } },
   { id: "working_mom", label: { el: "💼 Working Mom", en: "💼 Working Mom" } },
   { id: "wfh_mom", label: { el: "💻 Work-from-home Mom", en: "💻 Work-from-home Mom" } },
   { id: "stay_at_home", label: { el: "🏡 Stay-at-home Mom", en: "🏡 Stay-at-home Mom" } },
+  { id: "maternity_leave", label: { el: "🤍 Μαμά σε άδεια μητρότητας", en: "🤍 Mom on maternity leave" } },
+  { id: "with_support", label: { el: "🫶 Μαμά με υποστήριξη (παππούδες / οικογένεια κοντά)", en: "🫶 Mom with support (grandparents / family nearby)" } },
+  { id: "without_support", label: { el: "🌍 Μαμά χωρίς υποστήριξη (μακριά από οικογένεια)", en: "🌍 Mom without support (far from family)" } },
   { id: "cozy_homebody", label: { el: "🏠 Cozy Homebody / Home Loving", en: "🏠 Cozy Homebody / Home Loving" } },
   { id: "special_needs", label: { el: "💪 Special Needs Mom Warrior", en: "💪 Special Needs Mom Warrior" } },
   { id: "decluttering", label: { el: "🧽 Decluttering / Home Organization", en: "🧽 Decluttering / Home Organization" } },
   { id: "self_growth", label: { el: "🎓 Mom Learning / Self-growth", en: "🎓 Mom Learning / Self-growth" } },
+  { id: "mom_studying", label: { el: "📚 Μαμά & σπουδές", en: "📚 Mom & studies" } },
+  { id: "side_hustle", label: { el: "🚀 Μαμά & side hustle", en: "🚀 Mom & side hustle" } },
+  { id: "difficult_experience", label: { el: "💔 Μαμά μετά από δύσκολη εμπειρία", en: "💔 Mom after a difficult experience" } },
 
   // Food & Cooking
   { id: "cooking", label: { el: "🍳 Cooking", en: "🍳 Cooking" } },
@@ -78,7 +85,15 @@ export const INTERESTS = [
   // Personality & Vibes
   { id: "positive_vibes", label: { el: "🌈 Positive Vibes", en: "🌈 Positive Vibes" } },
   { id: "calm_chill", label: { el: "🧘 Calm & Chill", en: "🧘 Calm & Chill" } },
+  { id: "relaxed_mom", label: { el: "🌿 Χαλαρή μαμά", en: "🌿 Relaxed mom" } },
+  { id: "anxious_mom", label: { el: "😮‍💨 Αγχωμένη μαμά", en: "😮‍💨 Anxious mom" } },
+  { id: "sleep_deprived", label: { el: "😴 Sleep-deprived", en: "😴 Sleep-deprived" } },
   { id: "aesthetic", label: { el: "🎀 Aesthetic Lover", en: "🎀 Aesthetic Lover" } },
   { id: "planner", label: { el: "🎯 Planner / Organizer", en: "🎯 Planner / Organizer" } },
   { id: "board_games", label: { el: "🧩 Board games / Puzzles", en: "🧩 Board games / Puzzles" } },
+
+  // Connection & Needs
+  { id: "want_understanding", label: { el: "🤍 Θέλω κατανόηση", en: "🤍 I want understanding" } },
+  { id: "want_connection", label: { el: "🫂 Θέλω σύνδεση", en: "🫂 I want connection" } },
+  { id: "want_coffee_company", label: { el: "☕ Θέλω παρέα για καφέ", en: "☕ Looking for coffee company" } },
 ];
