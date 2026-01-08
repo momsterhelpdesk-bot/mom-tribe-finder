@@ -431,6 +431,36 @@ export default function Discover() {
     return false;
   };
 
+  // Check if current profile has similar lifestyle interests
+  const lifestyleInterestIds = [
+    'single_mom', 'working_mom', 'wfh_mom', 'stay_at_home', 'maternity_leave',
+    'with_support', 'without_support', 'relaxed_mom', 'anxious_mom', 'sleep_deprived',
+    'mom_studying', 'side_hustle', 'difficult_experience', 'special_needs', 'twin_mom',
+    'want_understanding', 'want_connection', 'want_coffee_company'
+  ];
+
+  const getSimilarLifestyleInterests = () => {
+    if (!currentUser?.interests || !currentProfile?.interests) return [];
+    
+    // Find common lifestyle interests
+    const userLifestyle = currentUser.interests.filter(i => 
+      lifestyleInterestIds.some(id => i.toLowerCase().includes(id.replace('_', ' ').toLowerCase()) || i.toLowerCase().includes(id.replace('_', '-').toLowerCase()))
+    );
+    const profileLifestyle = currentProfile.interests.filter(i => 
+      lifestyleInterestIds.some(id => i.toLowerCase().includes(id.replace('_', ' ').toLowerCase()) || i.toLowerCase().includes(id.replace('_', '-').toLowerCase()))
+    );
+
+    // Find common ones
+    return userLifestyle.filter(ui => 
+      profileLifestyle.some(pi => 
+        ui.toLowerCase() === pi.toLowerCase() || 
+        ui.replace(/[^\w\s]/g, '').toLowerCase() === pi.replace(/[^\w\s]/g, '').toLowerCase()
+      )
+    );
+  };
+
+  const similarLifestyle = getSimilarLifestyleInterests();
+
   // Collect all profile photos
   const profilePhotos = (() => {
     const photos: string[] = [];
@@ -629,6 +659,27 @@ export default function Discover() {
                   <span className="text-sm font-semibold text-purple-700">
                     Στο ίδιο στάδιο με εσένα ✨
                   </span>
+                </div>
+              )}
+
+              {/* Similar Lifestyle Badge */}
+              {similarLifestyle.length > 0 && (
+                <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-rose-50 to-orange-50 p-2 rounded-lg border border-rose-200 shadow-sm">
+                  <span className="text-sm font-semibold text-rose-600">
+                    Παρόμοιο lifestyle 🫶
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {similarLifestyle.slice(0, 2).map((interest, idx) => (
+                      <Badge key={idx} variant="secondary" className="text-[10px] px-1.5 py-0 bg-rose-100 text-rose-700 border-rose-200">
+                        {interest}
+                      </Badge>
+                    ))}
+                    {similarLifestyle.length > 2 && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-rose-300 text-rose-600">
+                        +{similarLifestyle.length - 2}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               )}
 
