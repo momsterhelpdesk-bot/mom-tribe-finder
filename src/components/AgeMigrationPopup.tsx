@@ -83,7 +83,7 @@ export default function AgeMigrationPopup({
         if (!nextOpen) onClose();
       }}
     >
-      <DialogContent className="max-w-md max-h-[90vh] p-0 overflow-hidden">
+      <DialogContent className="max-w-md max-h-[85vh] p-0 overflow-hidden flex flex-col">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -93,37 +93,34 @@ export default function AgeMigrationPopup({
           <X className="w-5 h-5 text-muted-foreground" />
         </button>
 
-        <div className="p-6">
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto p-6 pb-0">
           {/* Header with mascot */}
           <div className="flex items-center gap-4 mb-4">
             <img 
               src={mascot} 
               alt="Momster" 
-              className="w-16 h-16 rounded-full object-cover shadow-md"
+              className="w-14 h-14 rounded-full object-cover shadow-md"
             />
             <div>
-              <DialogTitle className="text-xl font-bold text-foreground">
+              <DialogTitle className="text-lg font-bold text-foreground">
                 {getText("age_migration_title", "Μικρή ενημέρωση 🤍")}
               </DialogTitle>
             </div>
           </div>
 
-          <p className="text-muted-foreground mb-4 leading-relaxed">
+          <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
             {getText("age_migration_description", "Ανανεώσαμε τις ηλικίες των παιδιών για πιο ταιριαστές γνωριμίες. Θες να μας πεις ξανά την ηλικία του παιδιού σου; Παίρνει λιγότερο από ένα λεπτό ✨")}
-          </p>
-
-          <p className="text-sm text-muted-foreground mb-4">
-            {getText("age_migration_hint", "Μπορείς να διαλέξεις περισσότερες ηλικίες, αν έχεις περισσότερα από ένα παιδάκια 🤍")}
           </p>
 
           {/* Child tabs */}
           {children.length > 1 && (
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+            <div className="flex gap-2 mb-3 overflow-x-auto pb-2">
               {children.map((child, index) => (
                 <button
                   key={index}
                   onClick={() => setActiveChildIndex(index)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
                     activeChildIndex === index
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary text-secondary-foreground"
@@ -147,7 +144,7 @@ export default function AgeMigrationPopup({
           )}
 
           {/* Gender selection for active child */}
-          <div className="mb-4">
+          <div className="mb-3">
             <p className="text-sm font-medium mb-2">{getText("gender_label", "Φύλο:")}</p>
             <div className="flex gap-2">
               <Button
@@ -178,44 +175,44 @@ export default function AgeMigrationPopup({
           </div>
 
           {/* Age selector */}
-          <ScrollArea className="h-[300px] pr-2">
+          <div className="mb-3">
             <ChildAgeSelector
               selectedAge={children[activeChildIndex]?.ageGroup || ""}
               onSelect={updateChildAge}
             />
-          </ScrollArea>
+          </div>
 
           {/* Add child button */}
           <Button
             type="button"
             variant="outline"
-            className="w-full mt-4"
+            size="sm"
+            className="w-full mb-4"
             onClick={addChild}
           >
             <Plus className="w-4 h-4 mr-2" />
             {getText("add_child_button", "Προσθήκη Παιδιού")}
           </Button>
+        </div>
 
-          {/* Actions */}
-          <div className="mt-4 flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1"
-              onClick={onClose}
-            >
-              {getText("later_button", "ΟΚ, αργότερα")}
-            </Button>
+        {/* Fixed Actions at bottom */}
+        <div className="p-4 border-t bg-background flex gap-2 shrink-0">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-1"
+            onClick={onClose}
+          >
+            {getText("later_button", "ΟΚ, αργότερα")}
+          </Button>
 
-            <Button
-              className="flex-1"
-              size="lg"
-              onClick={handleSave}
-              disabled={saving || !allChildrenHaveAge}
-            >
-              {saving ? getText("saving_button", "Αποθήκευση...") : getText("save_button", "Αποθήκευση")}
-            </Button>
-          </div>
+          <Button
+            className="flex-1"
+            onClick={handleSave}
+            disabled={saving || !allChildrenHaveAge}
+          >
+            {saving ? getText("saving_button", "Αποθήκευση...") : getText("save_button", "Αποθήκευση")}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
