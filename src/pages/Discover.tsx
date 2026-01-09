@@ -11,7 +11,7 @@ import MomsterMascot from "@/components/MomsterMascot";
 import MomsterPopup from "@/components/MomsterPopup";
 import ConfettiEffect from "@/components/ConfettiEffect";
 import { useMascot } from "@/hooks/use-mascot";
-import { useMatching, ProfileMatch } from "@/hooks/use-matching";
+import { useMatching, ProfileMatch, SortOption } from "@/hooks/use-matching";
 import { LocationPermissionDialog } from "@/components/LocationPermissionDialog";
 import { ProfilePhotoCarousel } from "@/components/ProfilePhotoCarousel";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -68,7 +68,7 @@ export default function Discover() {
   const { language } = useLanguage();
   const { getText } = useMicrocopy();
   const { mascotConfig, visible, hideMascot, showMatch, showEmptyDiscover } = useMascot();
-  const { profiles, loading, currentUser, reloadProfiles } = useMatching();
+  const { profiles, loading, currentUser, sortBy, setSortBy, reloadProfiles } = useMatching();
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
@@ -530,10 +530,36 @@ export default function Discover() {
         <Settings className="w-4 h-4" />
       </Button>
 
-      <div className="max-w-md mx-auto pt-32 pb-32 space-y-6">
+      <div className="max-w-md mx-auto pt-32 pb-32 space-y-4">
       <h1 className="text-2xl font-bold text-center mb-2 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
           {getText("discover_title", "Ανακάλυψε Μαμάδες")}
         </h1>
+
+        {/* Sorting Dropdown */}
+        <div className="flex flex-col items-center gap-1">
+          <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+            <SelectTrigger className="w-[220px] bg-background/80 backdrop-blur-sm">
+              <SelectValue placeholder="Ταξινόμηση" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recommended">
+                <span className="flex items-center gap-2">✨ Προτεινόμενες για εσένα</span>
+              </SelectItem>
+              <SelectItem value="nearby">
+                <span className="flex items-center gap-2">📍 Πιο κοντά μου</span>
+              </SelectItem>
+              <SelectItem value="lifestyle">
+                <span className="flex items-center gap-2">🤍 Παρόμοιο lifestyle</span>
+              </SelectItem>
+              <SelectItem value="same_stage">
+                <span className="flex items-center gap-2">👶 Ίδιο στάδιο</span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            {getText("sorting_hint", "Η σειρά αλλάζει — η ζεστασιά μένει 🤍")}
+          </p>
+        </div>
 
         {/* Privacy-first info banner */}
         <div className="text-center">

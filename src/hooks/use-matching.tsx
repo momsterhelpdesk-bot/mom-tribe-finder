@@ -65,11 +65,14 @@ export interface ProfileMatch {
   locationBoost?: number; // 1 = same city, 2 = same area, 3 = same area + lifestyle
 }
 
+export type SortOption = 'recommended' | 'nearby' | 'lifestyle' | 'same_stage';
+
 export function useMatching() {
   const [profiles, setProfiles] = useState<ProfileMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [filters, setFilters] = useState<MatchingFilters | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>('recommended');
 
   useEffect(() => {
     loadMatchingProfiles();
@@ -408,43 +411,7 @@ export function useMatching() {
         return { ...profile, matchPercentage };
       });
 
-      // SORT: 1) Users who liked you, 2) Location boost, 3) Lifestyle, 4) Age match, 5) Interests
-      profilesWithMatchPercentage.sort((a, b) => {
-        // FIRST PRIORITY: Users who liked you appear at the top!
-        if (a.hasLikedYou && !b.hasLikedYou) return -1;
-        if (!a.hasLikedYou && b.hasLikedYou) return 1;
-        
-        // SECOND PRIORITY: Location boost (profile-based, no GPS)
-        // 🔥🔥🔥 same area + lifestyle > 🔥🔥 same area > 🔥 same city
-        const locationDiff = (b.locationBoost || 0) - (a.locationBoost || 0);
-        if (locationDiff !== 0) return locationDiff;
-        
-        // THIRD PRIORITY: Similar lifestyle
-        if (userFilters.prioritizeLifestyle) {
-          const aHasLifestyle = (a.lifestyleMatchCount || 0) > 0;
-          const bHasLifestyle = (b.lifestyleMatchCount || 0) > 0;
-          if (aHasLifestyle && !bHasLifestyle) return -1;
-          if (!aHasLifestyle && bHasLifestyle) return 1;
-          if (aHasLifestyle && bHasLifestyle) {
-            const lifestyleDiff = (b.lifestyleMatchCount || 0) - (a.lifestyleMatchCount || 0);
-            if (lifestyleDiff !== 0) return lifestyleDiff;
-          }
-        }
-        
-        // FOURTH PRIORITY: Very close child age (within 12 months)
-        const aCloseAge = (a as any).ageDiffMonths <= 12;
-        const bCloseAge = (b as any).ageDiffMonths <= 12;
-        if (aCloseAge && !bCloseAge) return -1;
-        if (!aCloseAge && bCloseAge) return 1;
-        
-        // Fifth: common interests (highest first)
-        const interestsDiff = (b.commonInterestsCount || 0) - (a.commonInterestsCount || 0);
-        if (interestsDiff !== 0) return interestsDiff;
-        
-        // Sixth: kids age match score (highest first)
-        return (b.ageMatchScore || 0) - (a.ageMatchScore || 0);
-      });
-
+      // Default sort (recommended) - returns profiles as-is from scoring
       setProfiles(profilesWithMatchPercentage);
     } catch (error) {
       console.error("Error loading matching profiles:", error);
@@ -453,5 +420,56 @@ export function useMatching() {
     }
   };
 
-  return { profiles, loading, currentUser, filters, reloadProfiles: loadMatchingProfiles };
+  // Sort profiles based on selected sort option
+  const sortedProfiles = [...profiles].sort((a, b) => {
+    // ALWAYS: Users who liked you appear at the top!
+    if (a.hasLikedYou && !b.hasLikedYou) return -1;
+    if (!a.hasLikedYou && b.hasLikedYou) return 1;
+
+    switch (sortBy) {
+      case 'nearby':
+        // Sort by location boost (profile-based, no GPS)
+        const locationDiff = (b.locationBoost || 0) - (a.locationBoost || 0);
+        if (locationDiff !== 0) return locationDiff;
+        return (b.matchPercentage || 0) - (a.matchPercentage || 0);
+
+      case 'lifestyle':
+        // Sort by lifestyle match count
+        const lifestyleDiff = (b.lifestyleMatchCount || 0) - (a.lifestyleMatchCount || 0);
+        if (lifestyleDiff !== 0) return lifestyleDiff;
+        return (b.matchPercentage || 0) - (a.matchPercentage || 0);
+
+      case 'same_stage':
+        // Sort by child age match score
+        const ageDiff = (b.ageMatchScore || 0) - (a.ageMatchScore || 0);
+        if (ageDiff !== 0) return ageDiff;
+        return (b.matchPercentage || 0) - (a.matchPercentage || 0);
+
+      case 'recommended':
+      default:
+        // Default sorting: location > lifestyle > age > interests
+        const locDiff = (b.locationBoost || 0) - (a.locationBoost || 0);
+        if (locDiff !== 0) return locDiff;
+        
+        const styleDiff = (b.lifestyleMatchCount || 0) - (a.lifestyleMatchCount || 0);
+        if (styleDiff !== 0) return styleDiff;
+        
+        const aCloseAge = (a as any).ageDiffMonths <= 12;
+        const bCloseAge = (b as any).ageDiffMonths <= 12;
+        if (aCloseAge && !bCloseAge) return -1;
+        if (!aCloseAge && bCloseAge) return 1;
+        
+        return (b.matchPercentage || 0) - (a.matchPercentage || 0);
+    }
+  });
+
+  return { 
+    profiles: sortedProfiles, 
+    loading, 
+    currentUser, 
+    filters, 
+    sortBy,
+    setSortBy,
+    reloadProfiles: loadMatchingProfiles 
+  };
 }
