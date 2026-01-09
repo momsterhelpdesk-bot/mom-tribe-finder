@@ -21,6 +21,8 @@ import NotificationsPanel from "@/components/admin/NotificationsPanel";
 import { TestAccountsManager } from "@/components/admin/TestAccountsManager";
 import RecipesManagement from "@/components/admin/RecipesManagement";
 import PhotoModeration from "@/components/admin/PhotoModeration";
+import UserRescue from "@/components/admin/UserRescue";
+import MicrocopyManager from "@/components/admin/MicrocopyManager";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -271,9 +273,11 @@ export default function Admin() {
         </Card>
 
         <Tabs defaultValue="overview" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-11 gap-2 h-auto">
+          <TabsList className="flex flex-wrap justify-start gap-2 h-auto p-2">
             <TabsTrigger value="overview">Επισκόπηση</TabsTrigger>
             <TabsTrigger value="users">Χρήστες</TabsTrigger>
+            <TabsTrigger value="rescue">🚑 Rescue</TabsTrigger>
+            <TabsTrigger value="microcopy">📝 Micro-copy</TabsTrigger>
             <TabsTrigger value="photos">📸 Photos</TabsTrigger>
             <TabsTrigger value="moderation">Forum</TabsTrigger>
             <TabsTrigger value="verifications">
@@ -314,6 +318,14 @@ export default function Admin() {
 
           <TabsContent value="users">
             <UserManagement />
+          </TabsContent>
+
+          <TabsContent value="rescue">
+            <UserRescue />
+          </TabsContent>
+
+          <TabsContent value="microcopy">
+            <MicrocopyManager />
           </TabsContent>
 
           <TabsContent value="moderation">
