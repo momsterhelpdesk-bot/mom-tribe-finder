@@ -16,6 +16,7 @@ import { INTERESTS } from "@/lib/interests";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProfileSuccessScreen from "@/components/ProfileSuccessScreen";
 import ChildrenManager from "@/components/ChildrenManager";
+import { useMicrocopy } from "@/hooks/use-microcopy";
 const profileSetupSchema = z.object({
   username: z.string().trim().min(3, { message: "Το username πρέπει να είναι τουλάχιστον 3 χαρακτήρες" }).max(20, { message: "Το username πρέπει να είναι μικρότερο από 20 χαρακτήρες" }).regex(/^[a-zA-Z0-9_]+$/, { message: "Το username μπορεί να περιέχει μόνο γράμματα, αριθμούς και _" }),
   city: z.string().trim().min(1, { message: "Η πόλη είναι υποχρεωτική" }).max(100, { message: "Η πόλη πρέπει να είναι μικρότερη από 100 χαρακτήρες" }),
@@ -86,6 +87,7 @@ type PhotoItem = {
 export default function ProfileSetup() {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { getText } = useMicrocopy();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   
@@ -495,6 +497,10 @@ export default function ProfileSetup() {
                   ))}
                 </SelectContent>
               </Select>
+              {/* Privacy helper text - No GPS */}
+              <p className="text-[10px] text-muted-foreground mt-1">
+                {getText("city_privacy_hint", "Το χρησιμοποιούμε μόνο για να βρίσκεις μαμάδες κοντά σου 🤍 Δεν ζητάμε GPS.")}
+              </p>
             </div>
 
             <div>

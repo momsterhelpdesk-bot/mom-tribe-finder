@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { MapPin, Baby, Heart, Save, ArrowLeft, X, Users } from "lucide-react";
+import { MapPin, Baby, Heart, Save, ArrowLeft, X, Users, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import mascot from "@/assets/mascot.jpg";
 import { INTERESTS } from "@/lib/interests";
+import { useMicrocopy } from "@/hooks/use-microcopy";
 
 export default function MatchingFilters() {
   const navigate = useNavigate();
+  const { getText } = useMicrocopy();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
@@ -139,15 +141,22 @@ export default function MatchingFilters() {
       />
       
       <div className="max-w-md mx-auto pt-20 pb-24">
+        {/* Intro helper text */}
+        <div className="mb-4 p-3 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-200">
+          <p className="text-sm text-muted-foreground text-center">
+            {getText("filters_helper", "Τα φίλτρα βοηθούν να βρίσκεις πιο ταιριαστές μαμάδες — όχι να αποκλείεις 🤍")}
+          </p>
+        </div>
+
         <div className="space-y-4">
-          {/* Location Filter */}
+          {/* Location Filter - NO GPS */}
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-primary" />
                 <div>
-                  <Label className="text-base font-semibold">Φίλτρο Απόστασης</Label>
-                  <p className="text-sm text-muted-foreground">Βρες μαμάδες κοντά σου</p>
+                  <Label className="text-base font-semibold">{getText("filter_location_title", "Μόνο κοντά μου 🤍")}</Label>
+                  <p className="text-sm text-muted-foreground">{getText("filter_location_desc", "Για να βρίσκεις μαμάδες κοντά σου — χωρίς GPS 🤍")}</p>
                 </div>
               </div>
               <Switch
@@ -158,18 +167,38 @@ export default function MatchingFilters() {
 
             {showLocationFilter && (
               <div className="space-y-3 pt-4 border-t">
-                <div className="flex items-center justify-between">
-                  <Label className="text-sm">Μέγιστη απόσταση:</Label>
-                  <span className="text-sm font-semibold text-primary">{distancePreferenceKm} km</span>
+                <p className="text-xs text-muted-foreground">
+                  📍 {getText("filter_location_info", "Ίδια πόλη = Κοντά σου · Ίδια περιοχή = Πολύ κοντά!")}
+                </p>
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      distancePreferenceKm >= 100 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                    }`}
+                    onClick={() => setDistancePreferenceKm(100)}
+                  >
+                    Ίδια πόλη
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      distancePreferenceKm < 100 && distancePreferenceKm >= 10 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                    }`}
+                    onClick={() => setDistancePreferenceKm(10)}
+                  >
+                    Ίδια περιοχή
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      distancePreferenceKm >= 500 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                    }`}
+                    onClick={() => setDistancePreferenceKm(500)}
+                  >
+                    Όλη η Ελλάδα
+                  </button>
                 </div>
-                <Slider
-                  value={[distancePreferenceKm]}
-                  onValueChange={([value]) => setDistancePreferenceKm(value)}
-                  min={1}
-                  max={50}
-                  step={1}
-                  className="w-full"
-                />
               </div>
             )}
           </Card>
@@ -180,8 +209,8 @@ export default function MatchingFilters() {
               <div className="flex items-center gap-3">
                 <Baby className="w-5 h-5 text-primary" />
                 <div>
-                  <Label className="text-base font-semibold">Ηλικία παιδιού</Label>
-                  <p className="text-sm text-muted-foreground">Για να βρεις μαμάδες που ζουν παρόμοιες στιγμές με εσένα</p>
+                  <Label className="text-base font-semibold">{getText("filter_age_title", "Ίδιο στάδιο με εμένα 👶")}</Label>
+                  <p className="text-sm text-muted-foreground">{getText("filter_age_desc", "Κάθε στάδιο έχει τις δικές του ανάγκες.")}</p>
                 </div>
               </div>
               <Switch
@@ -193,7 +222,7 @@ export default function MatchingFilters() {
             {matchAgeFilter && (
               <div className="space-y-3 pt-4 border-t">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm">Διαφορά ηλικίας (±):</Label>
+                  <Label className="text-sm">{getText("filter_age_deviation", "Απόκλιση ηλικίας (±):")}</Label>
                   <span className="text-sm font-semibold text-primary">
                     {ageRangeMonths <= 12 ? `${ageRangeMonths} μήνες` : `${Math.round(ageRangeMonths / 12)} έτος/η`}
                   </span>
@@ -207,7 +236,34 @@ export default function MatchingFilters() {
                   className="w-full"
                 />
                 <p className="text-xs text-muted-foreground">
-                  ✨ Μαμά με παιδί ίδιας ηλικίας → Στο ίδιο στάδιο με εσένα
+                  ✨ {getText("filter_age_hint", "Μαμά με παιδί ίδιας ηλικίας → Ίδιες μικρές προκλήσεις, ίδιες χαρές")}
+                </p>
+              </div>
+            )}
+          </Card>
+
+          {/* Lifestyle Priority - Soft filter, not exclusion */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Users className="w-5 h-5 text-primary" />
+                <div>
+                  <Label className="text-base font-semibold">{getText("filter_lifestyle_title", "Παρόμοια καθημερινότητα 🤍")}</Label>
+                  <p className="text-sm text-muted-foreground">{getText("filter_lifestyle_desc", "Διάλεξε ό,τι σε εκφράζει — μόνο για καλύτερο ταίριασμα 🤍")}</p>
+                </div>
+              </div>
+              <Switch
+                checked={prioritizeLifestyle}
+                onCheckedChange={setPrioritizeLifestyle}
+              />
+            </div>
+            {prioritizeLifestyle && (
+              <div className="pt-3 border-t">
+                <p className="text-xs text-muted-foreground mb-2">
+                  👩‍👧 {getText("filter_lifestyle_examples", "Single Mom, WFH, Stay-at-Home, Χωρίς υποστήριξη κ.ά. θα εμφανίζονται πρώτες!")}
+                </p>
+                <p className="text-[10px] text-muted-foreground/70">
+                  {getText("filter_lifestyle_note", "Δεν αποκλείει κανέναν — απλά βάζει τα σημαντικά πρώτα 🌸")}
                 </p>
               </div>
             )}
@@ -219,8 +275,8 @@ export default function MatchingFilters() {
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5 text-primary" />
                 <div>
-                  <Label className="text-base font-semibold">Φίλτρο Ενδιαφερόντων</Label>
-                  <p className="text-sm text-muted-foreground">Κοινά ενδιαφέροντα</p>
+                  <Label className="text-base font-semibold">{getText("filter_interests_title", "Κοινά ενδιαφέροντα ✨")}</Label>
+                  <p className="text-sm text-muted-foreground">{getText("filter_interests_desc", "Ταιριάζετε σε πολλά")}</p>
                 </div>
               </div>
               <Switch
@@ -232,7 +288,7 @@ export default function MatchingFilters() {
             {matchInterestsFilter && (
               <div className="space-y-3 pt-4 border-t">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm">Ελάχιστο ποσοστό κοινών:</Label>
+                  <Label className="text-sm">{getText("filter_interests_min", "Ελάχιστο ποσοστό κοινών:")}</Label>
                   <span className="text-sm font-semibold text-primary">{interestsThreshold}%</span>
                 </div>
                 <Slider
@@ -251,28 +307,6 @@ export default function MatchingFilters() {
               </div>
             )}
           </Card>
-
-          {/* Lifestyle Priority */}
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Users className="w-5 h-5 text-primary" />
-                <div>
-                  <Label className="text-base font-semibold">Παρόμοιο Lifestyle</Label>
-                  <p className="text-sm text-muted-foreground">Δείξε πρώτα μαμάδες με παρόμοιο τρόπο ζωής</p>
-                </div>
-              </div>
-              <Switch
-                checked={prioritizeLifestyle}
-                onCheckedChange={setPrioritizeLifestyle}
-              />
-            </div>
-            {prioritizeLifestyle && (
-              <p className="text-xs text-muted-foreground mt-3 pt-3 border-t">
-                👩‍👧 Single Mom, 💻 WFH, 🏡 Stay-at-Home κ.ά. θα εμφανίζονται πρώτες!
-              </p>
-            )}
-          </Card>
         </div>
 
         <Button
@@ -282,14 +316,14 @@ export default function MatchingFilters() {
           disabled={saving}
         >
           <Save className="w-4 h-4 mr-2" />
-          {saving ? "Αποθήκευση..." : "Αποθήκευση Προτιμήσεων"}
+          {saving ? getText("saving_button", "Αποθήκευση...") : getText("save_filters_button", "Αποθήκευση Προτιμήσεων")}
         </Button>
       </div>
 
       <footer className="fixed bottom-0 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
         <div className="max-w-md mx-auto flex items-center justify-center gap-2">
           <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
-          <span className="text-sm text-muted-foreground">Together, moms thrive!</span>
+          <span className="text-sm text-muted-foreground">{getText("footer_tagline", "Together, moms thrive!")}</span>
         </div>
       </footer>
     </div>

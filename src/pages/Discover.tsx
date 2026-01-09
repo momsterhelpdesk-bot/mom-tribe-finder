@@ -364,7 +364,7 @@ export default function Discover() {
       <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative flex items-center justify-center">
         <div className="max-w-md w-full text-center">
           <h1 className="text-2xl font-bold mb-6 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
-            Ανακάλυψε Μαμάδες
+            {getText("discover_title", "Ανακάλυψε Μαμάδες")}
           </h1>
           <Card className="p-6 bg-gradient-to-br from-primary/10 via-background to-secondary/20 border-2 border-primary/30">
             <video
@@ -376,11 +376,15 @@ export default function Discover() {
             >
               <source src="/videos/mascot-empty-state.mp4" type="video/mp4" />
             </video>
-            <h2 className="text-xl font-semibold mb-2 text-foreground">Δεν υπάρχουν άλλες μαμάδες</h2>
-            <p className="text-muted-foreground mb-4">Δοκίμασε να προσαρμόσεις τα φίλτρα σου</p>
+            <h2 className="text-xl font-semibold mb-2 text-foreground">
+              {getText("empty_state_title", "Δεν είσαι μόνη 🤍")}
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              {getText("empty_state_message", "Μερικές μαμάδες είναι εδώ, απλώς όχι αυτή τη στιγμή. Δοκίμασε ξανά λίγο αργότερα 🌸")}
+            </p>
             <Button onClick={() => navigate("/matching-filters")} size="lg" className="w-full">
               <Settings className="w-4 h-4 mr-2" />
-              Ρυθμίσεις Φίλτρων
+              {getText("empty_state_cta", "Χαλάρωσε τα φίλτρα")}
             </Button>
           </Card>
         </div>
@@ -528,8 +532,15 @@ export default function Discover() {
 
       <div className="max-w-md mx-auto pt-32 pb-32 space-y-6">
       <h1 className="text-2xl font-bold text-center mb-2 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
-          Ανακάλυψε Μαμάδες
+          {getText("discover_title", "Ανακάλυψε Μαμάδες")}
         </h1>
+
+        {/* Privacy-first info banner */}
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">
+            {getText("discover_matching_info", "Τα matches βασίζονται σε ό,τι έχεις επιλέξει στο προφίλ σου 🌸")}
+          </p>
+        </div>
 
         {/* Likes You Counter - Bubble style */}
         {!locationDenied && likesYouCount > 0 && (
@@ -537,7 +548,7 @@ export default function Discover() {
             <div className="relative">
               <div className="bg-gradient-to-r from-pink-200 via-pink-100 to-purple-100 text-pink-700 px-5 py-2.5 rounded-full flex items-center gap-2 shadow-lg border-2 border-pink-300/50 backdrop-blur-sm animate-pulse-slow">
                 <span className="text-lg">🫧</span>
-                <span className="text-sm font-semibold">{likesYouCount} μαμάδες θα ήθελαν να σε γνωρίσουν!</span>
+                <span className="text-sm font-semibold">{likesYouCount} {getText("likes_you_message", "μαμάδες θα ήθελαν να σε γνωρίσουν!")}</span>
                 <span className="text-lg">💕</span>
               </div>
               {/* Decorative bubbles */}
@@ -547,13 +558,11 @@ export default function Discover() {
           </div>
         )}
 
-        {/* Location Info Message - shown after permission denied */}
+        {/* Location Info Message - shown when needed */}
         {locationDenied && (
           <Card className="p-4 bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-primary/30 rounded-2xl shadow-sm mb-4">
             <p className="text-sm text-muted-foreground text-center">
-              {language === "el" 
-                ? "Η περιοχή που έχεις δηλώσει στο προφίλ σου θα χρησιμοποιηθεί για να βρίσκεις μαμάδες κοντά σου."
-                : "The area you declared in your profile will be used to find moms near you."}
+              {getText("location_denied_message", "Η περιοχή που έχεις δηλώσει στο προφίλ σου θα χρησιμοποιηθεί για να βρίσκεις μαμάδες κοντά σου.")}
             </p>
           </Card>
         )}
