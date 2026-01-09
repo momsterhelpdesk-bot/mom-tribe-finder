@@ -75,7 +75,12 @@ export default function AgeMigrationPopup({
   const allChildrenHaveAge = children.every(c => c.ageGroup);
 
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose();
+      }}
+    >
       <DialogContent className="max-w-md max-h-[90vh] p-0 overflow-hidden">
         {/* Close button */}
         <button
@@ -190,15 +195,26 @@ export default function AgeMigrationPopup({
             Προσθήκη Παιδιού
           </Button>
 
-          {/* Save button */}
-          <Button
-            className="w-full mt-4"
-            size="lg"
-            onClick={handleSave}
-            disabled={saving || !allChildrenHaveAge}
-          >
-            {saving ? "Αποθήκευση..." : "👉 Εντάξει, πάμε"}
-          </Button>
+          {/* Actions */}
+          <div className="mt-4 flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={onClose}
+            >
+              ΟΚ, αργότερα
+            </Button>
+
+            <Button
+              className="flex-1"
+              size="lg"
+              onClick={handleSave}
+              disabled={saving || !allChildrenHaveAge}
+            >
+              {saving ? "Αποθήκευση..." : "Αποθήκευση"}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
