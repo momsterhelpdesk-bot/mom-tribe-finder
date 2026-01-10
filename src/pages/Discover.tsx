@@ -20,6 +20,7 @@ import { needsAgeMigration } from "@/lib/childAges";
 import { toast } from "sonner";
 import { useMicrocopy } from "@/hooks/use-microcopy";
 import { MomCardInfo, MomCardMicroText, MomCardBio } from "@/components/MomCard";
+import DiscoverEmptyState from "@/components/DiscoverEmptyState";
 
 // Demo profile for testing UI
 const demoProfile: ProfileMatch = {
@@ -372,38 +373,10 @@ export default function Discover() {
     );
   }
 
-  if (!currentProfile) {
+  // Show empty state when no profiles available OR when user swiped through all
+  if (!currentProfile || showNoMomsPopup) {
     console.log("No currentProfile - showing empty state");
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative flex items-center justify-center">
-        <div className="max-w-md w-full text-center">
-          <h1 className="text-2xl font-bold mb-6 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
-            {getText("discover_title", "Ανακάλυψε Μαμάδες")}
-          </h1>
-          <Card className="p-6 bg-gradient-to-br from-primary/10 via-background to-secondary/20 border-2 border-primary/30">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full max-w-[200px] mx-auto mb-4 rounded-lg"
-            >
-              <source src="/videos/mascot-empty-state.mp4" type="video/mp4" />
-            </video>
-            <h2 className="text-xl font-semibold mb-2 text-foreground">
-              {getText("empty_state_title", "Δεν είσαι μόνη 🤍")}
-            </h2>
-            <p className="text-muted-foreground mb-4">
-              {getText("empty_state_message", "Μερικές μαμάδες είναι εδώ, απλώς όχι αυτή τη στιγμή. Δοκίμασε ξανά λίγο αργότερα 🌸")}
-            </p>
-            <Button onClick={() => navigate("/matching-filters")} size="lg" className="w-full">
-              <Settings className="w-4 h-4 mr-2" />
-              {getText("empty_state_cta", "Χαλάρωσε τα φίλτρα")}
-            </Button>
-          </Card>
-        </div>
-      </div>
-    );
+    return <DiscoverEmptyState />;
   }
 
   // Get location text - profile based, no GPS tracking
@@ -940,17 +913,7 @@ export default function Discover() {
         </div>
       )}
 
-      {/* No More Moms Popup */}
-      <MomsterPopup
-        visible={showNoMomsPopup}
-        title="Τέλος για την ώρα! ✨"
-        subtitle="Έλεγξες όλες τις διαθέσιμες μαμάδες. Έλα ξανά σε λίγο ή δοκίμασε να αλλάξεις τα φίλτρα σου."
-        buttonText="Ρύθμιση Φίλτρων"
-        onButtonClick={() => {
-          setShowNoMomsPopup(false);
-          navigate("/matching-filters");
-        }}
-      />
+      {/* Note: No More Moms state is now handled by DiscoverEmptyState component */}
 
       {/* Daily Mascot Greeting - Once per day */}
       <MomsterPopup
