@@ -593,6 +593,7 @@ export type Database = {
           profile_completed: boolean | null
           profile_photo_url: string | null
           profile_photos_urls: string[] | null
+          required_interests: string[] | null
           selfie_photo_url: string | null
           show_location_filter: boolean | null
           updated_at: string | null
@@ -637,6 +638,7 @@ export type Database = {
           profile_completed?: boolean | null
           profile_photo_url?: string | null
           profile_photos_urls?: string[] | null
+          required_interests?: string[] | null
           selfie_photo_url?: string | null
           show_location_filter?: boolean | null
           updated_at?: string | null
@@ -681,6 +683,7 @@ export type Database = {
           profile_completed?: boolean | null
           profile_photo_url?: string | null
           profile_photos_urls?: string[] | null
+          required_interests?: string[] | null
           selfie_photo_url?: string | null
           show_location_filter?: boolean | null
           updated_at?: string | null
