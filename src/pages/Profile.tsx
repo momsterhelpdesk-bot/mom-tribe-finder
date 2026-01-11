@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Settings, LogOut, Sparkles, ChevronLeft, ChevronRight, MessageCircle, Flag, Bell, Trash2 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Settings, LogOut, Sparkles, ChevronLeft, ChevronRight, MessageCircle, Flag, Bell, Trash2, Pencil, Check, X } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import logo from "@/assets/logo-full.jpg";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +43,9 @@ export default function ProfileNew() {
   const [hasLikedYou, setHasLikedYou] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [editedBio, setEditedBio] = useState("");
+  const [bioError, setBioError] = useState("");
 
   useEffect(() => {
     fetchProfile();
@@ -462,12 +466,111 @@ export default function ProfileNew() {
               </div>
             )}
 
-            {/* Bio */}
-            {profile.bio && (
-              <div className="flex items-start gap-3">
-                <span className="text-lg">✨</span>
-                <p className="text-sm text-foreground/90 leading-relaxed">{profile.bio}</p>
+            {/* Bio - Editable for own profile */}
+            {isOwnProfile ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">✨</span>
+                    <span className="text-sm font-medium text-foreground">Bio</span>
+                  </div>
+                  {!isEditingBio && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 px-2 text-primary hover:text-primary/80"
+                      onClick={() => {
+                        setEditedBio(profile.bio || "");
+                        setIsEditingBio(true);
+                        setBioError("");
+                      }}
+                    >
+                      <Pencil className="w-4 h-4 mr-1" />
+                      Επεξεργασία
+                    </Button>
+                  )}
+                </div>
+                {isEditingBio ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={editedBio}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length <= 180) {
+                          setEditedBio(value);
+                          // Validate for links, emails, phones
+                          const hasLink = /https?:\/\/|www\./i.test(value);
+                          const hasEmail = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/i.test(value);
+                          const hasPhone = /(\+?30)?[\s.-]?\d{3}[\s.-]?\d{3}[\s.-]?\d{4}|\d{10}/i.test(value);
+                          if (hasLink || hasEmail || hasPhone) {
+                            setBioError("❌ Δεν επιτρέπονται links, emails ή τηλέφωνα");
+                          } else {
+                            setBioError("");
+                          }
+                        }
+                      }}
+                      placeholder="Λίγα λόγια για εμένα ως μαμά…"
+                      className="min-h-[100px] rounded-xl border-2 border-[#F3DCE5] focus:border-primary"
+                    />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className={`text-xs ${editedBio.length > 160 ? 'text-orange-500' : 'text-muted-foreground'}`}>
+                          {editedBio.length} / 180
+                        </span>
+                        {bioError && <p className="text-xs text-destructive mt-1">{bioError}</p>}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setIsEditingBio(false);
+                            setEditedBio("");
+                            setBioError("");
+                          }}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          disabled={!!bioError || editedBio.length > 180}
+                          onClick={async () => {
+                            const { error } = await supabase
+                              .from("profiles")
+                              .update({ bio: editedBio })
+                              .eq("id", profile.id);
+                            if (!error) {
+                              setProfile({ ...profile, bio: editedBio });
+                              setIsEditingBio(false);
+                              toast.success("Το bio αποθηκεύτηκε!");
+                            } else {
+                              toast.error("Σφάλμα αποθήκευσης");
+                            }
+                          }}
+                          className="bg-primary hover:bg-primary/90"
+                        >
+                          <Check className="w-4 h-4 mr-1" />
+                          Αποθήκευση
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Tip: πες ηλικία παιδιού & τι ψάχνεις σε παρέα 💗
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-foreground/90 leading-relaxed pl-7">
+                    {profile.bio || <span className="text-muted-foreground italic">Προσθήκη bio...</span>}
+                  </p>
+                )}
               </div>
+            ) : (
+              profile.bio && (
+                <div className="flex items-start gap-3">
+                  <span className="text-lg">✨</span>
+                  <p className="text-sm text-foreground/90 leading-relaxed">{profile.bio}</p>
+                </div>
+              )
             )}
           </div>
         </Card>

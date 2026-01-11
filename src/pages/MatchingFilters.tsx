@@ -25,6 +25,7 @@ export default function MatchingFilters() {
   const [matchInterestsFilter, setMatchInterestsFilter] = useState(false);
   const [interestsThreshold, setInterestsThreshold] = useState(40);
   const [prioritizeLifestyle, setPrioritizeLifestyle] = useState(false);
+  const [requiredInterests, setRequiredInterests] = useState<string[]>([]);
 
   useEffect(() => {
     loadFilters();
@@ -60,6 +61,7 @@ export default function MatchingFilters() {
         setMatchInterestsFilter(data.match_interests_filter || false);
         setInterestsThreshold((data as any).interests_threshold || 40);
         setPrioritizeLifestyle((data as any).prioritize_lifestyle || false);
+        setRequiredInterests((data as any).required_interests || []);
       }
     } catch (error) {
       console.error("Error loading filters:", error);
@@ -84,7 +86,8 @@ export default function MatchingFilters() {
           age_range_months: ageRangeMonths,
           match_interests_filter: matchInterestsFilter,
           interests_threshold: interestsThreshold,
-          prioritize_lifestyle: prioritizeLifestyle
+          prioritize_lifestyle: prioritizeLifestyle,
+          required_interests: requiredInterests
         })
         .eq("id", user.id);
 
@@ -286,7 +289,7 @@ export default function MatchingFilters() {
             </div>
 
             {matchInterestsFilter && (
-              <div className="space-y-3 pt-4 border-t">
+              <div className="space-y-4 pt-4 border-t">
                 <div className="flex items-center justify-between">
                   <Label className="text-sm">{getText("filter_interests_min", "Ελάχιστο ποσοστό κοινών:")}</Label>
                   <span className="text-sm font-semibold text-primary">{interestsThreshold}%</span>
@@ -303,6 +306,55 @@ export default function MatchingFilters() {
                   <span>40%</span>
                   <span>60%</span>
                   <span>80%</span>
+                </div>
+                
+                {/* Specific interests selection */}
+                <div className="pt-3 border-t">
+                  <Label className="text-sm font-medium mb-2 block">
+                    🎯 Θέλω να γνωρίσω μαμάδες με:
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Επίλεξε συγκεκριμένα ενδιαφέροντα που πρέπει να έχει η άλλη μαμά
+                  </p>
+                  <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto p-1">
+                    {INTERESTS.map((interest) => {
+                      const isSelected = requiredInterests.includes(interest.id);
+                      return (
+                        <button
+                          key={interest.id}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setRequiredInterests(requiredInterests.filter(i => i !== interest.id));
+                            } else {
+                              setRequiredInterests([...requiredInterests, interest.id]);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                            isSelected 
+                              ? 'bg-primary text-primary-foreground shadow-md scale-105' 
+                              : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                          }`}
+                        >
+                          {interest.label.el}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {requiredInterests.length > 0 && (
+                    <div className="mt-3 flex items-center justify-between">
+                      <p className="text-xs text-primary font-medium">
+                        ✨ {requiredInterests.length} επιλεγμένα
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setRequiredInterests([])}
+                        className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        Καθαρισμός
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

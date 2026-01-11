@@ -10,6 +10,7 @@ export const INTERESTS = [
   { id: "breastfeeding", label: { el: "🤱 Breastfeeding", en: "🤱 Breastfeeding" } },
   { id: "formula_feeding", label: { el: "🍼 Formula feeding", en: "🍼 Formula feeding" } },
   { id: "co_sleeping", label: { el: "🌙 Co-sleeping", en: "🌙 Co-sleeping" } },
+  { id: "happily_married", label: { el: "💍 Happily Married", en: "💍 Happily Married" } },
 
   // Mom Types & Life Situations
   { id: "twin_mom", label: { el: "👯 Twin Mom / Multiples", en: "👯 Twin Mom / Multiples" } },
