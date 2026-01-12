@@ -55,7 +55,7 @@ export default function Discover() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [showNoMomsPopup, setShowNoMomsPopup] = useState(false);
+  const [reachedEndOfProfiles, setReachedEndOfProfiles] = useState(false);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [showDailyMascot, setShowDailyMascot] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
@@ -282,7 +282,7 @@ export default function Discover() {
     }
     
     if (nextIndex >= allProfiles.length) {
-      setShowNoMomsPopup(true);
+      setReachedEndOfProfiles(true);
     } else {
       setCurrentIndex(nextIndex);
     }
@@ -373,9 +373,9 @@ export default function Discover() {
     );
   }
 
-  // Show empty state when no profiles available OR when user swiped through all
-  if (!currentProfile || showNoMomsPopup) {
-    console.log("No currentProfile - showing empty state");
+  // Show empty state inline when no profiles available OR when user swiped through all
+  if (!currentProfile || reachedEndOfProfiles) {
+    console.log("No currentProfile - showing empty state inline");
     return <DiscoverEmptyState />;
   }
 
