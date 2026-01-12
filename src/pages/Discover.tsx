@@ -23,11 +23,10 @@ import { MomCardInfo, MomCardMicroText, MomCardBio } from "@/components/MomCard"
 import DiscoverEmptyState from "@/components/DiscoverEmptyState";
 
 // Demo/test profile IDs to exclude from the feed
-const TEST_PROFILE_IDS = [
-  'demo-123',
-  'test-',
-  'review-',
-];
+const TEST_PROFILE_IDS = ["demo-123", "test-", "review-"];
+
+const PULL_TO_REFRESH_THRESHOLD_PX = 72;
+const MAX_PULL_PX = 96;
 
 export default function Discover() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -49,7 +48,21 @@ export default function Discover() {
   const [selectedManualDistance, setSelectedManualDistance] = useState<string>("");
   const [likesYouCount, setLikesYouCount] = useState(0);
   const [showAgeMigration, setShowAgeMigration] = useState(false);
-  const [currentChildren, setCurrentChildren] = useState<Array<{ name?: string; ageGroup: string; gender?: 'boy' | 'girl' | 'baby' }>>([]);
+  const [currentChildren, setCurrentChildren] = useState<
+    Array<{ name?: string; ageGroup: string; gender?: "boy" | "girl" | "baby" }>
+  >([]);
+
+  // Pull-to-refresh gesture state
+  const [pullDistance, _setPullDistance] = useState(0);
+  const pullDistanceRef = useRef(0);
+  const setPullDistance = (next: number) => {
+    pullDistanceRef.current = next;
+    _setPullDistance(next);
+  };
+  const pullStartRef = useRef<{ x: number; y: number } | null>(null);
+  const pullingRef = useRef(false);
+  const refreshingRef = useRef(false);
+
   const cardRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { language } = useLanguage();
@@ -224,18 +237,37 @@ export default function Discover() {
   console.log("Discover profiles:", {
     totalFromHook: profiles.length,
     afterFiltering: filteredProfiles.length,
-    currentUserId: currentUserId || 'not set yet'
+    currentUserId: currentUserId || "not set yet",
   });
-  
+
   const currentProfile = filteredProfiles[currentIndex];
+
+  // If new profiles arrive while we're "past the end" (common after refresh/new users), reset index.
+  useEffect(() => {
+    if (filteredProfiles.length > 0 && (reachedEndOfProfiles || currentIndex >= filteredProfiles.length)) {
+      setReachedEndOfProfiles(false);
+      setCurrentIndex(0);
+    }
+  }, [filteredProfiles.length, reachedEndOfProfiles, currentIndex]);
 
   // Pull to refresh handler
   const handlePullToRefresh = async () => {
+    if (refreshingRef.current) return;
+    refreshingRef.current = true;
+
     console.log("Pull to refresh triggered");
     setCurrentIndex(0);
     setReachedEndOfProfiles(false);
-    await reloadProfiles();
-    toast.success("Η λίστα ανανεώθηκε! 🌸");
+
+    try {
+      await reloadProfiles();
+      toast.success("Η λίστα ανανεώθηκε! 🌸");
+    } finally {
+      refreshingRef.current = false;
+      setPullDistance(0);
+      pullingRef.current = false;
+      pullStartRef.current = null;
+    }
   };
 
   const handleSwipe = async (liked: boolean) => {
@@ -347,6 +379,54 @@ export default function Discover() {
 
   const onTouchEnd = () => {
     handleDragEnd();
+  };
+
+  // Pull-to-refresh gesture (capture phase so it can coexist with card swipe)
+  const onPullTouchStartCapture = (e: React.TouchEvent) => {
+    if (refreshingRef.current) return;
+    if (window.scrollY > 0) return;
+
+    const touch = e.touches[0];
+    pullStartRef.current = { x: touch.clientX, y: touch.clientY };
+    pullingRef.current = true;
+    setPullDistance(0);
+  };
+
+  const onPullTouchMoveCapture = (e: React.TouchEvent) => {
+    if (!pullingRef.current || !pullStartRef.current) return;
+    if (refreshingRef.current) return;
+
+    const touch = e.touches[0];
+    const dx = touch.clientX - pullStartRef.current.x;
+    const dy = touch.clientY - pullStartRef.current.y;
+
+    // Only treat as pull-to-refresh when the intention is vertical.
+    if (Math.abs(dx) > Math.abs(dy)) return;
+    if (dy <= 0) {
+      setPullDistance(0);
+      return;
+    }
+
+    const next = Math.min(MAX_PULL_PX, dy);
+    setPullDistance(next);
+
+    // Prevent browser overscroll bounce while pulling.
+    e.preventDefault();
+  };
+
+  const onPullTouchEndCapture = async () => {
+    if (!pullingRef.current) return;
+
+    const shouldRefresh = pullDistanceRef.current >= PULL_TO_REFRESH_THRESHOLD_PX;
+    pullingRef.current = false;
+    pullStartRef.current = null;
+
+    if (shouldRefresh) {
+      await handlePullToRefresh();
+      return;
+    }
+
+    setPullDistance(0);
   };
 
   const getCardStyle = () => {
@@ -503,7 +583,32 @@ export default function Discover() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative">
+    <div
+      className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4 relative"
+      onTouchStartCapture={onPullTouchStartCapture}
+      onTouchMoveCapture={onPullTouchMoveCapture}
+      onTouchEndCapture={onPullTouchEndCapture}
+    >
+      {/* Pull-to-refresh indicator */}
+      <div
+        className="fixed top-0 left-0 right-0 z-20 flex justify-center pointer-events-none"
+        style={{ transform: `translateY(${Math.min(48, pullDistance)}px)` }}
+        aria-hidden="true"
+      >
+        <div className="mt-2 rounded-full bg-background/90 border border-border shadow-sm px-3 py-1.5 flex items-center gap-2">
+          <RefreshCw
+            className={`w-4 h-4 text-muted-foreground ${
+              pullDistance >= PULL_TO_REFRESH_THRESHOLD_PX ? "animate-spin" : ""
+            }`}
+          />
+          <span className="text-xs text-muted-foreground">
+            {pullDistance >= PULL_TO_REFRESH_THRESHOLD_PX
+              ? "Άφησε για ανανέωση"
+              : "Τράβηξε προς τα κάτω"}
+          </span>
+        </div>
+      </div>
+
       {/* Location Permission Dialog */}
       <LocationPermissionDialog
         open={showLocationDialog}
