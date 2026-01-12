@@ -177,16 +177,7 @@ export default function MatchingFilters() {
                   <button
                     type="button"
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                      distancePreferenceKm >= 100 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
-                    }`}
-                    onClick={() => setDistancePreferenceKm(100)}
-                  >
-                    Ίδια πόλη
-                  </button>
-                  <button
-                    type="button"
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                      distancePreferenceKm < 100 && distancePreferenceKm >= 10 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                      distancePreferenceKm === 10 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
                     }`}
                     onClick={() => setDistancePreferenceKm(10)}
                   >
@@ -195,7 +186,16 @@ export default function MatchingFilters() {
                   <button
                     type="button"
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                      distancePreferenceKm >= 500 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                      distancePreferenceKm === 100 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+                    }`}
+                    onClick={() => setDistancePreferenceKm(100)}
+                  >
+                    Ίδια πόλη
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      distancePreferenceKm === 500 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
                     }`}
                     onClick={() => setDistancePreferenceKm(500)}
                   >
