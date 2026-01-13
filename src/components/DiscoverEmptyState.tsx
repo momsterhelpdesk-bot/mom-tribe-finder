@@ -8,20 +8,22 @@ import { Sparkles, Bell, Share2 } from "lucide-react";
 export default function DiscoverEmptyState() {
   const navigate = useNavigate();
 
+  const playStoreUrl = 'https://play.google.com/store/apps/details?id=app.lovable.c58e3403aac24acbb98496e3ec2af7ed';
+
   const handleInviteMom = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'Momster - Βρες τη μαμαδοπαρέα σου',
-          text: 'Γίνε μέλος στο Momster και βρες μαμάδες κοντά σου! 💕',
-          url: window.location.origin,
+          text: 'Κατέβασε το Momster και βρες μαμάδες κοντά σου! 💕',
+          url: playStoreUrl,
         });
       } catch (err) {
         console.log('Share cancelled');
       }
     } else {
       // Fallback: copy to clipboard
-      navigator.clipboard.writeText(window.location.origin);
+      navigator.clipboard.writeText(playStoreUrl);
     }
   };
 
