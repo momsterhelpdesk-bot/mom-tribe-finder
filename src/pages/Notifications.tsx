@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bell, Check } from "lucide-react";
+import { Bell, Check, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -24,6 +24,15 @@ export default function Notifications() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Pull-to-refresh state
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const touchStartY = useRef(0);
+  const PULL_THRESHOLD = 70;
+  const MAX_PULL = 120;
 
   useEffect(() => {
     fetchNotifications();
@@ -128,13 +137,61 @@ export default function Notifications() {
       toast.error("Failed to mark all as read");
     }
   };
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await fetchNotifications();
+    setIsRefreshing(false);
+  }, []);
 
+  // Pull-to-refresh touch handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (containerRef.current?.scrollTop === 0) {
+      touchStartY.current = e.touches[0].clientY;
+      setIsPulling(true);
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling) return;
+    const deltaY = e.touches[0].clientY - touchStartY.current;
+    if (deltaY > 0) {
+      setPullDistance(Math.min(deltaY * 0.5, MAX_PULL));
+    }
+  }, [isPulling]);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (pullDistance >= PULL_THRESHOLD) {
+      await handleRefresh();
+    }
+    setPullDistance(0);
+    setIsPulling(false);
+  }, [pullDistance, handleRefresh]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pt-20 pb-24 px-3">
-      <div className="container max-w-lg mx-auto">
+    <div 
+      ref={containerRef}
+      className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pt-20 pb-24 px-3 overflow-auto"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      <div 
+        className="absolute left-0 right-0 flex items-center justify-center transition-all duration-200 overflow-hidden z-10"
+        style={{ 
+          height: pullDistance, 
+          top: 80,
+          opacity: pullDistance / PULL_THRESHOLD 
+        }}
+      >
+        <RefreshCw className={`w-6 h-6 text-primary ${pullDistance >= PULL_THRESHOLD ? 'animate-spin' : ''}`} />
+        <span className="ml-2 text-sm text-muted-foreground">
+          {pullDistance >= PULL_THRESHOLD ? 'Αφήστε για ανανέωση' : 'Τραβήξτε για ανανέωση'}
+        </span>
+      </div>
+      <div className="container max-w-lg mx-auto" style={{ marginTop: pullDistance }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Bell className="w-6 h-6 text-primary" />
@@ -148,17 +205,28 @@ export default function Notifications() {
             </div>
           </div>
           
-          {unreadCount > 0 && (
+          <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
-              onClick={markAllAsRead}
-              className="gap-1 text-xs h-8"
+              variant="ghost"
+              size="icon"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="h-8 w-8"
             >
-              <Check className="w-3 h-3" />
-              Διαβάστηκαν
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </Button>
-          )}
+            {unreadCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={markAllAsRead}
+                className="gap-1 text-xs h-8"
+              >
+                <Check className="w-3 h-3" />
+                Διαβάστηκαν
+              </Button>
+            )}
+          </div>
         </div>
 
         <ScrollArea className="h-[calc(100vh-160px)]">
