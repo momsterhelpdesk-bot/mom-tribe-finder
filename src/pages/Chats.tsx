@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Flag } from "lucide-react";
+import { MessageCircle, Flag, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
@@ -16,6 +16,15 @@ export default function Chats() {
   const [matches, setMatches] = useState<any[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Pull-to-refresh state
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const touchStartY = useRef(0);
+  const PULL_THRESHOLD = 70;
+  const MAX_PULL = 120;
 
   useEffect(() => {
     loadMatches();
@@ -24,6 +33,36 @@ export default function Chats() {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await loadMatches();
+    setIsRefreshing(false);
+  }, []);
+
+  // Pull-to-refresh touch handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (containerRef.current?.scrollTop === 0) {
+      touchStartY.current = e.touches[0].clientY;
+      setIsPulling(true);
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isPulling) return;
+    const deltaY = e.touches[0].clientY - touchStartY.current;
+    if (deltaY > 0) {
+      setPullDistance(Math.min(deltaY * 0.5, MAX_PULL));
+    }
+  }, [isPulling]);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (pullDistance >= PULL_THRESHOLD) {
+      await handleRefresh();
+    }
+    setPullDistance(0);
+    setIsPulling(false);
+  }, [pullDistance, handleRefresh]);
 
   const loadMatches = async () => {
     setLoading(true);
@@ -117,16 +156,48 @@ export default function Chats() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative">
+    <div 
+      ref={containerRef}
+      className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative overflow-auto"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      <div 
+        className="absolute left-0 right-0 flex items-center justify-center transition-all duration-200 overflow-hidden z-10"
+        style={{ 
+          height: pullDistance, 
+          top: 0,
+          opacity: pullDistance / PULL_THRESHOLD 
+        }}
+      >
+        <RefreshCw className={`w-6 h-6 text-primary ${pullDistance >= PULL_THRESHOLD ? 'animate-spin' : ''}`} />
+        <span className="ml-2 text-sm text-muted-foreground">
+          {pullDistance >= PULL_THRESHOLD ? 'Αφήστε για ανανέωση' : 'Τραβήξτε για ανανέωση'}
+        </span>
+      </div>
+
       <img 
         src={mascot} 
         alt="Momster Mascot" 
         className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none"
       />
-      <div className="max-w-2xl mx-auto pt-20 pb-24 px-4">
-        <h1 className="text-2xl font-bold mb-6 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
-          Συνομιλίες
-        </h1>
+      <div className="max-w-2xl mx-auto pt-20 pb-24 px-4" style={{ marginTop: pullDistance }}>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
+            Συνομιλίες
+          </h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="h-8 w-8"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
 
         {loading ? (
           <div className="text-center py-12">
