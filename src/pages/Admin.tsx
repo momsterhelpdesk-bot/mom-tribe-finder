@@ -24,6 +24,7 @@ import PhotoModeration from "@/components/admin/PhotoModeration";
 import UserRescue from "@/components/admin/UserRescue";
 import MicrocopyManager from "@/components/admin/MicrocopyManager";
 import UserActivityStats from "@/components/admin/UserActivityStats";
+import EmailLogsManager from "@/components/admin/EmailLogsManager";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -305,7 +306,8 @@ export default function Admin() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="logs">Logs</TabsTrigger>
             <TabsTrigger value="activity">📊 Activity</TabsTrigger>
-            <TabsTrigger value="emails">Emails</TabsTrigger>
+            <TabsTrigger value="email-logs">📬 Email Logs</TabsTrigger>
+            <TabsTrigger value="emails">Email Templates</TabsTrigger>
             <TabsTrigger value="recipes">Συνταγές</TabsTrigger>
             <TabsTrigger value="test-accounts">Test Accounts</TabsTrigger>
           </TabsList>
@@ -356,6 +358,10 @@ export default function Admin() {
 
           <TabsContent value="activity">
             <UserActivityStats />
+          </TabsContent>
+
+          <TabsContent value="email-logs">
+            <EmailLogsManager />
           </TabsContent>
 
           <TabsContent value="recipes">

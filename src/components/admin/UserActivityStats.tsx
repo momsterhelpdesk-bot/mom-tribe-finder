@@ -246,11 +246,14 @@ export default function UserActivityStats() {
 
       for (const user of usersToEmail) {
         try {
-          const { error } = await supabase.functions.invoke('send-reengagement-email', {
+          // Use the new send-admin-email function with proper logging
+          const { error } = await supabase.functions.invoke('send-admin-email', {
             body: {
-              userId: user.user_id,
-              email: user.email,
-              fullName: user.full_name,
+              recipientUserId: user.user_id,
+              recipientEmail: user.email,
+              recipientName: user.full_name,
+              reason: 'bulk_reengagement',
+              templateKey: 'inactive_user',
               language: 'el'
             }
           });
