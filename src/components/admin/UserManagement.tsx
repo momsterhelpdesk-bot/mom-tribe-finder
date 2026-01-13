@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { 
   Ban, Search, MapPin, Calendar, Heart, AlertTriangle, ExternalLink, 
   Eye, Edit, Trash2, Save, X, User, Mail, Phone, Baby, Clock, 
-  Filter, Activity, TrendingUp
+  Filter, Activity, TrendingUp, Send
 } from "lucide-react";
 import { formatDistanceToNow, differenceInDays, differenceInHours } from "date-fns";
 import { el } from "date-fns/locale";
@@ -40,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import SendEmailModal from "./SendEmailModal";
 
 interface Profile {
   id: string;
@@ -83,6 +84,8 @@ export default function UserManagement() {
   const [viewingProfile, setViewingProfile] = useState<Profile | null>(null);
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
   const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
+  const [emailProfile, setEmailProfile] = useState<Profile | null>(null);
+  const [emailReason, setEmailReason] = useState<string>("");
   const [saving, setSaving] = useState(false);
   
   // Filters
@@ -332,6 +335,25 @@ export default function UserManagement() {
 
   const hasActiveFilters = searchTerm || filterVerified !== "all" || filterBlocked !== "all" || filterCity !== "all" || filterDateFrom || filterDateTo;
 
+  const getSuggestedEmailReason = (profile: Profile): string => {
+    if (!profile.profile_completed) {
+      return "incomplete_profile";
+    }
+    if (profile.last_activity_at) {
+      const daysSinceActive = differenceInDays(new Date(), new Date(profile.last_activity_at));
+      if (daysSinceActive >= 30) return "inactive_30";
+      if (daysSinceActive >= 14) return "inactive_14";
+      if (daysSinceActive >= 7) return "inactive_7";
+    }
+    return "";
+  };
+
+  const handleOpenEmailModal = (profile: Profile) => {
+    const reason = getSuggestedEmailReason(profile);
+    setEmailReason(reason);
+    setEmailProfile(profile);
+  };
+
   return (
     <div className="space-y-6">
       {/* Search Bar */}
@@ -493,6 +515,14 @@ export default function UserManagement() {
                     onClick={() => setEditingProfile({ ...profile })}
                   >
                     <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleOpenEmailModal(profile)}
+                    title="Στείλε email"
+                  >
+                    <Mail className="w-4 h-4" />
                   </Button>
                   <Button
                     size="sm"
@@ -998,6 +1028,25 @@ export default function UserManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Send Email Modal */}
+      <SendEmailModal
+        open={!!emailProfile}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEmailProfile(null);
+            setEmailReason("");
+          }
+        }}
+        user={emailProfile ? {
+          id: emailProfile.id,
+          full_name: emailProfile.full_name,
+          email: emailProfile.email,
+          profile_completed: emailProfile.profile_completed,
+          last_activity_at: emailProfile.last_activity_at,
+        } : null}
+        suggestedReason={emailReason}
+      />
     </div>
   );
 }

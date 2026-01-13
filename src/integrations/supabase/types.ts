@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_email_logs: {
+        Row: {
+          admin_id: string | null
+          created_at: string
+          custom_body: string | null
+          custom_subject: string | null
+          id: string
+          reason: string
+          recipient_email: string
+          recipient_user_id: string
+          template_key: string | null
+        }
+        Insert: {
+          admin_id?: string | null
+          created_at?: string
+          custom_body?: string | null
+          custom_subject?: string | null
+          id?: string
+          reason: string
+          recipient_email: string
+          recipient_user_id: string
+          template_key?: string | null
+        }
+        Update: {
+          admin_id?: string | null
+          created_at?: string
+          custom_body?: string | null
+          custom_subject?: string | null
+          id?: string
+          reason?: string
+          recipient_email?: string
+          recipient_user_id?: string
+          template_key?: string | null
+        }
+        Relationships: []
+      }
       answer_likes: {
         Row: {
           answer_id: string
