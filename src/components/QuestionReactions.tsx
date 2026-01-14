@@ -104,60 +104,45 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
 
   return (
     <TooltipProvider>
-      <div className="bg-pink-50/70 rounded-xl p-3 space-y-2">
-        {/* Reaction Buttons */}
-        <div className="flex items-center gap-2">
-          {REACTIONS.map((reaction) => {
-            const isActive = userReactions.has(reaction.type);
-            const isAnimating = animating === reaction.type;
-            
-            return (
-              <Tooltip key={reaction.type}>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => handleReaction(reaction.type)}
-                    className={`
-                      relative w-10 h-10 rounded-full flex items-center justify-center text-lg
-                      transition-all duration-200 hover:scale-110
-                      ${isActive 
-                        ? 'bg-pink-200 shadow-md ring-2 ring-pink-300' 
-                        : 'bg-white/80 hover:bg-pink-100 shadow-sm'
-                      }
-                    `}
-                  >
-                    <span className={`transition-transform ${isAnimating ? 'animate-bounce' : ''}`}>
-                      {reaction.emoji}
-                    </span>
-                    {counts[reaction.type] > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-pink-400 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                        {counts[reaction.type] > 9 ? '9+' : counts[reaction.type]}
-                      </span>
-                    )}
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent 
-                  side="top" 
-                  className="bg-white/95 border-pink-200 text-foreground shadow-lg rounded-xl px-3 py-2"
+      <div className="flex items-center gap-1.5">
+        {REACTIONS.map((reaction) => {
+          const isActive = userReactions.has(reaction.type);
+          const isAnimating = animating === reaction.type;
+          const count = counts[reaction.type];
+          
+          return (
+            <Tooltip key={reaction.type}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => handleReaction(reaction.type)}
+                  className={`
+                    flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs
+                    transition-all duration-200 hover:scale-105
+                    ${isActive 
+                      ? 'bg-pink-100 text-pink-600' 
+                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                    }
+                  `}
                 >
-                  <p className="text-sm">{reaction.tooltip}</p>
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
-        </div>
-
-        {/* Counter Text */}
-        {(sameCount > 0 || hugCount > 0) && (
-          <p className="text-xs text-muted-foreground text-center">
-            {sameCount > 0 && (
-              <span>{sameCount} μαμά{sameCount > 1 ? 'δες έχουν' : ' έχει'} περάσει το ίδιο</span>
-            )}
-            {sameCount > 0 && hugCount > 0 && <span> · </span>}
-            {hugCount > 0 && (
-              <span>{hugCount} αγκαλι{hugCount > 1 ? 'ές' : 'ά'}</span>
-            )}
-          </p>
-        )}
+                  <span className={`text-sm ${isAnimating ? 'animate-bounce' : ''}`}>
+                    {reaction.emoji}
+                  </span>
+                  {count > 0 && (
+                    <span className="text-[10px] font-medium">
+                      {count}
+                    </span>
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent 
+                side="top" 
+                className="bg-white/95 border-pink-200 text-foreground shadow-lg rounded-lg px-2 py-1"
+              >
+                <p className="text-xs">{reaction.tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          );
+        })}
       </div>
     </TooltipProvider>
   );

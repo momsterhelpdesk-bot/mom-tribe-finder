@@ -83,21 +83,8 @@ export default function Notifications() {
   };
 
   const markAsRead = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from("notifications")
-        .update({ read: true })
-        .eq("id", id);
-
-      if (error) throw error;
-      
-      setNotifications(notifications.map(n => 
-        n.id === id ? { ...n, read: true } : n
-      ));
-    } catch (error) {
-      console.error("Error marking notification as read:", error);
-      toast.error("Failed to mark as read");
-    }
+    // When marking as read, delete the notification instead
+    await deleteNotification(id);
   };
 
   const deleteNotification = async (id: string) => {
@@ -122,19 +109,20 @@ export default function Notifications() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Delete all unread notifications instead of marking as read
       const { error } = await supabase
         .from("notifications")
-        .update({ read: true })
+        .delete()
         .eq("user_id", user.id)
         .eq("read", false);
 
       if (error) throw error;
       
-      setNotifications(notifications.map(n => ({ ...n, read: true })));
-      toast.success("All notifications marked as read");
+      setNotifications(notifications.filter(n => n.read));
+      toast.success("Οι ειδοποιήσεις διαγράφηκαν");
     } catch (error) {
-      console.error("Error marking all as read:", error);
-      toast.error("Failed to mark all as read");
+      console.error("Error deleting notifications:", error);
+      toast.error("Αποτυχία διαγραφής");
     }
   };
   const handleRefresh = useCallback(async () => {
