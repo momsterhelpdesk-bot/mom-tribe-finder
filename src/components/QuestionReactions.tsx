@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { hapticFeedback } from "@/hooks/use-haptic";
 
 interface ReactionCounts {
   thanks: number;
@@ -93,7 +94,8 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
       setUserReactions(prev => new Set([...prev, reactionType]));
       setCounts(prev => ({ ...prev, [reactionType]: prev[reactionType] + 1 }));
       
-      // Animate
+      // Haptic + animate
+      hapticFeedback.light();
       setAnimating(reactionType);
       setTimeout(() => setAnimating(null), 600);
     }

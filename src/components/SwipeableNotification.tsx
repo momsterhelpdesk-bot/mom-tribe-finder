@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Trash2, Bell, MessageCircle, Heart, Calendar, ShoppingBag } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { el } from "date-fns/locale";
+import { hapticFeedback } from "@/hooks/use-haptic";
 
 interface SwipeableNotificationProps {
   notification: {
@@ -49,6 +50,7 @@ export default function SwipeableNotification({
   const handleTouchEnd = () => {
     setIsDragging(false);
     if (translateX < -60) {
+      hapticFeedback.light();
       triggerDelete();
     } else {
       setTranslateX(0);

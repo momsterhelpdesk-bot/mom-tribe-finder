@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { hapticFeedback } from "@/hooks/use-haptic";
 
 interface MatchedProfile {
   id: string;
@@ -214,60 +215,69 @@ const MagicMatching = () => {
     }
   };
 
-  const sendMessage = async () => {
+  const sendGreeting = async () => {
     if (!matchedProfile) return;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Check if match already exists
-      const { data: existingMatch } = await supabase
-        .from("matches")
-        .select("*")
-        .or(`and(user1_id.eq.${user.id},user2_id.eq.${matchedProfile.id}),and(user1_id.eq.${matchedProfile.id},user2_id.eq.${user.id})`)
-        .maybeSingle();
+      // Create a magic match request instead of direct match
+      const { error } = await supabase
+        .from("magic_match_requests")
+        .insert({
+          from_user_id: user.id,
+          to_user_id: matchedProfile.id,
+          match_score: matchedProfile.matchScore || 90,
+          message: language === 'el' 
+            ? 'Γεια! Μας πρότεινε το Momster γιατί περνάμε παρόμοια 🤍'
+            : 'Hi! Momster suggested us because we have similar experiences 🤍'
+        });
 
-      let matchId = existingMatch?.id;
-
-      if (!existingMatch) {
-        // Create new match
-        const { data: newMatch, error } = await supabase
-          .from("matches")
-          .insert([{
-            user1_id: user.id,
-            user2_id: matchedProfile.id
-          }])
-          .select()
-          .single();
-
-        if (error) throw error;
-        matchId = newMatch.id;
-
-        // Create notification
-        await supabase
-          .from('notifications')
-          .insert({
-            user_id: user.id,
-            type: 'match',
-            title: language === 'el' ? 'Νέο Magic Match! 🎀' : 'New Magic Match! 🎀',
-            message: language === 'el' 
-              ? `Έχεις νέο match με την ${matchedProfile.full_name}!`
-              : `You have a new match with ${matchedProfile.full_name}!`,
-            icon: '🎀',
-            metadata: {
-              match_id: matchedProfile.id,
-              match_name: matchedProfile.full_name
-            }
-          });
+      if (error) {
+        if (error.code === '23505') {
+          // Duplicate - already sent a request
+          toast.info(language === 'el' 
+            ? 'Έχεις ήδη στείλει αίτημα σε αυτή τη μαμά!' 
+            : 'You already sent a request to this mom!');
+          return;
+        }
+        throw error;
       }
 
-      toast.success(`Match με την ${matchedProfile.full_name}! 💕`);
-      navigate(`/chat/${matchId}`);
+      // Create notification for the recipient
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: matchedProfile.id,
+          type: 'magic_match_request',
+          title: language === 'el' ? 'Νέο Magic Match! ✨' : 'New Magic Match! ✨',
+          message: language === 'el' 
+            ? `Μια μαμά θέλει να σε γνωρίσει!`
+            : `A mom wants to connect with you!`,
+          icon: '✨',
+          metadata: {
+            from_user_id: user.id
+          }
+        });
+
+      hapticFeedback.medium();
+      toast.success(language === 'el' 
+        ? `Το "Γεια" σου στάλθηκε! Θα ειδοποιηθείς όταν απαντήσει 💕`
+        : `Your greeting was sent! You'll be notified when they respond 💕`);
+      
+      setMatchedProfile(null);
     } catch (error) {
-      console.error("Error creating match:", error);
-      toast.error(language === "el" ? "Σφάλμα κατά τη δημιουργία match" : "Error creating match");
+      console.error("Error sending greeting:", error);
+      hapticFeedback.error();
+      toast.error(language === "el" ? "Σφάλμα κατά την αποστολή" : "Error sending greeting");
     }
+  };
+
+  const handleSkip = () => {
+    // Silent skip - no notification to the other user
+    setMatchedProfile(null);
+    findMagicMatch();
   };
 
   return (
@@ -353,22 +363,22 @@ const MagicMatching = () => {
 
               <div className="flex gap-2">
                 <Button 
-                  onClick={sendMessage}
+                  onClick={sendGreeting}
                   className="flex-1 rounded-[25px] bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500"
                 >
-                  💌 {language === "el" ? "Στείλε Μήνυμα" : "Send Message"}
+                  👋 {language === "el" ? "Πες γεια" : "Say Hi"}
                 </Button>
                 <Button 
-                  onClick={() => {
-                    setMatchedProfile(null);
-                    findMagicMatch();
-                  }}
+                  onClick={handleSkip}
                   variant="outline"
-                  className="rounded-[25px]"
+                  className="rounded-[25px] text-muted-foreground"
                 >
-                  🔄
+                  {language === "el" ? "Όχι τώρα" : "Not now"}
                 </Button>
               </div>
+              <p className="text-[10px] text-center text-muted-foreground mt-2">
+                💡 {language === "el" ? "Η μαμά θα πρέπει να αποδεχτεί για να ανοίξει chat" : "Mom needs to accept to open chat"}
+              </p>
             </div>
           ) : null}
         </CardContent>

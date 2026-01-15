@@ -3,14 +3,33 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell, Send, Check, AlertCircle, Volume2 } from "lucide-react";
+import { Bell, Send, Check, AlertCircle, Volume2, Vibrate } from "lucide-react";
 import { usePushNotifications, useMatchNotifications } from "@/hooks/use-push-notifications";
+import { useHaptic } from "@/hooks/use-haptic";
 import { toast } from "sonner";
 
 interface NotificationSettingsCardProps {
   profile: any;
   language: string;
   onNotificationChange: (key: string, value: boolean) => void;
+}
+
+// Haptic toggle sub-component
+function HapticToggle({ language }: { language: string }) {
+  const { hapticEnabled, toggleHaptic } = useHaptic();
+  
+  return (
+    <div className="flex items-center justify-between">
+      <Label htmlFor="haptic" className="text-sm font-medium flex items-center gap-2">
+        📳 {language === "el" ? "Δονήσεις (haptic)" : "Vibration (haptic)"}
+      </Label>
+      <Switch
+        id="haptic"
+        checked={hapticEnabled}
+        onCheckedChange={toggleHaptic}
+      />
+    </div>
+  );
 }
 
 export function NotificationSettingsCard({ 
@@ -175,6 +194,8 @@ export function NotificationSettingsCard({
               onCheckedChange={(checked) => onNotificationChange('messages', checked)}
             />
           </div>
+
+          <HapticToggle language={language} />
         </div>
       </div>
     </Card>

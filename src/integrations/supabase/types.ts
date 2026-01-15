@@ -281,6 +281,39 @@ export type Database = {
         }
         Relationships: []
       }
+      magic_match_requests: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          match_score: number | null
+          message: string | null
+          responded_at: string | null
+          status: string
+          to_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          match_score?: number | null
+          message?: string | null
+          responded_at?: string | null
+          status?: string
+          to_user_id: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          match_score?: number | null
+          message?: string | null
+          responded_at?: string | null
+          status?: string
+          to_user_id?: string
+        }
+        Relationships: []
+      }
       marketplace_notifications: {
         Row: {
           created_at: string
@@ -609,6 +642,7 @@ export type Database = {
           email: string
           first_login_date: string | null
           full_name: string
+          haptic_enabled: boolean | null
           has_completed_onboarding: boolean | null
           id: string
           interests: string[] | null
@@ -654,6 +688,7 @@ export type Database = {
           email: string
           first_login_date?: string | null
           full_name: string
+          haptic_enabled?: boolean | null
           has_completed_onboarding?: boolean | null
           id: string
           interests?: string[] | null
@@ -699,6 +734,7 @@ export type Database = {
           email?: string
           first_login_date?: string | null
           full_name?: string
+          haptic_enabled?: boolean | null
           has_completed_onboarding?: boolean | null
           id?: string
           interests?: string[] | null

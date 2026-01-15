@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { el } from "date-fns/locale";
+import { hapticFeedback } from "@/hooks/use-haptic";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -221,10 +222,12 @@ export default function ChatView() {
       });
 
     if (error) {
+      hapticFeedback.error();
       toast.error("Σφάλμα αποστολής μηνύματος");
       return;
     }
 
+    hapticFeedback.light();
     setNewMessage("");
     setShowQuickReplies(false);
   };
