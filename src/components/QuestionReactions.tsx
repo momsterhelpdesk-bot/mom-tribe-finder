@@ -14,9 +14,9 @@ interface QuestionReactionsProps {
 }
 
 const REACTIONS = [
-  { type: 'thanks' as const, emoji: '❤️', tooltip: 'Ευχαριστώ πολύ!' },
-  { type: 'same' as const, emoji: '🙋‍♀️', tooltip: 'Κι εγώ το έχω ζήσει..' },
-  { type: 'hug' as const, emoji: '🫂', tooltip: 'Δεν είσαι μόνη 🤗' },
+  { type: 'thanks' as const, emoji: '❤️', tooltip: 'Ευχαριστώ πολύ!', label: 'Ευχαριστώ' },
+  { type: 'same' as const, emoji: '🙋‍♀️', tooltip: 'Κι εγώ το έχω ζήσει..', label: 'Κι εγώ' },
+  { type: 'hug' as const, emoji: '🫂', tooltip: 'Δεν είσαι μόνη 🤗', label: 'Αγκαλιά' },
 ];
 
 export default function QuestionReactions({ questionId }: QuestionReactionsProps) {
@@ -118,10 +118,10 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
                 <button
                   onClick={() => handleReaction(reaction.type)}
                   className={`
-                    flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-xs
+                    flex items-center gap-1 px-2 py-1 rounded-full text-xs
                     transition-all duration-200 hover:scale-105
                     ${isActive 
-                      ? 'bg-pink-100 text-pink-600' 
+                      ? 'bg-primary/15 text-primary' 
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                     }
                   `}
@@ -129,8 +129,11 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
                   <span className={`text-sm ${isAnimating ? 'animate-bounce' : ''}`}>
                     {reaction.emoji}
                   </span>
+                  <span className="text-[10px] font-medium hidden sm:inline">
+                    {reaction.label}
+                  </span>
                   {count > 0 && (
-                    <span className="text-[10px] font-medium">
+                    <span className={`text-[10px] font-semibold ${isActive ? 'text-primary' : ''}`}>
                       {count}
                     </span>
                   )}

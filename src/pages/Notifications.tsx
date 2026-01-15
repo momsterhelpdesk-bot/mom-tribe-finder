@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import SwipeableNotification from "@/components/SwipeableNotification";
-import { el } from "date-fns/locale";
+import MagicMatchRequests from "@/components/MagicMatchRequests";
 
 interface Notification {
   id: string;
@@ -218,6 +218,9 @@ export default function Notifications() {
         </div>
 
         <ScrollArea className="h-[calc(100vh-160px)]">
+          {/* Magic Match Requests Section */}
+          <MagicMatchRequests />
+          
           <div className="space-y-2">
             {loading ? (
               <Card className="p-6 text-center">
