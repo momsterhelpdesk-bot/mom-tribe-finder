@@ -33,20 +33,26 @@ serve(async (req) => {
 
     if (!currentProfile || !potentialMatches || potentialMatches.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No profiles to match", matches: [] }),
+        JSON.stringify({ 
+          error: "No profiles available", 
+          matches: [],
+          noProfiles: true 
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     // Build the prompt for AI analysis
     const systemPrompt = `You are a friendly matchmaking assistant for a mom community app called Momster. 
-Your job is to analyze mom profiles and find the BEST match based on life stage, mood, and compatibility.
+Your job is to analyze mom profiles and find the BEST available match based on life stage, mood, and compatibility.
 
-IMPORTANT RULES:
+CRITICAL RULES:
+- ALWAYS select a match from the list - never say "no match found"
 - Never mention "AI" or "algorithm" - speak as if you're a caring friend who knows both moms
 - Generate warm, human reasons for the match in ${language === 'el' ? 'Greek' : 'English'}
 - Focus on emotional connection, not technical scores
-- Reasons should feel personal and relatable
+- Even if compatibility seems low, find SOMETHING positive to highlight
+- Scores can range from 60-100: 60-75 = potential connection, 75-85 = good match, 85+ = great match
 
 Reason examples (${language === 'el' ? 'Greek' : 'English'}):
 ${language === 'el' ? `
@@ -54,13 +60,15 @@ ${language === 'el' ? `
 - "Φαίνεται να έχετε παρόμοιο mood τελευταία 🌸"
 - "Είστε και οι δύο online συχνά τις ίδιες ώρες"
 - "Μοιράζεστε την αγάπη για [interest] - τέλεια αφορμή για καφεδάκι!"
-- "Φαίνεται να περνάτε παρόμοια στάδια με τα παιδιά σας"
+- "Είστε στην ίδια γειτονιά - ποτέ δεν ξέρεις!"
+- "Μπορεί να σας εκπλήξει αυτή η γνωριμία 💫"
 ` : `
 - "Your kids are the same age - you'll have so much to share!"
 - "You seem to have a similar mood lately 🌸"
 - "You're both online around the same times"
 - "You share a love for [interest] - perfect excuse for coffee!"
-- "Looks like you're going through similar stages with your kids"
+- "You're in the same neighborhood - you never know!"
+- "This connection might surprise you 💫"
 `}`;
 
     const userPrompt = `Analyze these mom profiles and find the BEST match for the current user.
@@ -112,7 +120,7 @@ Return the TOP match with warm, human reasons for why they'd connect well.`;
                   },
                   matchScore: {
                     type: "number",
-                    description: "Compatibility score from 85-100"
+                    description: "Compatibility score from 60-100. Give higher scores (85+) for great matches, but always find SOMEONE even if score is lower (60-75)."
                   },
                   primaryReason: {
                     type: "string",
@@ -150,17 +158,22 @@ Return the TOP match with warm, human reasons for why they'd connect well.`;
         );
       }
       
-      // Fallback to rule-based matching if AI fails
+      // Fallback to first available match if AI fails
+      const fallbackProfile = potentialMatches[0];
+      const fallbackReason = language === 'el' 
+        ? "Είστε στην ίδια πόλη — ίσως να έχετε περισσότερα κοινά απ' όσο νομίζετε! 🌸"
+        : "You're in the same city — you might have more in common than you think! 🌸";
+      
       return new Response(
         JSON.stringify({ 
-          fallback: true,
-          selectedProfile: potentialMatches[0],
-          matchScore: 90,
-          primaryReason: language === 'el' 
-            ? "Είστε κοντά και φαίνεται να έχετε πολλά κοινά! 🌸"
-            : "You're nearby and seem to have a lot in common! 🌸",
-          secondaryReasons: [],
-          matchType: "nearby_vibes"
+          selectedProfile: fallbackProfile,
+          matchScore: 70,
+          primaryReason: fallbackReason,
+          secondaryReasons: [
+            language === 'el' ? "Μπορεί να σας εκπλήξει!" : "They might surprise you!"
+          ],
+          matchType: "nearby_vibes",
+          fallback: true
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
