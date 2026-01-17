@@ -369,9 +369,23 @@ const MagicMatching = () => {
                     <span>{matchedProfile.area}, {matchedProfile.city}</span>
                   </div>
                   {matchedProfile.matchScore && (
-                    <Badge className="mt-1 bg-gradient-to-r from-purple-400 to-pink-400 text-white border-none">
-                      ✨ {matchedProfile.matchScore}% {language === "el" ? "ταίριασμα" : "match"}
-                      {matchedProfile.matchScore >= 97 && " 🔮"}
+                    <Badge className={`mt-1 text-white border-none ${
+                      matchedProfile.matchScore >= 95 
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
+                        : matchedProfile.matchScore >= 85 
+                          ? 'bg-gradient-to-r from-purple-400 to-pink-400'
+                          : matchedProfile.matchScore >= 75
+                            ? 'bg-gradient-to-r from-pink-300 to-rose-300'
+                            : 'bg-gradient-to-r from-pink-200 to-rose-200 text-foreground'
+                    }`}>
+                      {matchedProfile.matchScore >= 95 
+                        ? `🔮 ${matchedProfile.matchScore}% Super Match!`
+                        : matchedProfile.matchScore >= 85 
+                          ? `✨ ${matchedProfile.matchScore}% ${language === 'el' ? 'Πολύ καλό!' : 'Great!'}`
+                          : matchedProfile.matchScore >= 75
+                            ? `🌸 ${matchedProfile.matchScore}% ${language === 'el' ? 'Καλό ταίριασμα' : 'Good match'}`
+                            : `💫 ${matchedProfile.matchScore}% ${language === 'el' ? 'Αξίζει μια δοκιμή!' : 'Worth a try!'}`
+                      }
                     </Badge>
                   )}
                 </div>
