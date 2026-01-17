@@ -215,18 +215,27 @@ const MagicMatching = () => {
         return;
       }
 
-      if (aiResult?.error || !aiResult?.selectedProfile) {
+      if (aiResult?.noProfiles) {
+        // Truly no profiles in this city
         setShowNoMomsDialog(true);
         return;
       }
 
-      // Set the AI-selected match with warm reasons
+      if (aiResult?.error && !aiResult?.selectedProfile) {
+        // AI error but no fallback - shouldn't happen
+        setShowNoMomsDialog(true);
+        return;
+      }
+
+      // Set the AI-selected match with warm reasons (always finds someone!)
       setMatchedProfile({
         ...aiResult.selectedProfile,
-        matchScore: aiResult.matchScore,
-        primaryReason: aiResult.primaryReason,
+        matchScore: aiResult.matchScore || 70,
+        primaryReason: aiResult.primaryReason || (language === 'el' 
+          ? "Είστε στην ίδια πόλη — αξίζει μια γνωριμία! 🌸"
+          : "You're in the same city — worth meeting! 🌸"),
         secondaryReasons: aiResult.secondaryReasons || [],
-        matchType: aiResult.matchType
+        matchType: aiResult.matchType || 'nearby_vibes'
       } as MatchedProfile);
 
     } catch (error) {
