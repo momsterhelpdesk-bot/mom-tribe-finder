@@ -21,6 +21,10 @@ interface MatchedProfile {
   latitude?: number;
   longitude?: number;
   matchScore?: number;
+  // AI-generated match reasons
+  primaryReason?: string;
+  secondaryReasons?: string[];
+  matchType?: 'same_stage' | 'similar_mood' | 'common_schedule' | 'shared_interests' | 'nearby_vibes';
 }
 
 const MagicMatching = () => {
@@ -186,27 +190,45 @@ const MagicMatching = () => {
         return;
       }
 
-      // Calculate scores for each potential match
-      const scoredMatches = potentialMatches
-        .map((profile: any) => ({
-          ...profile,
-          matchScore: calculateMatchScore(currentProfile, profile)
-        }))
-        .filter((profile: any) => profile.matchScore >= 90) // Only 90%+ matches
-        .sort((a: any, b: any) => b.matchScore - a.matchScore); // Sort by score
+      // Call AI edge function for smart matching
+      const { data: aiResult, error: aiError } = await supabase.functions.invoke('ai-magic-match', {
+        body: {
+          currentProfile,
+          potentialMatches,
+          language
+        }
+      });
 
-      if (scoredMatches.length === 0) {
+      if (aiError) {
+        console.error("AI matching error:", aiError);
+        // Fallback to first match with generic reason
+        const fallbackMatch = potentialMatches[0];
+        setMatchedProfile({
+          ...fallbackMatch,
+          matchScore: 90,
+          primaryReason: language === 'el' 
+            ? "Είστε κοντά και φαίνεται να ταιριάζετε! 🌸"
+            : "You're nearby and seem compatible! 🌸",
+          secondaryReasons: [],
+          matchType: 'nearby_vibes'
+        } as MatchedProfile);
+        return;
+      }
+
+      if (aiResult?.error || !aiResult?.selectedProfile) {
         setShowNoMomsDialog(true);
         return;
       }
 
-      // Pick the best match (or random from top matches)
-      const topMatches = scoredMatches.filter((p: any) => p.matchScore >= 97);
-      const selectedMatch = topMatches.length > 0 
-        ? topMatches[Math.floor(Math.random() * topMatches.length)]
-        : scoredMatches[0];
+      // Set the AI-selected match with warm reasons
+      setMatchedProfile({
+        ...aiResult.selectedProfile,
+        matchScore: aiResult.matchScore,
+        primaryReason: aiResult.primaryReason,
+        secondaryReasons: aiResult.secondaryReasons || [],
+        matchType: aiResult.matchType
+      } as MatchedProfile);
 
-      setMatchedProfile(selectedMatch as MatchedProfile);
     } catch (error) {
       console.error("Error finding match:", error);
       toast.error(language === "el" ? "Σφάλμα κατά την αναζήτηση" : "Error finding match");
@@ -339,12 +361,36 @@ const MagicMatching = () => {
                   </div>
                   {matchedProfile.matchScore && (
                     <Badge className="mt-1 bg-gradient-to-r from-purple-400 to-pink-400 text-white border-none">
-                      ✨ {language === "el" ? "Ταιριάζετε κατά" : "Match"} {matchedProfile.matchScore}%! 
-                      {matchedProfile.matchScore >= 97 && " 🔮 Super Match!"}
+                      ✨ {matchedProfile.matchScore}% {language === "el" ? "ταίριασμα" : "match"}
+                      {matchedProfile.matchScore >= 97 && " 🔮"}
                     </Badge>
                   )}
                 </div>
               </div>
+
+              {/* AI-generated match reason - The magic! */}
+              {matchedProfile.primaryReason && (
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 border border-pink-100">
+                  <p className="text-sm font-medium text-foreground flex items-start gap-2">
+                    <span className="text-lg">💫</span>
+                    <span>
+                      {language === 'el' ? 'Ταιριάξαμε γιατί...' : 'We matched you because...'}
+                    </span>
+                  </p>
+                  <p className="text-base text-foreground mt-2 font-medium">
+                    {matchedProfile.primaryReason}
+                  </p>
+                  {matchedProfile.secondaryReasons && matchedProfile.secondaryReasons.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {matchedProfile.secondaryReasons.map((reason, idx) => (
+                        <p key={idx} className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span>•</span> {reason}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {matchedProfile.interests && matchedProfile.interests.length > 0 && (
                 <div>
