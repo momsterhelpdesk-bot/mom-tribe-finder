@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'el' | 'en';
 
@@ -7,6 +7,8 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
 }
+
+const LANGUAGE_STORAGE_KEY = 'momster_language';
 
 const translations = {
   el: {
@@ -90,7 +92,25 @@ const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('el');
+  const [language, setLanguageState] = useState<Language>(() => {
+    // Check localStorage for saved preference
+    const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (saved === 'el' || saved === 'en') {
+      return saved;
+    }
+    // Check browser language as fallback
+    const browserLang = navigator.language.toLowerCase();
+    if (browserLang.startsWith('el')) {
+      return 'el';
+    }
+    return 'el'; // Default to Greek
+  });
+
+  // Persist language choice
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+  };
 
   const t = (key: string): string => {
     return translations[language][key as keyof typeof translations.el] || key;
