@@ -13,6 +13,8 @@ import logoNew from "@/assets/logo-new.jpg";
 import MomsterMascot from "@/components/MomsterMascot";
 import { useMascot } from "@/hooks/use-mascot";
 import PasswordInput from "@/components/PasswordInput";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Globe } from "lucide-react";
 import { z } from "zod";
 
 const signUpSchema = z.object({
@@ -40,6 +42,7 @@ export default function Auth() {
   const [forgotEmail, setForgotEmail] = useState("");
   const navigate = useNavigate();
   const { mascotConfig, visible, hideMascot, showWelcome } = useMascot();
+  const { language, setLanguage, t } = useLanguage();
   
   const passwordsMatch = password === confirmPassword;
   const canRegister = !isLogin && acceptedTerms && acceptedAge && passwordsMatch && password.length >= 8;
@@ -281,7 +284,22 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
+      {/* Enhanced Language Switcher - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setLanguage(language === 'el' ? 'en' : 'el')}
+          className="gap-2 bg-white/90 backdrop-blur-sm shadow-md border-nav-pink/30 hover:border-nav-pink hover:bg-nav-pink/5 transition-all"
+        >
+          <Globe className="h-4 w-4 text-nav-pink" />
+          <span className="font-medium">
+            {language === 'el' ? '🇬🇷 Ελληνικά' : '🇬🇧 English'}
+          </span>
+        </Button>
+      </div>
+
       <Card className="w-full max-w-md p-8 shadow-lg relative overflow-hidden bg-white/95 backdrop-blur-sm border-nav-pink/20">
         <img 
           src={mascot} 
@@ -303,10 +321,10 @@ export default function Auth() {
         <form onSubmit={isLogin ? handleSignIn : handleSignUp} className="space-y-4">
           {!isLogin && (
             <div className="space-y-2">
-              <Label htmlFor="name">Πλήρες Όνομα</Label>
+              <Label htmlFor="name">{language === 'el' ? 'Πλήρες Όνομα' : 'Full Name'}</Label>
               <Input 
                 id="name" 
-                placeholder="Το όνομά σας" 
+                placeholder={language === 'el' ? 'Το όνομά σας' : 'Your name'}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
@@ -327,7 +345,7 @@ export default function Auth() {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password">Κωδικός</Label>
+            <Label htmlFor="password">{language === 'el' ? 'Κωδικός' : 'Password'}</Label>
             <PasswordInput 
               id="password" 
               placeholder="••••••••" 
@@ -340,7 +358,7 @@ export default function Auth() {
 
           {!isLogin && (
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Επιβεβαίωση Κωδικού</Label>
+              <Label htmlFor="confirmPassword">{language === 'el' ? 'Επιβεβαίωση Κωδικού' : 'Confirm Password'}</Label>
               <PasswordInput 
                 id="confirmPassword" 
                 placeholder="••••••••" 
@@ -349,10 +367,10 @@ export default function Auth() {
                 required
               />
               {confirmPassword.length > 0 && !passwordsMatch && (
-                <p className="text-xs text-destructive">Οι κωδικοί δεν ταιριάζουν</p>
+                <p className="text-xs text-destructive">{language === 'el' ? 'Οι κωδικοί δεν ταιριάζουν' : 'Passwords do not match'}</p>
               )}
               {confirmPassword.length > 0 && passwordsMatch && (
-                <p className="text-xs text-green-600">Οι κωδικοί ταιριάζουν ✓</p>
+                <p className="text-xs text-green-600">{language === 'el' ? 'Οι κωδικοί ταιριάζουν ✓' : 'Passwords match ✓'}</p>
               )}
             </div>
           )}
@@ -360,7 +378,7 @@ export default function Auth() {
           {!isLogin && (
             <div className="space-y-3 py-2">
               <p className="text-sm font-medium text-foreground">
-                Με τη δημιουργία λογαριασμού δηλώνω υπεύθυνα ότι:
+                {language === 'el' ? 'Με τη δημιουργία λογαριασμού δηλώνω υπεύθυνα ότι:' : 'By creating an account I confirm that:'}
               </p>
               
               <div className="flex items-start gap-2">
@@ -371,7 +389,7 @@ export default function Auth() {
                   required
                 />
                 <Label htmlFor="age" className="text-sm leading-tight cursor-pointer">
-                  Είμαι άνω των 18 ετών
+                  {language === 'el' ? 'Είμαι άνω των 18 ετών' : 'I am over 18 years old'}
                 </Label>
               </div>
 
@@ -383,11 +401,23 @@ export default function Auth() {
                   required
                 />
                 <Label htmlFor="terms" className="text-sm leading-tight cursor-pointer">
-                  Έχω διαβάσει και αποδέχομαι τους{" "}
-                  <Link to="/privacy-terms" className="text-nav-pink hover:underline" target="_blank">
-                    Όρους Χρήσης, την Πολιτική Απορρήτου και την Πολιτική Cookies
-                  </Link>
-                  {" "}και συμφωνώ με την επεξεργασία των προσωπικών μου δεδομένων σύμφωνα με το GDPR
+                  {language === 'el' ? (
+                    <>
+                      Έχω διαβάσει και αποδέχομαι τους{" "}
+                      <Link to="/privacy-terms" className="text-nav-pink hover:underline" target="_blank">
+                        Όρους Χρήσης, την Πολιτική Απορρήτου και την Πολιτική Cookies
+                      </Link>
+                      {" "}και συμφωνώ με την επεξεργασία των προσωπικών μου δεδομένων σύμφωνα με το GDPR
+                    </>
+                  ) : (
+                    <>
+                      I have read and accept the{" "}
+                      <Link to="/privacy-terms" className="text-nav-pink hover:underline" target="_blank">
+                        Terms of Use, Privacy Policy and Cookie Policy
+                      </Link>
+                      {" "}and agree to the processing of my personal data in accordance with GDPR
+                    </>
+                  )}
                 </Label>
               </div>
             </div>
@@ -399,7 +429,11 @@ export default function Auth() {
             size="lg" 
             disabled={loading || (!isLogin && !canRegister)}
           >
-            {loading ? "Παρακαλώ περιμένετε..." : (isLogin ? "Σύνδεση" : "Δημιουργία Λογαριασμού")}
+            {loading 
+              ? (language === 'el' ? "Παρακαλώ περιμένετε..." : "Please wait...") 
+              : (isLogin 
+                ? (language === 'el' ? "Σύνδεση" : "Sign In") 
+                : (language === 'el' ? "Δημιουργία Λογαριασμού" : "Create Account"))}
           </Button>
 
           {isLogin && (
@@ -409,26 +443,30 @@ export default function Auth() {
                 onClick={() => setShowForgotPassword(true)}
                 className="text-nav-pink hover:underline"
               >
-                Ξέχασες τον κωδικό;
+                {language === 'el' ? 'Ξέχασες τον κωδικό;' : 'Forgot password?'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForgotUsername(true)}
                 className="text-nav-pink hover:underline"
               >
-                Ξέχασες το email σου;
+                {language === 'el' ? 'Ξέχασες το email σου;' : 'Forgot your email?'}
               </button>
             </div>
           )}
 
           <p className="text-center text-sm text-muted-foreground">
-            {isLogin ? "Δεν έχετε λογαριασμό; " : "Έχετε ήδη λογαριασμό; "}
+            {isLogin 
+              ? (language === 'el' ? "Δεν έχετε λογαριασμό; " : "Don't have an account? ") 
+              : (language === 'el' ? "Έχετε ήδη λογαριασμό; " : "Already have an account? ")}
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
               className="text-nav-pink hover:underline font-medium"
             >
-              {isLogin ? "Εγγραφή" : "Σύνδεση"}
+              {isLogin 
+                ? (language === 'el' ? "Εγγραφή" : "Sign Up") 
+                : (language === 'el' ? "Σύνδεση" : "Sign In")}
             </button>
           </p>
         </form>
