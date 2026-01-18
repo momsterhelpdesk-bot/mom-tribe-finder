@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Send, Flag, Heart, Coffee, Baby, MoreVertical, UserX, Ban } from "lucide-react";
+import { ArrowLeft, Send, Flag, Heart, Coffee, Baby, MoreVertical, UserX, Ban, Check, CheckCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -154,6 +154,23 @@ export default function ChatView() {
           if (payload.new.sender_id !== currentUserId) {
             setIsOtherUserTyping(false);
           }
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "chat_messages",
+          filter: `match_id=eq.${matchId}`
+        },
+        (payload) => {
+          // Update message read status in real-time
+          setMessages((prev) => 
+            prev.map((msg) => 
+              msg.id === payload.new.id ? { ...msg, read_at: payload.new.read_at } : msg
+            )
+          );
         }
       )
       .subscribe();
@@ -462,12 +479,23 @@ export default function ChatView() {
                     </p>
                   )}
                 </Card>
-                <span className="text-xs text-muted-foreground mt-1 px-1">
-                  {formatDistanceToNow(new Date(message.created_at), {
-                    addSuffix: true,
-                    locale: el
-                  })}
-                </span>
+                <div className="flex items-center gap-1 mt-1 px-1">
+                  <span className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(message.created_at), {
+                      addSuffix: true,
+                      locale: el
+                    })}
+                  </span>
+                  {isOwn && (
+                    <span className="flex items-center">
+                      {message.read_at ? (
+                        <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
+                      ) : (
+                        <Check className="w-3.5 h-3.5 text-muted-foreground" />
+                      )}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           );
