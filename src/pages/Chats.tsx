@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Flag, RefreshCw } from "lucide-react";
+import { MessageCircle, Flag, RefreshCw, Mail, MailOpen } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
@@ -83,8 +83,7 @@ export default function Chats() {
       .select("*")
       .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
       .neq("user1_id", ADMIN_PROFILE_ID)
-      .neq("user2_id", ADMIN_PROFILE_ID)
-      .order("last_message_at", { ascending: false, nullsFirst: false });
+      .neq("user2_id", ADMIN_PROFILE_ID);
 
     if (!matchesData) {
       setLoading(false);
@@ -121,12 +120,23 @@ export default function Chats() {
           ...match,
           profile,
           lastMessage: lastMsg,
-          unreadCount: unreadCount || 0
+          unreadCount: unreadCount || 0,
+          // For sorting: use last message time, or match created_at for new matches
+          sortTime: lastMsg?.created_at || match.created_at
         };
       })
     );
 
-    setMatches(enrichedMatches);
+    // Sort by most recent activity (newest first) and unread messages priority
+    const sortedMatches = enrichedMatches.sort((a, b) => {
+      // First priority: unread messages come first
+      if (a.unreadCount > 0 && b.unreadCount === 0) return -1;
+      if (b.unreadCount > 0 && a.unreadCount === 0) return 1;
+      // Second priority: sort by most recent activity
+      return new Date(b.sortTime).getTime() - new Date(a.sortTime).getTime();
+    });
+
+    setMatches(sortedMatches);
     setLoading(false);
   };
 
@@ -205,54 +215,82 @@ export default function Chats() {
           </div>
         ) : (
           <div className="space-y-3">
-            {matches.map((match) => (
-              <Card
-                key={match.id}
-                className="p-4 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => handleChatClick(match.id)}
-              >
-                <div className="flex items-center gap-4">
-                  <Avatar className="w-14 h-14">
-                    <AvatarImage src={match.profile?.profile_photo_url} alt={match.profile?.full_name} />
-                    <AvatarFallback>{match.profile?.full_name?.[0] || "M"}</AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-semibold text-foreground">{match.profile?.full_name}</h3>
-                      <span className="text-xs text-muted-foreground">
-                        {match.lastMessage
-                          ? formatDistanceToNow(new Date(match.lastMessage.created_at), {
-                              addSuffix: true,
-                              locale: el
-                            })
-                          : "Νέο match!"}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {match.lastMessage?.content || "Πες γεια! 👋"}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {match.unreadCount > 0 && (
-                      <Badge className="rounded-full px-2">{match.unreadCount}</Badge>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
+            {matches.map((match) => {
+              const hasUnread = match.unreadCount > 0;
+              return (
+                <Card
+                  key={match.id}
+                  className={`p-4 hover:shadow-md transition-all cursor-pointer ${
+                    hasUnread 
+                      ? 'bg-primary/5 border-primary/20 shadow-sm' 
+                      : ''
+                  }`}
+                  onClick={() => handleChatClick(match.id)}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Clickable avatar to open profile */}
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleReportProfile(match.profile?.full_name);
+                        navigate(`/profile/${match.profile?.id}`);
                       }}
+                      className="relative flex-shrink-0 hover:scale-105 transition-transform"
                     >
-                      <Flag className="h-4 w-4 text-destructive" />
-                    </Button>
+                      <Avatar className="w-14 h-14">
+                        <AvatarImage src={match.profile?.profile_photo_url} alt={match.profile?.full_name} />
+                        <AvatarFallback>{match.profile?.full_name?.[0] || "M"}</AvatarFallback>
+                      </Avatar>
+                    </button>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className={`font-semibold ${hasUnread ? 'text-foreground font-bold' : 'text-foreground'}`}>
+                          {match.profile?.full_name}
+                        </h3>
+                        <span className="text-xs text-muted-foreground">
+                          {match.lastMessage
+                            ? formatDistanceToNow(new Date(match.lastMessage.created_at), {
+                                addSuffix: true,
+                                locale: el
+                              })
+                            : "Νέο match!"}
+                        </span>
+                      </div>
+                      <p className={`text-sm truncate ${hasUnread ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                        {match.lastMessage?.content?.startsWith('[GIF]') 
+                          ? '🎞️ GIF'
+                          : match.lastMessage?.content?.startsWith('[IMG]')
+                            ? '📷 Φωτογραφία'
+                            : match.lastMessage?.content || "Πες γεια! 👋"}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {/* Envelope icon - closed for unread, open for read */}
+                      {hasUnread ? (
+                        <div className="flex items-center gap-1">
+                          <Mail className="h-4 w-4 text-primary" />
+                          <Badge className="rounded-full px-2 bg-primary">{match.unreadCount}</Badge>
+                        </div>
+                      ) : (
+                        <MailOpen className="h-4 w-4 text-muted-foreground/50" />
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleReportProfile(match.profile?.full_name);
+                        }}
+                      >
+                        <Flag className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
 
             {matches.length === 0 && (
               <div className="text-center py-12">
