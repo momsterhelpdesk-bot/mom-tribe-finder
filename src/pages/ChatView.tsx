@@ -442,7 +442,7 @@ export default function ChatView() {
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 space-y-3">
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-40 scroll-pb-40 space-y-3">
         {messages.map((message) => {
           const isOwn = message.sender_id === currentUserId;
           return (

@@ -66,89 +66,103 @@ serve(async (req) => {
         console.log('Mutual match found!');
 
         // Check if match already exists
-        const { data: existingMatch } = await supabaseClient
+        const { data: existingMatch, error: existingMatchError } = await supabaseClient
           .from('matches')
           .select('id')
           .or(`and(user1_id.eq.${fromUserId},user2_id.eq.${toUserId}),and(user1_id.eq.${toUserId},user2_id.eq.${fromUserId})`)
           .maybeSingle();
 
-        if (!existingMatch) {
-          // Create match
-          const { data: newMatch, error: matchError } = await supabaseClient
-            .from('matches')
-            .insert({
-              user1_id: fromUserId,
-              user2_id: toUserId,
-              last_message_at: new Date().toISOString()
-            })
-            .select()
-            .single();
+        if (existingMatchError) {
+          console.error('Error checking existing match:', existingMatchError);
+          throw existingMatchError;
+        }
 
-          if (matchError) {
-            console.error('Error creating match:', matchError);
-            throw matchError;
-          }
-
-          console.log('Match created:', newMatch);
-
-          // Get both users' profiles
-          const { data: fromUserProfile } = await supabaseClient
-            .from('profiles')
-            .select('full_name')
-            .eq('id', fromUserId)
-            .single();
-
-          const { data: toUserProfile } = await supabaseClient
-            .from('profiles')
-            .select('full_name')
-            .eq('id', toUserId)
-            .single();
-
-          // Create notifications for both users
-          const notifications = [
-            {
-              user_id: fromUserId,
-              type: 'match',
-              title: 'Νέο Match! 💕',
-              message: `Έχεις νέο match με την ${toUserProfile?.full_name}!`,
-              icon: '💕',
-              metadata: {
-                match_id: newMatch.id,
-                other_user_id: toUserId,
-                other_user_name: toUserProfile?.full_name
-              }
-            },
-            {
-              user_id: toUserId,
-              type: 'match',
-              title: 'Νέο Match! 💕',
-              message: `Έχεις νέο match με την ${fromUserProfile?.full_name}!`,
-              icon: '💕',
-              metadata: {
-                match_id: newMatch.id,
-                other_user_id: fromUserId,
-                other_user_name: fromUserProfile?.full_name
-              }
-            }
-          ];
-
-          const { error: notificationError } = await supabaseClient
-            .from('notifications')
-            .insert(notifications);
-
-          if (notificationError) {
-            console.error('Error creating notifications:', notificationError);
-          }
-
+        // If a match already exists, still return mutualMatch=true so the UI can react properly.
+        if (existingMatch) {
           return new Response(
-            JSON.stringify({ 
-              mutualMatch: true, 
-              matchId: newMatch.id,
-              otherUserName: toUserProfile?.full_name
+            JSON.stringify({
+              mutualMatch: true,
+              matchId: existingMatch.id,
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
           );
         }
+
+        // Create match
+        const { data: newMatch, error: matchError } = await supabaseClient
+          .from('matches')
+          .insert({
+            user1_id: fromUserId,
+            user2_id: toUserId,
+            last_message_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (matchError) {
+          console.error('Error creating match:', matchError);
+          throw matchError;
+        }
+
+        console.log('Match created:', newMatch);
+
+        // Get both users' profiles
+        const { data: fromUserProfile } = await supabaseClient
+          .from('profiles')
+          .select('full_name')
+          .eq('id', fromUserId)
+          .single();
+
+        const { data: toUserProfile } = await supabaseClient
+          .from('profiles')
+          .select('full_name')
+          .eq('id', toUserId)
+          .single();
+
+        // Create notifications for both users
+        const notifications = [
+          {
+            user_id: fromUserId,
+            type: 'match',
+            title: 'Νέο Match! 💕',
+            message: `Έχεις νέο match με την ${toUserProfile?.full_name}!`,
+            icon: '💕',
+            metadata: {
+              match_id: newMatch.id,
+              other_user_id: toUserId,
+              other_user_name: toUserProfile?.full_name
+            }
+          },
+          {
+            user_id: toUserId,
+            type: 'match',
+            title: 'Νέο Match! 💕',
+            message: `Έχεις νέο match με την ${fromUserProfile?.full_name}!`,
+            icon: '💕',
+            metadata: {
+              match_id: newMatch.id,
+              other_user_id: fromUserId,
+              other_user_name: fromUserProfile?.full_name
+            }
+          }
+        ];
+
+        const { error: notificationError } = await supabaseClient
+          .from('notifications')
+          .insert(notifications);
+
+        if (notificationError) {
+          console.error('Error creating notifications:', notificationError);
+        }
+
+        return new Response(
+          JSON.stringify({
+            mutualMatch: true,
+            matchId: newMatch.id,
+            otherUserName: toUserProfile?.full_name
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        );
       }
     }
 

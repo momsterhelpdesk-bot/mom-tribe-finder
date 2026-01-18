@@ -86,9 +86,10 @@ export function useMatching() {
   };
 
   // Enhanced age calculation supporting new age format
-  const getAverageChildAge = (children: Json): number => {
-    if (!children || !Array.isArray(children) || children.length === 0) return 0;
-    
+  // Returns null when age can't be determined (so we don't accidentally treat "unknown" as "same stage").
+  const getAverageChildAge = (children: Json): number | null => {
+    if (!children || !Array.isArray(children) || children.length === 0) return null;
+
     // Legacy age group mappings for backward compatibility
     const legacyAgeGroupMap: { [key: string]: number } = {
       "0-6 months": 3,
@@ -117,13 +118,13 @@ export function useMatching() {
     const childArray = children as any[];
     const totalMonths = childArray.reduce((sum, child) => {
       const ageGroup = child.ageGroup || child.age;
-      
+
       // First try new format
       const newFormatMonths = getMonthsFromAgeValue(ageGroup);
-      if (newFormatMonths !== 24 || ALL_AGE_OPTIONS.some(opt => opt.value === ageGroup)) {
+      if (newFormatMonths !== 24 || ALL_AGE_OPTIONS.some((opt) => opt.value === ageGroup)) {
         return sum + newFormatMonths;
       }
-      
+
       // Fall back to legacy mapping
       return sum + (legacyAgeGroupMap[ageGroup] || 24);
     }, 0);
@@ -354,6 +355,12 @@ export function useMatching() {
       const currentUserAvgAge = getAverageChildAge(currentProfile.children);
       let profilesWithAgeScore = filteredProfiles.map(profile => {
         const profileAvgAge = getAverageChildAge(profile.children);
+
+        // If we can't determine age for either profile, don't claim "same stage"
+        if (currentUserAvgAge == null || profileAvgAge == null) {
+          return { ...profile, ageMatchScore: undefined, ageDiffMonths: undefined } as any;
+        }
+
         const ageDiff = Math.abs(profileAvgAge - currentUserAvgAge);
         const ageMatchScore = Math.max(0, 100 - ageDiff * 2);
         return { ...profile, ageMatchScore, ageDiffMonths: ageDiff };
@@ -361,8 +368,8 @@ export function useMatching() {
 
       // APPLY AGE FILTER
       if (userFilters.matchAgeFilter) {
-        profilesWithAgeScore = profilesWithAgeScore.filter(profile => 
-          (profile as any).ageDiffMonths <= userFilters.ageRangeMonths
+        profilesWithAgeScore = profilesWithAgeScore.filter(profile =>
+          (profile as any).ageDiffMonths != null && (profile as any).ageDiffMonths <= userFilters.ageRangeMonths
         );
       }
 
