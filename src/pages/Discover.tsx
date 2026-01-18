@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { useMicrocopy } from "@/hooks/use-microcopy";
 import { MomCardInfo, MomCardMicroText, MomCardBio } from "@/components/MomCard";
 import DiscoverEmptyState from "@/components/DiscoverEmptyState";
+import AIMatchReason from "@/components/AIMatchReason";
 
 // Demo/test profile IDs to exclude from the feed
 const TEST_PROFILE_IDS = ["demo-123", "test-", "review-"];
@@ -885,6 +886,9 @@ export default function Discover() {
                   )}
                 </div>
               )}
+
+              {/* AI-Generated Match Reason */}
+              <AIMatchReason profile={currentProfile} currentUser={currentUser} />
 
               {/* Micro-text under card */}
               <MomCardMicroText profile={currentProfile} currentUser={currentUser} />

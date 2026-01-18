@@ -240,9 +240,36 @@ export default function ProfileSetup() {
     });
 
     if (!validation.success) {
-      const firstError = validation.error.errors[0];
-      console.error('Validation error:', validation.error.errors);
-      toast.error(firstError.message);
+      // Build detailed error message showing all issues
+      const errors = validation.error.errors;
+      console.error('Validation errors:', errors);
+      
+      // Map field names to Greek labels
+      const fieldLabels: Record<string, string> = {
+        username: 'Username',
+        city: 'Πόλη',
+        area: 'Περιοχή',
+        bio: 'Bio',
+        children: 'Παιδιά',
+        matchPreference: 'Προτίμηση',
+        interests: 'Ενδιαφέροντα'
+      };
+      
+      // Show first error with field name
+      const firstError = errors[0];
+      const fieldPath = firstError.path.join('.');
+      const fieldLabel = fieldLabels[firstError.path[0] as string] || fieldPath;
+      
+      // Show specific error message
+      toast.error(`❌ ${fieldLabel}: ${firstError.message}`, {
+        duration: 5000,
+        description: errors.length > 1 ? `Και ${errors.length - 1} ακόμα σφάλματα` : undefined
+      });
+      
+      // Log all errors for debugging
+      errors.forEach((err, idx) => {
+        console.log(`Error ${idx + 1}: ${err.path.join('.')} - ${err.message}`);
+      });
       return;
     }
 
@@ -273,7 +300,11 @@ export default function ProfileSetup() {
 
     if (!validation.success) {
       console.error('Validation failed in submitProfile:', validation.error);
-      toast.error("Σφάλμα επικύρωσης δεδομένων");
+      const firstError = validation.error.errors[0];
+      toast.error(`❌ Σφάλμα: ${firstError.message}`, {
+        duration: 5000
+      });
+      setLoading(false);
       return;
     }
 
@@ -397,7 +428,29 @@ export default function ProfileSetup() {
       
     } catch (error: any) {
       console.error('Profile submission error:', error);
-      toast.error(error.message || "Σφάλμα κατά την ενημέρωση του προφίλ");
+      
+      // Provide detailed error message
+      let errorMessage = "Σφάλμα κατά την αποθήκευση του προφίλ";
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Check for specific error types
+      if (error.code === '23505') {
+        errorMessage = "Το username χρησιμοποιείται ήδη. Διάλεξε ένα διαφορετικό.";
+      } else if (error.code === '23503') {
+        errorMessage = "Σφάλμα σύνδεσης με τη βάση δεδομένων. Δοκίμασε ξανά.";
+      } else if (error.message?.includes('upload')) {
+        errorMessage = "Πρόβλημα με το ανέβασμα φωτογραφίας. Δοκίμασε μικρότερη εικόνα.";
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        errorMessage = "Πρόβλημα σύνδεσης. Έλεγξε το internet και δοκίμασε ξανά.";
+      }
+      
+      toast.error(`❌ ${errorMessage}`, {
+        duration: 6000,
+        description: "Αν το πρόβλημα συνεχίζεται, επικοινώνησε μαζί μας."
+      });
       setLoading(false);
     }
     // Note: Don't setLoading(false) on success - keep it until navigation
