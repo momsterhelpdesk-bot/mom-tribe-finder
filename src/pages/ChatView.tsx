@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { el } from "date-fns/locale";
+import MomGifPicker from "@/components/chat/MomGifPicker";
+import SmartReplySuggestions from "@/components/chat/SmartReplySuggestions";
 import { hapticFeedback } from "@/hooks/use-haptic";
 import {
   DropdownMenu,
@@ -423,7 +425,7 @@ export default function ChatView() {
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 space-y-3">
         {messages.map((message) => {
           const isOwn = message.sender_id === currentUserId;
           return (
@@ -447,9 +449,18 @@ export default function ChatView() {
                   }`}
                   style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
                 >
-                  <p className="text-sm text-foreground whitespace-pre-wrap break-words">
-                    {message.content}
-                  </p>
+                  {message.content.startsWith('[GIF]') ? (
+                    <img 
+                      src={message.content.replace('[GIF] ', '')} 
+                      alt="GIF" 
+                      className="max-w-[200px] rounded-lg"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <p className="text-sm text-foreground whitespace-pre-wrap break-words">
+                      {message.content}
+                    </p>
+                  )}
                 </Card>
                 <span className="text-xs text-muted-foreground mt-1 px-1">
                   {formatDistanceToNow(new Date(message.created_at), {
@@ -504,8 +515,19 @@ export default function ChatView() {
         </div>
       )}
 
-      {/* Emoji Bar */}
-      <div className="px-4 py-2 border-t border-border bg-card flex gap-2 overflow-x-auto">
+      {/* Smart Reply Suggestions */}
+      {messages.length > 0 && messages[messages.length - 1]?.sender_id !== currentUserId && (
+        <SmartReplySuggestions
+          lastMessage={messages[messages.length - 1]?.content || ""}
+          senderName={otherUser?.full_name?.split(' ')[0]}
+          onSelect={(reply) => sendMessage(reply)}
+        />
+      )}
+
+      {/* Emoji & GIF Bar */}
+      <div className="px-4 py-2 border-t border-border bg-card flex gap-2 overflow-x-auto items-center">
+        <MomGifPicker onSelect={(gifUrl) => sendMessage(`[GIF] ${gifUrl}`)} />
+        <div className="w-px h-6 bg-border" />
         {EMOJI_SHORTCUTS.map((item, index) => (
           <Button
             key={index}
@@ -520,7 +542,7 @@ export default function ChatView() {
       </div>
 
       {/* Input Area */}
-      <div className="bg-card border-t border-border px-4 py-3 pb-20">
+      <div className="bg-card border-t border-border px-4 py-3 pb-24">
         <div className="flex gap-2">
           <Textarea
             value={newMessage}
