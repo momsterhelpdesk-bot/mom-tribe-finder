@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { hapticFeedback } from "@/hooks/use-haptic";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ReactionCounts {
   thanks: number;
@@ -13,13 +14,30 @@ interface QuestionReactionsProps {
   questionId: string;
 }
 
-const REACTIONS = [
-  { type: 'thanks' as const, emoji: '❤️', tooltip: 'Ευχαριστώ για τη βοήθεια!', label: 'Thanks' },
-  { type: 'same' as const, emoji: '🙋‍♀️', tooltip: 'Κι εγώ το περνάω αυτό!', label: 'Same here' },
-  { type: 'hug' as const, emoji: '🫂', tooltip: 'Σου στέλνω αγκαλιά 🤗', label: 'Virtual hug' },
+const getReactions = (language: 'el' | 'en') => [
+  { 
+    type: 'thanks' as const, 
+    emoji: '❤️', 
+    tooltip: language === 'el' ? 'Ευχαριστώ για τη βοήθεια!' : 'Thanks for the help!', 
+    label: language === 'el' ? 'Ευχαριστώ' : 'Thanks' 
+  },
+  { 
+    type: 'same' as const, 
+    emoji: '🙋‍♀️', 
+    tooltip: language === 'el' ? 'Κι εγώ το περνάω αυτό!' : 'I\'m going through this too!', 
+    label: language === 'el' ? 'Κι εγώ' : 'Same here' 
+  },
+  { 
+    type: 'hug' as const, 
+    emoji: '🫂', 
+    tooltip: language === 'el' ? 'Σου στέλνω αγκαλιά 🤗' : 'Sending you a hug 🤗', 
+    label: language === 'el' ? 'Αγκαλιά' : 'Virtual hug' 
+  },
 ];
 
 export default function QuestionReactions({ questionId }: QuestionReactionsProps) {
+  const { language } = useLanguage();
+  const REACTIONS = getReactions(language);
   const [counts, setCounts] = useState<ReactionCounts>({ thanks: 0, same: 0, hug: 0 });
   const [userReactions, setUserReactions] = useState<Set<string>>(new Set());
   const [animating, setAnimating] = useState<string | null>(null);
