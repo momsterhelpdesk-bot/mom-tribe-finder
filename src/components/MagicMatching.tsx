@@ -166,7 +166,7 @@ const MagicMatching = () => {
         return;
       }
 
-      // Get current user's profile
+      // Get current user's profile with filter preferences
       const { data: currentProfile } = await supabase
         .from("profiles")
         .select("*")
@@ -178,14 +178,114 @@ const MagicMatching = () => {
         return;
       }
 
-      // Get potential matches from profiles_safe (same city)
-      const { data: potentialMatches } = await supabase
+      // Extract user filter preferences
+      const showLocationFilter = currentProfile.show_location_filter || false;
+      const distancePreferenceKm = currentProfile.distance_preference_km || 10;
+      const matchAgeFilter = currentProfile.match_age_filter || false;
+      const ageRangeMonths = currentProfile.age_range_months || 12;
+      const matchInterestsFilter = currentProfile.match_interests_filter || false;
+      const interestsThreshold = (currentProfile as any).interests_threshold || 40;
+      const requiredInterests: string[] = (currentProfile as any).required_interests || [];
+
+      // Get potential matches from profiles_safe - apply location filter
+      let query = supabase
         .from("profiles_safe")
         .select("*")
-        .eq("city", currentProfile.city)
         .neq("id", user.id);
 
-      if (!potentialMatches || potentialMatches.length === 0) {
+      // Apply location filter based on user preferences
+      if (showLocationFilter) {
+        if (distancePreferenceKm >= 500) {
+          // All Greece - no city filter
+        } else if (distancePreferenceKm >= 100) {
+          // Same city
+          query = query.eq("city", currentProfile.city);
+        } else if (distancePreferenceKm >= 20) {
+          // Same city
+          query = query.eq("city", currentProfile.city);
+        } else {
+          // Same area (strict local)
+          query = query.eq("city", currentProfile.city).eq("area", currentProfile.area);
+        }
+      } else {
+        // Default: same city
+        query = query.eq("city", currentProfile.city);
+      }
+
+      const { data: rawMatches } = await query;
+
+      if (!rawMatches || rawMatches.length === 0) {
+        setShowNoMomsDialog(true);
+        return;
+      }
+
+      // Helper function to get average child age in months
+      const getAvgChildAgeMonths = (children: any): number | null => {
+        if (!children || !Array.isArray(children) || children.length === 0) return null;
+        const ageGroupMap: Record<string, number> = {
+          "pregnant": 0, "0-3m": 2, "4-6m": 5, "7-9m": 8, "10-12m": 11,
+          "1y": 12, "2y": 24, "3y": 36, "4y": 48, "5y": 60, "6y": 72, "7y": 84,
+          "8y": 96, "9y": 108, "10y": 120, "11y": 132, "12y": 144, "13y": 156,
+          "14y": 168, "15y": 180, "16y": 192, "17y": 204
+        };
+        const total = children.reduce((sum: number, child: any) => {
+          const age = child.ageGroup || child.age;
+          return sum + (ageGroupMap[age] || 24);
+        }, 0);
+        return Math.round(total / children.length);
+      };
+
+      const currentUserAge = getAvgChildAgeMonths(currentProfile.children);
+      const currentUserInterests: string[] = currentProfile.interests || [];
+
+      // Filter matches based on user preferences
+      let potentialMatches = rawMatches.filter((profile: any) => {
+        // Exclude test/demo profiles
+        const lowerName = (profile.full_name || '').toLowerCase();
+        if (lowerName.includes('test') || lowerName.includes('demo') || lowerName.includes('review')) {
+          return false;
+        }
+
+        // Apply age filter if enabled
+        if (matchAgeFilter && currentUserAge !== null) {
+          const profileAge = getAvgChildAgeMonths(profile.children);
+          if (profileAge !== null) {
+            const ageDiff = Math.abs(profileAge - currentUserAge);
+            if (ageDiff > ageRangeMonths) {
+              return false;
+            }
+          }
+        }
+
+        // Apply interests filter if enabled
+        if (matchInterestsFilter) {
+          const profileInterests: string[] = profile.interests || [];
+          const commonCount = profileInterests.filter((i: string) => currentUserInterests.includes(i)).length;
+          const maxInterests = Math.max(currentUserInterests.length, profileInterests.length, 1);
+          const matchPercent = (commonCount / maxInterests) * 100;
+          if (matchPercent < interestsThreshold) {
+            return false;
+          }
+        }
+
+        // Apply required interests filter
+        if (requiredInterests.length > 0) {
+          const profileInterests: string[] = profile.interests || [];
+          const hasAllRequired = requiredInterests.every((req: string) =>
+            profileInterests.some((pi: string) => 
+              pi.toLowerCase().includes(req.replace('_', ' ').toLowerCase()) ||
+              pi.toLowerCase().includes(req.toLowerCase())
+            )
+          );
+          if (!hasAllRequired) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      if (potentialMatches.length === 0) {
         setShowNoMomsDialog(true);
         return;
       }
