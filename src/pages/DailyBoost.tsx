@@ -15,92 +15,167 @@ import { useNightMode } from "@/hooks/use-night-mode";
 import { supabase } from "@/integrations/supabase/client";
 
 const MOODS = [
-  { emoji: "😊", value: "positive", label: "Happy" },
-  { emoji: "😐", value: "neutral", label: "Neutral" },
-  { emoji: "😔", value: "sad", label: "Sad" },
-  { emoji: "😫", value: "overwhelmed", label: "Overwhelmed" },
-  { emoji: "😴", value: "tired", label: "Tired" },
+  { emoji: "🥰", value: "positive", label: "Happy", color: "from-pink-400 to-rose-400" },
+  { emoji: "😌", value: "neutral", label: "Neutral", color: "from-blue-400 to-indigo-400" },
+  { emoji: "🥺", value: "sad", label: "Sad", color: "from-purple-400 to-violet-400" },
+  { emoji: "🤯", value: "overwhelmed", label: "Overwhelmed", color: "from-orange-400 to-red-400" },
+  { emoji: "😴", value: "tired", label: "Tired", color: "from-indigo-400 to-purple-400" },
+  { emoji: "😤", value: "frustrated", label: "Frustrated", color: "from-red-400 to-pink-400" },
+  { emoji: "🥳", value: "proud", label: "Proud", color: "from-yellow-400 to-orange-400" },
+  { emoji: "😰", value: "anxious", label: "Anxious", color: "from-teal-400 to-cyan-400" },
 ];
 
 const MOOD_QUOTES = {
   positive: {
     en: [
-      "You're glowing today — keep that light moving.",
-      "Small joy counts too — it all adds up.",
-      "Today is a page you're writing beautifully.",
-      "Pause, smile, store the moment.",
-      "Your heart is doing a beautiful job.",
+      "You're glowing today mama — keep that light moving! ✨🌸",
+      "Small joy counts too — it all adds up to something beautiful 💕",
+      "Today is a page you're writing beautifully, one moment at a time 📖💗",
+      "Pause, smile, store the moment — you deserve this happiness! 🦋",
+      "Your heart is doing a beautiful job, even when you don't see it 💖",
+      "This joy? You earned it mama. Soak it in! 🌈💫",
     ],
     el: [
-      "Λάμπεις σήμερα — κράτα το φως σε κίνηση.",
-      "Και η μικρή χαρά μετράει — στο τέλος τα φτιάχνει όλα.",
-      "Σήμερα γράφεις μια όμορφη σελίδα.",
-      "Στάσου, χαμογέλα, φύλαξε τη στιγμή.",
-      "Η καρδιά σου κάνει υπέροχη δουλειά.",
+      "Λάμπεις σήμερα μαμά — κράτα το φως σε κίνηση! ✨🌸",
+      "Και η μικρή χαρά μετράει — στο τέλος τα φτιάχνει όλα 💕",
+      "Σήμερα γράφεις μια όμορφη σελίδα, μια στιγμή τη φορά 📖💗",
+      "Στάσου, χαμογέλα, φύλαξε τη στιγμή — αξίζεις αυτή τη χαρά! 🦋",
+      "Η καρδιά σου κάνει υπέροχη δουλειά, ακόμα κι όταν δεν το βλέπεις 💖",
+      "Αυτή η χαρά; Την κέρδισες μαμά. Απόλαυσέ την! 🌈💫",
     ],
   },
   neutral: {
     en: [
-      "It's okay to feel 'just fine.' Not every day is a highlight.",
-      "One small win changes the whole tone — pick one.",
-      "Gentle progress counts too.",
-      "Your spark is still here — maybe today it whispers.",
-      "Slow is still moving.",
+      "It's okay to feel 'just fine' — not every day needs fireworks 🌿",
+      "One small win changes the whole tone — pick one today! ⭐",
+      "Gentle progress counts too — you're still moving forward 🐢💕",
+      "Your spark is still here — maybe today it whispers 🕊️",
+      "Slow is still moving, and that's more than enough 🌸",
+      "Some days we just exist, and that's perfectly okay 🤍",
     ],
     el: [
-      "Είναι εντάξει να νιώθεις 'απλά καλά'. Δεν είναι όλες οι μέρες κορυφές.",
-      "Ένα μικρό κέρδος αλλάζει όλο τον τόνο — διάλεξε ένα.",
-      "Και η ήπια πρόοδος είναι πρόοδος.",
-      "Η σπίθα σου είναι εδώ — ίσως σήμερα ψιθυρίζει.",
-      "Αργά σημαίνει ακόμα μπροστά.",
+      "Είναι εντάξει να νιώθεις 'απλά καλά' — δεν χρειάζονται πυροτεχνήματα 🌿",
+      "Ένα μικρό κέρδος αλλάζει όλο τον τόνο — διάλεξε ένα! ⭐",
+      "Και η ήπια πρόοδος μετράει — ακόμα προχωράς 🐢💕",
+      "Η σπίθα σου είναι εδώ — ίσως σήμερα ψιθυρίζει 🕊️",
+      "Αργά σημαίνει ακόμα μπροστά, κι αυτό αρκεί 🌸",
+      "Μερικές μέρες απλά υπάρχουμε, κι αυτό είναι τέλεια εντάξει 🤍",
     ],
   },
   sad: {
     en: [
-      "You're not weak — you're carrying so much with love.",
-      "It's safe to feel — not every tear means defeat.",
-      "Some days are heavy — not because you failed, but because you care.",
-      "You don't have to be okay to be worthy.",
-      "Hold on — the soft dawn always returns.",
+      "You're not weak mama — you're carrying so much with love 🫂💜",
+      "It's safe to feel — not every tear means defeat, it means you're human 💧🤍",
+      "Some days are heavy — not because you failed, but because you care so deeply 💗",
+      "You don't have to be okay to be worthy — you ARE worthy 🌷",
+      "Hold on — the soft dawn always returns, I promise 🌅💕",
+      "Even on your hardest days, you're still someone's whole world 🌍💖",
+      "It's okay to not be okay. We see you. We're here 🫶",
     ],
     el: [
-      "Δεν είσαι αδύναμη — κουβαλάς τόσα με αγάπη.",
-      "Είναι ασφαλές να νιώθεις — τα δάκρυα δεν είναι ήττα.",
-      "Μερικές μέρες είναι βαριές — όχι από αποτυχία, αλλά από νοιάξιμο.",
-      "Δεν χρειάζεται να είσαι καλά για να αξίζεις.",
-      "Κράτα λίγο ακόμα — η απαλή αυγή πάντα επιστρέφει.",
+      "Δεν είσαι αδύναμη μαμά — κουβαλάς τόσα με αγάπη 🫂💜",
+      "Είναι ασφαλές να νιώθεις — τα δάκρυα δεν είναι ήττα, σημαίνουν ότι είσαι άνθρωπος 💧🤍",
+      "Μερικές μέρες είναι βαριές — όχι από αποτυχία, αλλά γιατί νοιάζεσαι τόσο βαθιά 💗",
+      "Δεν χρειάζεται να είσαι καλά για να αξίζεις — ΑΞΙΖΕΙΣ 🌷",
+      "Κράτα λίγο ακόμα — η απαλή αυγή πάντα επιστρέφει, το υπόσχομαι 🌅💕",
+      "Ακόμα και στις πιο δύσκολες μέρες σου, είσαι ακόμα ο κόσμος κάποιου 🌍💖",
+      "Είναι εντάξει να μην είσαι εντάξει. Σε βλέπουμε. Είμαστε εδώ 🫶",
     ],
   },
   overwhelmed: {
     en: [
-      "One breath. One pause. One tiny next step.",
-      "You're not 'behind' — you're surviving a heavy chapter.",
-      "You're allowed to simplify — everything doesn't need your 100%.",
-      "Drop one thing — not your peace.",
-      "Your best today might look different — and that's still enough.",
+      "One breath. One pause. One tiny next step — you've got this 🌬️💪",
+      "You're not 'behind' — you're surviving a heavy chapter 📚💜",
+      "You're allowed to simplify — everything doesn't need your 100% 🎯",
+      "Drop one thing today — not your peace 🕊️✨",
+      "Your best today might look different — and that's still enough 💖",
+      "The chaos is temporary. Your strength is permanent 💪🌸",
+      "Even superheroes need rest — and you ARE a superhero 🦸‍♀️💕",
     ],
     el: [
-      "Μία ανάσα. Μία παύση. Ένα μικρό επόμενο βήμα.",
-      "Δεν μένεις πίσω — απλά διαχειρίζεσαι ένα δύσκολο κεφάλαιο.",
-      "Σου επιτρέπεται να απλοποιείς — δεν χρειάζεται να δίνεις πάντα το 100%.",
-      "Άφησε κάτι κάτω — όχι την ηρεμία σου.",
-      "Το καλύτερό σου σήμερα μπορεί να φαίνεται αλλιώς — και αυτό αρκεί.",
+      "Μία ανάσα. Μία παύση. Ένα μικρό επόμενο βήμα — τα καταφέρνεις 🌬️💪",
+      "Δεν μένεις πίσω — απλά διαχειρίζεσαι ένα δύσκολο κεφάλαιο 📚💜",
+      "Σου επιτρέπεται να απλοποιείς — δεν χρειάζεται να δίνεις πάντα το 100% 🎯",
+      "Άφησε κάτι κάτω σήμερα — όχι την ηρεμία σου 🕊️✨",
+      "Το καλύτερό σου σήμερα μπορεί να φαίνεται αλλιώς — κι αυτό αρκεί 💖",
+      "Το χάος είναι προσωρινό. Η δύναμή σου είναι μόνιμη 💪🌸",
+      "Ακόμα και οι υπερήρωες χρειάζονται ξεκούραση — κι ΕΙΣΑΙ υπερήρωας 🦸‍♀️💕",
     ],
   },
   tired: {
     en: [
-      "Rest is productive too — your body is your home.",
-      "Even batteries recharge — you deserve that, too.",
-      "The world can wait — your breath can't.",
-      "Closing your eyes for a moment counts.",
-      "Slow days protect you, not hold you back.",
+      "Rest is productive too — your body is your home 🏠💤",
+      "Even batteries recharge — you deserve that too, mama 🔋💕",
+      "The world can wait — your breath can't 🌬️🤍",
+      "Closing your eyes for a moment counts as self-care 😌✨",
+      "Slow days protect you, not hold you back 🐌💜",
+      "You're tired because you gave your all. That's not weakness, that's love 💖",
+      "Tonight, rest. Tomorrow, rise. You're doing amazing 🌙🌅",
     ],
     el: [
-      "Η ξεκούραση είναι παραγωγική — το σώμα σου είναι το σπίτι σου.",
-      "Ακόμα και οι μπαταρίες φορτίζουν — κι εσύ το ίδιο αξίζεις.",
-      "Ο κόσμος μπορεί να περιμένει — η ανάσα σου όχι.",
-      "Το να κλείσεις τα μάτια για λίγο μετράει.",
-      "Οι αργές μέρες σε προστατεύουν — δεν σε κρατούν πίσω.",
+      "Η ξεκούραση είναι παραγωγική — το σώμα σου είναι το σπίτι σου 🏠💤",
+      "Ακόμα και οι μπαταρίες φορτίζουν — κι εσύ το ίδιο αξίζεις, μαμά 🔋💕",
+      "Ο κόσμος μπορεί να περιμένει — η ανάσα σου όχι 🌬️🤍",
+      "Το να κλείσεις τα μάτια για λίγο μετράει ως αυτοφροντίδα 😌✨",
+      "Οι αργές μέρες σε προστατεύουν — δεν σε κρατούν πίσω 🐌💜",
+      "Είσαι κουρασμένη γιατί έδωσες τα πάντα. Αυτό δεν είναι αδυναμία, είναι αγάπη 💖",
+      "Απόψε ξεκουράσου. Αύριο σηκώσου. Τα πας καταπληκτικά 🌙🌅",
+    ],
+  },
+  frustrated: {
+    en: [
+      "It's okay to feel frustrated — your feelings are valid 😤💜",
+      "This too shall pass — breathe through it, mama 🌬️🔥",
+      "Frustration means you care deeply — that's a superpower 💪✨",
+      "Take a moment. Scream into a pillow if you need to. We get it 🗣️💕",
+      "You're allowed to feel all your feelings — even the messy ones 🎭",
+      "Behind every frustrated mom is a woman who's trying SO hard 💖",
+    ],
+    el: [
+      "Είναι εντάξει να νιώθεις απογοήτευση — τα συναισθήματά σου είναι έγκυρα 😤💜",
+      "Κι αυτό θα περάσει — ανάπνευσε βαθιά, μαμά 🌬️🔥",
+      "Η απογοήτευση σημαίνει ότι νοιάζεσαι βαθιά — αυτό είναι υπερδύναμη 💪✨",
+      "Πάρε μια στιγμή. Φώναξε σ' ένα μαξιλάρι αν χρειαστεί. Σε καταλαβαίνουμε 🗣️💕",
+      "Επιτρέπεται να νιώθεις όλα τα συναισθήματά σου — ακόμα και τα ακατάστατα 🎭",
+      "Πίσω από κάθε απογοητευμένη μαμά κρύβεται μια γυναίκα που προσπαθεί ΤΟΣΟ πολύ 💖",
+    ],
+  },
+  proud: {
+    en: [
+      "YES MAMA! Celebrate yourself — you earned this! 🎉👑",
+      "That proud feeling? Hold onto it tight! You're amazing! ⭐💖",
+      "Look at you go! The world is lucky to have you 🌟🦋",
+      "You did THAT! And nobody can take it from you 💪✨",
+      "This is your moment — own it, queen! 👸💕",
+      "Pride looks beautiful on you, mama! Keep shining! 🌈💫",
+    ],
+    el: [
+      "ΝΑΙΙΙ ΜΑΜΑ! Γιόρτασε τον εαυτό σου — το κέρδισες! 🎉👑",
+      "Αυτό το αίσθημα υπερηφάνειας; Κράτα το σφιχτά! Είσαι υπέροχη! ⭐💖",
+      "Κοίτα εσένα! Ο κόσμος είναι τυχερός που σε έχει 🌟🦋",
+      "Το έκανες! Και κανείς δεν μπορεί να στο πάρει 💪✨",
+      "Αυτή είναι η στιγμή σου — απόλαυσέ την, βασίλισσα! 👸💕",
+      "Η υπερηφάνεια σου στέκει τέλεια, μαμά! Συνέχισε να λάμπεις! 🌈💫",
+    ],
+  },
+  anxious: {
+    en: [
+      "Breathe in... breathe out... you're safe here 🌬️💜",
+      "Anxiety lies — you're doing better than you think 🧠💕",
+      "One moment at a time, one breath at a time 🕊️✨",
+      "You've survived 100% of your hardest days — you'll survive this too 💪",
+      "Ground yourself: 5 things you see, 4 you hear, 3 you touch... 🌿🤍",
+      "Your worries are valid, but they don't define you, mama 🦋💖",
+      "This anxious feeling is temporary — your strength is forever 💜",
+    ],
+    el: [
+      "Εισπνοή... εκπνοή... είσαι ασφαλής εδώ 🌬️💜",
+      "Το άγχος λέει ψέματα — τα πας καλύτερα απ' ό,τι νομίζεις 🧠💕",
+      "Μία στιγμή τη φορά, μία ανάσα τη φορά 🕊️✨",
+      "Έχεις επιβιώσει το 100% των πιο δύσκολων ημερών σου — θα επιβιώσεις κι αυτή 💪",
+      "Γείωσε τον εαυτό σου: 5 πράγματα που βλέπεις, 4 που ακούς, 3 που αγγίζεις... 🌿🤍",
+      "Οι ανησυχίες σου είναι έγκυρες, αλλά δεν σε ορίζουν, μαμά 🦋💖",
+      "Αυτό το αίσθημα άγχους είναι προσωρινό — η δύναμή σου είναι για πάντα 💜",
     ],
   },
 };
@@ -343,49 +418,58 @@ export default function DailyBoost() {
           <SilentHug language={language} />
         </div>
 
-        {/* Quote of the Day - Full width (hide in night mode) */}
+        {/* How Are You Feeling Today? - Enhanced with more empathy (hide in night mode) */}
         {!isNightTime && (
         <div className="max-w-5xl mx-auto">
-          <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
-            <div className="flex items-start gap-4">
-              <div className="text-4xl">💭</div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-purple-700 mb-2">
-                  {language === 'el' ? 'Quote of the Day' : 'Quote of the Day'}
-                </h3>
-                <p className="text-purple-600 italic text-base leading-relaxed">
-                  {dailyQuote}
-                </p>
-              </div>
+          <Card className="p-6 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
+            <div className="text-center mb-4">
+              <h3 className="text-xl font-bold text-orange-700 mb-1">
+                {language === 'el' ? '💭 Πώς νιώθεις σήμερα, μαμά;' : '💭 How are you feeling today, mama?'}
+              </h3>
+              <p className="text-sm text-orange-600/80">
+                {language === 'el' ? 'Πάτα σε ένα emoji και πες μου — είμαι εδώ για σένα 🤍' : 'Tap an emoji and tell me — I\'m here for you 🤍'}
+              </p>
             </div>
-          </Card>
-        </div>
-        )}
-
-        {/* How Are You Feeling Today? - Full width (hide in night mode) */}
-        {!isNightTime && (
-        <div className="max-w-5xl mx-auto">
-          <Card className="p-6 bg-gradient-to-br from-yellow-50 to-orange-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
-            <h3 className="text-xl font-bold text-orange-700 mb-4 text-center">
-              {language === 'el' ? 'Πώς νιώθεις σήμερα;' : 'How are you feeling today?'}
-            </h3>
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
               {MOODS.map((mood) => (
                 <button
                   key={mood.value}
-                  className={`aspect-square rounded-full bg-white/80 hover:bg-white shadow-md hover:shadow-lg transition-all hover:scale-110 flex items-center justify-center text-4xl ${
-                    selectedMood === mood.value ? 'ring-4 ring-orange-400 bg-white' : ''
+                  className={`aspect-square rounded-2xl bg-gradient-to-br ${mood.color} bg-opacity-20 hover:scale-110 shadow-md hover:shadow-xl transition-all flex items-center justify-center text-3xl md:text-4xl ${
+                    selectedMood === mood.value ? 'ring-4 ring-orange-400 scale-110' : 'hover:ring-2 hover:ring-orange-200'
                   }`}
                   onClick={() => handleMoodSelect(mood.value)}
                   title={mood.label}
+                  style={{ background: selectedMood === mood.value ? `linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))` : undefined }}
                 >
-                  {mood.emoji}
+                  <span className={selectedMood === mood.value ? 'animate-bounce' : 'hover:animate-pulse'}>
+                    {mood.emoji}
+                  </span>
                 </button>
               ))}
             </div>
             {selectedMood && moodQuote && (
-              <div className="mt-4 p-4 bg-white/60 rounded-2xl text-center">
-                <p className="text-orange-700 italic">{moodQuote}</p>
+              <div className="mt-5 p-5 bg-white/80 rounded-2xl text-center border border-orange-100 shadow-inner animate-fade-in">
+                <p className="text-orange-700 italic text-lg leading-relaxed font-medium">
+                  "{moodQuote}"
+                </p>
+                <div className="flex justify-center gap-3 mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleNextQuote}
+                    className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                  >
+                    {language === 'el' ? '🔄 Άλλο quote' : '🔄 Another quote'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleShareQuote}
+                    className="text-pink-600 border-pink-200 hover:bg-pink-50"
+                  >
+                    {language === 'el' ? '💕 Μοιράσου' : '💕 Share'}
+                  </Button>
+                </div>
               </div>
             )}
             
@@ -466,6 +550,25 @@ export default function DailyBoost() {
               <p className="text-sm text-blue-600 leading-relaxed">
                 {didYouKnowFact}
               </p>
+            </div>
+          </Card>
+        </div>
+        )}
+
+        {/* Quote of the Day - MOVED BELOW GRID (hide in night mode) */}
+        {!isNightTime && (
+        <div className="max-w-5xl mx-auto">
+          <Card className="p-6 bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
+            <div className="flex items-start gap-4">
+              <div className="text-4xl">💭✨</div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-purple-700 mb-2">
+                  {language === 'el' ? 'Quote of the Day 🌸' : 'Quote of the Day 🌸'}
+                </h3>
+                <p className="text-purple-600 italic text-base leading-relaxed">
+                  "{dailyQuote}"
+                </p>
+              </div>
             </div>
           </Card>
         </div>
