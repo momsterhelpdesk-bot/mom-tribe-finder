@@ -26,6 +26,8 @@ import Notifications from "./pages/Notifications";
 import NotificationSettings from "./pages/NotificationSettings";
 import PrivacyTerms from "./pages/PrivacyTerms";
 import NotFound from "./pages/NotFound";
+import MomMeets from "./pages/MomMeets";
+import MomMeetChat from "./pages/MomMeetChat";
 
 import Onboarding from "./pages/Onboarding";
 import BottomNav from "./components/BottomNav";
@@ -77,6 +79,8 @@ const App = () => (
           <Route path="/profile/:userId" element={<AuthGuard><><Profile /><MomAlerts /><BottomNav /></></AuthGuard>} />
           <Route path="/notification-settings" element={<AuthGuard><NotificationSettings /></AuthGuard>} />
           <Route path="/privacy-terms" element={<PrivacyTerms />} />
+          <Route path="/mom-meets" element={<AuthGuard><><MomMeets /><MomAlerts /><BottomNav /></></AuthGuard>} />
+          <Route path="/mom-meet-chat/:meetId" element={<AuthGuard><MomMeetChat /></AuthGuard>} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -389,6 +389,121 @@ export type Database = {
         }
         Relationships: []
       }
+      mom_meet_chats: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_system_message: boolean
+          mom_meet_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_system_message?: boolean
+          mom_meet_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_system_message?: boolean
+          mom_meet_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mom_meet_chats_mom_meet_id_fkey"
+            columns: ["mom_meet_id"]
+            isOneToOne: false
+            referencedRelation: "mom_meets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mom_meet_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          mom_meet_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          mom_meet_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          mom_meet_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mom_meet_participants_mom_meet_id_fkey"
+            columns: ["mom_meet_id"]
+            isOneToOne: false
+            referencedRelation: "mom_meets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mom_meets: {
+        Row: {
+          area: string
+          city: string
+          created_at: string
+          creator_id: string
+          description: string | null
+          exact_location: string | null
+          id: string
+          max_participants: number
+          meet_date: string
+          meet_time: string
+          meet_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          area: string
+          city: string
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          exact_location?: string | null
+          id?: string
+          max_participants?: number
+          meet_date: string
+          meet_time: string
+          meet_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          city?: string
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          exact_location?: string | null
+          id?: string
+          max_participants?: number
+          meet_date?: string
+          meet_time?: string
+          meet_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
