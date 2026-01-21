@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useHaptic } from "@/hooks/use-haptic";
 import mascotSleepy from "@/assets/mascot-sleepy.png";
-import { Moon, Baby, Sparkles } from "lucide-react";
+import { Moon, Baby, Sparkles, Users, ChefHat, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface OnlineMom {
   id: string;
@@ -46,6 +47,7 @@ export default function NightMode({ language }: NightModeProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
   const { triggerHaptic } = useHaptic();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOnlineMoms();
@@ -253,6 +255,67 @@ export default function NightMode({ language }: NightModeProps) {
           </p>
         )}
       </Card>
+
+      {/* Night Mode Quick Access Cards */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Mom Meets Card */}
+        <Card 
+          className="p-4 bg-gradient-to-br from-[#3D2B3D] to-[#2D1F2D] border-[#4D3B4D] rounded-[16px] cursor-pointer hover:scale-[1.02] transition-all relative overflow-hidden"
+          onClick={() => {
+            triggerHaptic('light');
+            navigate('/mom-meets');
+          }}
+        >
+          <div className="absolute top-2 right-2 opacity-20">
+            <Users className="w-12 h-12 text-pink-300" />
+          </div>
+          <div className="relative z-10 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🤝</span>
+              <h3 className="text-sm font-medium text-white">Mom Meets</h3>
+            </div>
+            <p className="text-[10px] text-gray-400 leading-relaxed">
+              {language === 'el' 
+                ? 'Βρες μαμάδες κοντά σου για καφέ ή βόλτα' 
+                : 'Find moms nearby for coffee or walks'}
+            </p>
+            <div className="flex items-center gap-1 text-[#C8788D] text-xs">
+              <span>{language === 'el' ? 'Δες περισσότερα' : 'See more'}</span>
+              <ArrowRight className="w-3 h-3" />
+            </div>
+          </div>
+        </Card>
+
+        {/* Ταπεράκι Card */}
+        <Card 
+          className="p-4 bg-gradient-to-br from-[#3D3525] to-[#2D2820] border-[#4D4535] rounded-[16px] cursor-pointer hover:scale-[1.02] transition-all relative overflow-hidden"
+          onClick={() => {
+            triggerHaptic('light');
+            navigate('/recipes');
+          }}
+        >
+          <div className="absolute top-2 right-2 opacity-20">
+            <ChefHat className="w-12 h-12 text-amber-300" />
+          </div>
+          <div className="relative z-10 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🍲</span>
+              <h3 className="text-sm font-medium text-white">
+                {language === 'el' ? 'Ταπεράκι' : 'Recipes'}
+              </h3>
+            </div>
+            <p className="text-[10px] text-gray-400 leading-relaxed">
+              {language === 'el' 
+                ? 'Συνταγές για το σχολείο αύριο 🌙' 
+                : 'Recipes for school tomorrow 🌙'}
+            </p>
+            <div className="flex items-center gap-1 text-amber-400 text-xs">
+              <span>{language === 'el' ? 'Δες συνταγές' : 'See recipes'}</span>
+              <ArrowRight className="w-3 h-3" />
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
