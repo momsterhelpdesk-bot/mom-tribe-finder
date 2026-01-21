@@ -7,14 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { format, formatDistanceToNow, differenceInHours, differenceInMinutes, differenceInDays } from "date-fns";
 import { el } from "date-fns/locale";
 import { 
   Plus, MapPin, Calendar, Clock, Users, Baby, Coffee, 
   TreePine, ShoppingBag, Heart, Lock, Info, AlertTriangle,
-  MessageCircle, ArrowLeft, Timer, X, Bell
+  MessageCircle, ArrowLeft, Timer, X, Bell, Trash2
 } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import { useNavigate } from "react-router-dom";
@@ -63,6 +64,7 @@ export default function MomMeets() {
   const [creating, setCreating] = useState(false);
   const [joiningMeetId, setJoiningMeetId] = useState<string | null>(null);
   const [cancellingMeetId, setCancellingMeetId] = useState<string | null>(null);
+  const [cancellingEntireMeetId, setCancellingEntireMeetId] = useState<string | null>(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -272,6 +274,56 @@ export default function MomMeets() {
       toast.error("Σφάλμα κατά την ακύρωση");
     } finally {
       setCancellingMeetId(null);
+    }
+  };
+
+  const handleCancelEntireMeet = async (meetId: string, meetType: string, meetDate: string, meetTime: string) => {
+    if (!currentUserId) return;
+
+    setCancellingEntireMeetId(meetId);
+    try {
+      // Get all participants to notify them
+      const { data: participants } = await supabase
+        .from("mom_meet_participants")
+        .select("user_id")
+        .eq("mom_meet_id", meetId)
+        .eq("status", "confirmed");
+
+      // Update meet status to cancelled
+      const { error: updateError } = await supabase
+        .from("mom_meets")
+        .update({ status: "cancelled" })
+        .eq("id", meetId)
+        .eq("creator_id", currentUserId);
+
+      if (updateError) throw updateError;
+
+      // Send notifications to all participants
+      const typeInfo = getMeetTypeInfo(meetType);
+      const formattedDate = format(new Date(meetDate), "d MMMM", { locale: el });
+      
+      if (participants && participants.length > 0) {
+        const notifications = participants.map(p => ({
+          user_id: p.user_id,
+          type: "mom_meet_cancelled",
+          title: "Ακυρώθηκε Mom Meet",
+          message: `Το ${typeInfo.emoji} ${typeInfo.label} στις ${formattedDate} ακυρώθηκε από τη διοργανώτρια.`,
+          icon: "calendar-x",
+          metadata: { meet_id: meetId },
+        }));
+
+        await supabase
+          .from("notifications")
+          .insert(notifications);
+      }
+
+      toast.success("Το Mom Meet ακυρώθηκε και ειδοποιήθηκαν οι συμμετέχουσες");
+      await loadData();
+    } catch (error) {
+      console.error("Error cancelling meet:", error);
+      toast.error("Σφάλμα κατά την ακύρωση");
+    } finally {
+      setCancellingEntireMeetId(null);
     }
   };
 
@@ -562,20 +614,47 @@ export default function MomMeets() {
                                 <MessageCircle className="w-4 h-4 mr-1" />
                                 Μπες στο chat
                               </Button>
-                              {meet.creator_id !== currentUserId && (
+                              {meet.creator_id !== currentUserId ? (
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
                                   className="text-muted-foreground border-muted"
-                                  onClick={() => handleCancelParticipation(meet.id, meet.creator_id === currentUserId)}
+                                  onClick={() => handleCancelParticipation(meet.id, false)}
                                   disabled={cancellingMeetId === meet.id}
                                 >
-                                  {cancellingMeetId === meet.id ? (
-                                    "..."
-                                  ) : (
-                                    <X className="w-4 h-4" />
-                                  )}
+                                  {cancellingMeetId === meet.id ? "..." : <X className="w-4 h-4" />}
                                 </Button>
+                              ) : (
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Ακύρωση Mom Meet</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Είσαι σίγουρη ότι θέλεις να ακυρώσεις αυτό το Mom Meet; 
+                                        Όλες οι μαμάδες που έχουν δηλώσει συμμετοχή θα ειδοποιηθούν.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Όχι, κράτα το</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        onClick={() => handleCancelEntireMeet(meet.id, meet.meet_type, meet.meet_date, meet.meet_time)}
+                                        disabled={cancellingEntireMeetId === meet.id}
+                                      >
+                                        {cancellingEntireMeetId === meet.id ? "Ακύρωση..." : "Ναι, ακύρωσε"}
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               )}
                             </div>
                           </>
