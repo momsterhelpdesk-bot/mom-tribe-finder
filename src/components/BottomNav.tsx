@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Search, MessageCircle, Users, User, MessageSquare } from "lucide-react";
+import { Search, MessageCircle, ShoppingBag, User, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/hooks/use-notifications";
 import mascot from "@/assets/mascot.jpg";
@@ -12,8 +12,8 @@ export default function BottomNav() {
     { path: "/discover", icon: Search, label: "Find a mom\nfriend" },
     { path: "/chats", icon: MessageCircle, label: "Chat", badge: unreadCount },
     { path: "/daily-boost", label: "Momster Home", isCenter: true, isMascot: true },
-    { path: "/mom-meets", icon: Users, label: "Mom\nMeets" },
     { path: "/ask-moms", icon: MessageSquare, label: "Ρώτα μια\nμαμά" },
+    { path: "/marketplace", icon: ShoppingBag, label: "Market" },
     { path: "/profile", icon: User, label: "Profile" },
   ];
 

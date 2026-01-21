@@ -9,16 +9,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { format, formatDistanceToNow, differenceInHours, differenceInMinutes, differenceInDays } from "date-fns";
 import { el } from "date-fns/locale";
 import { 
   Plus, MapPin, Calendar, Clock, Users, Baby, Coffee, 
   TreePine, ShoppingBag, Heart, Lock, Info, AlertTriangle,
-  MessageCircle
+  MessageCircle, ArrowLeft, Timer
 } from "lucide-react";
 import mascot from "@/assets/mascot.jpg";
 import { useNavigate } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 interface MomMeet {
   id: string;
   creator_id: string;
@@ -61,6 +61,7 @@ export default function MomMeets() {
   const [userArea, setUserArea] = useState<string>("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [joiningMeetId, setJoiningMeetId] = useState<string | null>(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -72,6 +73,26 @@ export default function MomMeets() {
     description: "",
     max_participants: 5,
   });
+
+  // Countdown timer helper
+  const getCountdown = (meetDate: string, meetTime: string) => {
+    const meetDateTime = new Date(`${meetDate}T${meetTime}`);
+    const now = new Date();
+    
+    if (meetDateTime <= now) return null;
+    
+    const days = differenceInDays(meetDateTime, now);
+    const hours = differenceInHours(meetDateTime, now) % 24;
+    const minutes = differenceInMinutes(meetDateTime, now) % 60;
+    
+    if (days > 0) {
+      return `σε ${days} μέρ${days === 1 ? 'α' : 'ες'}`;
+    } else if (hours > 0) {
+      return `σε ${hours} ώρ${hours === 1 ? 'α' : 'ες'}`;
+    } else {
+      return `σε ${minutes} λεπτά`;
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -196,6 +217,7 @@ export default function MomMeets() {
   const handleJoinMeet = async (meetId: string) => {
     if (!currentUserId) return;
 
+    setJoiningMeetId(meetId);
     try {
       const { error } = await supabase
         .from("mom_meet_participants")
@@ -207,14 +229,20 @@ export default function MomMeets() {
       if (error) throw error;
 
       toast.success("Μια ακόμα μαμά πλησιάζει 🤍");
-      loadData();
+      await loadData();
+      // Navigate to chat after joining
+      navigate(`/mom-meet-chat/${meetId}`);
     } catch (error: any) {
       console.error("Error joining meet:", error);
       if (error.code === "23505") {
         toast.error("Έχεις ήδη δηλώσει συμμετοχή");
+        // If already participant, just navigate to chat
+        navigate(`/mom-meet-chat/${meetId}`);
       } else {
         toast.error("Σφάλμα κατά τη συμμετοχή");
       }
+    } finally {
+      setJoiningMeetId(null);
     }
   };
 
@@ -226,14 +254,23 @@ export default function MomMeets() {
   const otherMeets = meets.filter(m => m.area !== userArea && m.city !== userCity);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative pb-32">
       <img 
         src={mascot} 
         alt="Momster Mascot" 
         className="fixed top-24 right-4 w-16 h-16 opacity-15 object-contain pointer-events-none"
       />
       
-      <div className="max-w-2xl mx-auto pt-20 px-4">
+      <div className="max-w-2xl mx-auto pt-6 px-4">
+        {/* Back Button */}
+        <Link 
+          to="/daily-boost" 
+          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm">Πίσω στο Momster Home</span>
+        </Link>
+        
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-foreground mb-2" style={{ fontFamily: "'Pacifico', cursive" }}>
@@ -418,7 +455,9 @@ export default function MomMeets() {
             <div className="space-y-3">
               {myAreaMeets.map((meet) => {
                 const typeInfo = getMeetTypeInfo(meet.meet_type);
-                const isFull = meet.participant_count >= meet.max_participants;
+                const isFull = (meet.participant_count || 0) >= meet.max_participants;
+                const countdown = getCountdown(meet.meet_date, meet.meet_time);
+                const isJoining = joiningMeetId === meet.id;
                 
                 return (
                   <Card key={meet.id} className={`overflow-hidden ${meet.is_participant ? 'ring-2 ring-rose-300' : ''}`}>
@@ -428,16 +467,24 @@ export default function MomMeets() {
                           <span className="text-xl">{typeInfo.emoji}</span>
                           <span className="font-medium">{typeInfo.label}</span>
                         </div>
-                        {meet.is_participant && (
-                          <Badge variant="secondary" className="bg-rose-100 text-rose-600">
-                            Συμμετέχεις
-                          </Badge>
-                        )}
-                        {isFull && !meet.is_participant && (
-                          <Badge variant="secondary" className="bg-gray-100">
-                            Πλήρες
-                          </Badge>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {countdown && (
+                            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                              <Timer className="w-3 h-3 mr-1" />
+                              {countdown}
+                            </Badge>
+                          )}
+                          {meet.is_participant && (
+                            <Badge variant="secondary" className="bg-rose-100 text-rose-600">
+                              Συμμετέχεις
+                            </Badge>
+                          )}
+                          {isFull && !meet.is_participant && (
+                            <Badge variant="secondary" className="bg-gray-100">
+                              Πλήρες
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="pb-3">
@@ -469,13 +516,13 @@ export default function MomMeets() {
                       <div className="mt-3 flex gap-2">
                         {meet.is_participant ? (
                           <Button 
-                            variant="outline" 
+                            variant="default" 
                             size="sm" 
-                            className="flex-1"
+                            className="flex-1 bg-gradient-to-r from-rose-400 to-pink-400"
                             onClick={() => navigate(`/mom-meet-chat/${meet.id}`)}
                           >
                             <MessageCircle className="w-4 h-4 mr-1" />
-                            {CHAT_NAMES[meet.meet_type as keyof typeof CHAT_NAMES] || 'Chat'}
+                            Μπες στο chat
                           </Button>
                         ) : isFull ? (
                           <Button 
@@ -494,9 +541,16 @@ export default function MomMeets() {
                             size="sm" 
                             className="flex-1 bg-gradient-to-r from-rose-400 to-pink-400"
                             onClick={() => handleJoinMeet(meet.id)}
+                            disabled={isJoining}
                           >
-                            <Heart className="w-4 h-4 mr-1" />
-                            Θέλω να έρθω
+                            {isJoining ? (
+                              <>Συμμετοχή...</>
+                            ) : (
+                              <>
+                                <Heart className="w-4 h-4 mr-1" />
+                                Θέλω να έρθω
+                              </>
+                            )}
                           </Button>
                         )}
                       </div>
@@ -536,36 +590,41 @@ export default function MomMeets() {
         </div>
 
         {/* Section 2: Momster-hosted Mom Meets (Coming Soon) */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-lg">2️⃣</span>
-            <h2 className="text-lg font-semibold">Mom Meets by Momster</h2>
-            <Badge variant="secondary" className="ml-2 text-xs">coming soon</Badge>
-          </div>
+        <Card className="mb-8 bg-gradient-to-br from-purple-100 via-indigo-50 to-blue-50 border-purple-200 shadow-lg overflow-hidden">
+          <CardContent className="pt-6 pb-6">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-2xl">✨</span>
+              <h2 className="text-xl font-bold text-purple-800">Momster Official Mom Meets</h2>
+            </div>
+            
+            <div className="text-center mb-4">
+              <Badge className="bg-purple-600 text-white text-sm px-4 py-1 animate-pulse">
+                🚀 Coming Soon
+              </Badge>
+            </div>
 
-          <div className="space-y-2 opacity-60">
-            {[
-              { emoji: '🧸', label: 'Επίσημη Momster stroller walk' },
-              { emoji: '🍷', label: 'Μόνο μαμάδες — wine & chat' },
-              { emoji: '📚', label: 'Ιστορίες & αγκαλιές' },
-              { emoji: '🛝', label: 'Momster Playday' },
-            ].map((item, idx) => (
-              <Card key={idx} className="bg-gray-50/50">
-                <CardContent className="py-3 flex items-center justify-between">
+            <div className="space-y-2 opacity-80">
+              {[
+                { emoji: '🧸', label: 'Επίσημη Momster stroller walk' },
+                { emoji: '🍷', label: 'Μόνο μαμάδες — wine & chat' },
+                { emoji: '📚', label: 'Ιστορίες & αγκαλιές' },
+                { emoji: '🛝', label: 'Momster Playday' },
+              ].map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <span>{item.emoji}</span>
-                    <span className="text-sm text-muted-foreground">{item.label}</span>
+                    <span className="text-lg">{item.emoji}</span>
+                    <span className="text-sm text-purple-700 font-medium">{item.label}</span>
                   </div>
-                  <Lock className="w-4 h-4 text-gray-300" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          
-          <p className="text-center text-sm text-muted-foreground mt-4 italic">
-            Σύντομα το χωριό θα οργανώνει και μόνο του 🤍
-          </p>
-        </div>
+                  <Lock className="w-4 h-4 text-purple-300" />
+                </div>
+              ))}
+            </div>
+            
+            <p className="text-center text-sm text-purple-600 mt-4 italic font-medium">
+              Σύντομα το χωριό θα οργανώνει και μόνο του 🤍
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Village Value */}
         <Card className="mb-6 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/50">
@@ -618,10 +677,12 @@ export default function MomMeets() {
       </div>
 
       {/* Footer */}
-      <footer className="fixed bottom-20 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
-        <div className="max-w-2xl mx-auto flex items-center justify-center gap-2">
-          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
-          <span className="text-sm text-muted-foreground">Μικρές συναντήσεις. Χωρίς πίεση. Με κατανόηση.</span>
+      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-background/95 backdrop-blur-md border-t border-border z-40">
+        <div className="max-w-2xl mx-auto flex items-center justify-center gap-3">
+          <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain flex-shrink-0" />
+          <span className="text-sm text-muted-foreground text-center leading-snug">
+            Μικρές συναντήσεις.<br className="sm:hidden" /> Χωρίς πίεση. Με κατανόηση.
+          </span>
         </div>
       </footer>
     </div>
