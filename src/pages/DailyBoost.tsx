@@ -407,12 +407,9 @@ export default function DailyBoost() {
         {/* 2x2 Grid Layout with generous spacing (hide in night mode) */}
         {!isNightTime && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* Magic Matching - FIRST */}
-          <MagicMatching />
-
-          {/* Mom Meets Banner */}
+          {/* Mom Meets Banner - FIRST */}
           <Link to="/mom-meets">
-            <Card className="p-6 bg-gradient-to-br from-pink-100 to-rose-100 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all cursor-pointer group rounded-[30px]">
+            <Card className="p-6 bg-gradient-to-br from-pink-100 to-rose-100 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all cursor-pointer group rounded-[30px] h-full">
               <div className="relative space-y-3">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-6 h-6 text-rose-700 group-hover:scale-110 transition-transform" />
@@ -435,22 +432,7 @@ export default function DailyBoost() {
             </Card>
           </Link>
 
-          {/* Did You Know Section */}
-          <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
-            <div className="relative space-y-3">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="w-6 h-6 text-blue-700" />
-                <h2 className="text-xl font-bold text-blue-700">
-                  {language === 'el' ? 'Ήξερες ότι;' : 'Did You Know?'}
-                </h2>
-              </div>
-              <p className="text-sm text-blue-600 leading-relaxed">
-                {didYouKnowFact}
-              </p>
-            </div>
-          </Card>
-
-          {/* Momster Ταπεράκι */}
+          {/* Momster Ταπεράκι - SECOND */}
           <Link to="/recipes">
             <Card className="p-6 bg-gradient-to-br from-pink-50 to-rose-50 border-[#F3DCE5] hover:shadow-xl transition-all cursor-pointer group rounded-[30px] h-full">
               <div className="space-y-3">
@@ -468,6 +450,24 @@ export default function DailyBoost() {
               </div>
             </Card>
           </Link>
+
+          {/* Magic Matching - THIRD */}
+          <MagicMatching />
+
+          {/* Did You Know Section - FOURTH */}
+          <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
+            <div className="relative space-y-3">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-6 h-6 text-blue-700" />
+                <h2 className="text-xl font-bold text-blue-700">
+                  {language === 'el' ? 'Ήξερες ότι;' : 'Did You Know?'}
+                </h2>
+              </div>
+              <p className="text-sm text-blue-600 leading-relaxed">
+                {didYouKnowFact}
+              </p>
+            </div>
+          </Card>
         </div>
         )}
 
