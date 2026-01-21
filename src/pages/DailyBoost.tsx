@@ -250,6 +250,7 @@ export default function DailyBoost() {
   const [currentMoodQuoteIndex, setCurrentMoodQuoteIndex] = useState(0);
   const { mascotConfig, visible, showMascot, hideMascot } = useMascot();
   const [showHearts, setShowHearts] = useState(false);
+  const [showProudConfetti, setShowProudConfetti] = useState(false);
   const { isNightTime } = useNightMode();
   const [profile, setProfile] = useState<any>(null);
 
@@ -311,16 +312,20 @@ export default function DailyBoost() {
     setCurrentMoodQuoteIndex(randomIndex);
     setMoodQuote(randomQuote);
     
-    setShowHearts(true);
+    // Special celebration for "proud" mood
+    if (moodValue === 'proud') {
+      setShowProudConfetti(true);
+      setTimeout(() => setShowProudConfetti(false), 4000);
+    } else {
+      setShowHearts(true);
+      setTimeout(() => setShowHearts(false), 3000);
+    }
+    
     showMascot({
       state: "happy",
       message: randomQuote,
       duration: 3000,
     });
-    
-    setTimeout(() => {
-      setShowHearts(false);
-    }, 3000);
   };
 
   const handleNextQuote = () => {
@@ -389,6 +394,36 @@ export default function DailyBoost() {
               💕
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Proud mood celebration confetti */}
+      {showProudConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+          {[...Array(40)].map((_, i) => {
+            const emojis = ['🎉', '🌟', '⭐', '✨', '👑', '🎊', '💪', '🔥', '💖', '🦋'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const randomLeft = Math.random() * 100;
+            const randomDelay = Math.random() * 2;
+            const randomDuration = 3 + Math.random() * 2;
+            const randomSize = 16 + Math.random() * 24;
+            
+            return (
+              <div
+                key={i}
+                className="absolute"
+                style={{
+                  left: `${randomLeft}%`,
+                  top: '-50px',
+                  fontSize: `${randomSize}px`,
+                  animation: `confetti-fall ${randomDuration}s ease-out forwards`,
+                  animationDelay: `${randomDelay}s`,
+                }}
+              >
+                {randomEmoji}
+              </div>
+            );
+          })}
         </div>
       )}
       
@@ -491,24 +526,28 @@ export default function DailyBoost() {
         {/* 2x2 Grid Layout with generous spacing (hide in night mode) */}
         {!isNightTime && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* Mom Meets Banner - FIRST */}
+          {/* Mom Meets Banner - FIRST - ENHANCED */}
           <Link to="/mom-meets">
-            <Card className="p-6 bg-gradient-to-br from-pink-100 to-rose-100 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all cursor-pointer group rounded-[30px] h-full">
-              <div className="relative space-y-3">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-6 h-6 text-rose-700 group-hover:scale-110 transition-transform" />
-                  <h2 className="text-xl font-bold text-rose-700">
+            <Card className="p-8 bg-gradient-to-br from-rose-200 via-pink-200 to-rose-300 border-2 border-rose-300 overflow-hidden relative hover:shadow-2xl hover:scale-[1.02] transition-all cursor-pointer group rounded-[30px] h-full shadow-lg">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/15 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+              <div className="relative space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/40 rounded-xl">
+                    <Calendar className="w-7 h-7 text-rose-700 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-rose-800">
                     🏡 Mom Meets
                   </h2>
                 </div>
-                <p className="text-sm text-rose-600 font-medium">
+                <p className="text-base text-rose-700 font-semibold">
                   The village in action 🤍
                 </p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <span className="text-xs bg-rose-200/60 text-rose-700 px-2 py-1 rounded-full">
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <span className="text-sm bg-white/50 text-rose-800 px-3 py-1.5 rounded-full font-medium shadow-sm">
                     👩‍👦 Community Meets
                   </span>
-                  <span className="text-xs bg-purple-200/60 text-purple-700 px-2 py-1 rounded-full">
+                  <span className="text-sm bg-purple-200/70 text-purple-800 px-3 py-1.5 rounded-full font-medium shadow-sm">
                     ✨ Official Meets
                   </span>
                 </div>
@@ -516,20 +555,24 @@ export default function DailyBoost() {
             </Card>
           </Link>
 
-          {/* Momster Ταπεράκι - SECOND */}
+          {/* Momster Ταπεράκι - SECOND - ENHANCED */}
           <Link to="/recipes">
-            <Card className="p-6 bg-gradient-to-br from-pink-50 to-rose-50 border-[#F3DCE5] hover:shadow-xl transition-all cursor-pointer group rounded-[30px] h-full">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <ChefHat className="w-6 h-6 text-rose-700 group-hover:scale-110 transition-transform" />
-                  <h2 className="text-xl font-bold text-rose-700">
+            <Card className="p-8 bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 border-2 border-amber-200 hover:shadow-2xl hover:scale-[1.02] transition-all cursor-pointer group rounded-[30px] h-full shadow-lg overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white/25 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+              <div className="absolute bottom-0 left-0 w-14 h-14 bg-white/20 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+              <div className="relative space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/50 rounded-xl">
+                    <ChefHat className="w-7 h-7 text-amber-700 group-hover:scale-110 transition-transform" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-amber-800">
                     🧀 Momster Ταπεράκι
                   </h2>
                 </div>
-                <p className="text-sm text-rose-600">
+                <p className="text-base text-amber-700 font-medium">
                   {language === 'el' 
-                    ? 'Υγιεινές συνταγές για μικρά χεράκια' 
-                    : 'Healthy recipes for little hands'}
+                    ? 'Υγιεινές συνταγές για μικρά χεράκια 🍎' 
+                    : 'Healthy recipes for little hands 🍎'}
                 </p>
               </div>
             </Card>
