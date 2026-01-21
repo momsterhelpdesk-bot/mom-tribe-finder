@@ -420,12 +420,17 @@ export default function DailyBoost() {
                     🏡 Mom Meets
                   </h2>
                 </div>
-                <p className="text-sm text-rose-600">
-                  {language === 'el' 
-                    ? 'Το χωριό συναντιέται — The village in action 🤍' 
-                    : 'The village in action 🤍'}
+                <p className="text-sm text-rose-600 font-medium">
+                  The village in action 🤍
                 </p>
-                <div className="text-3xl text-center py-2">🫂</div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <span className="text-xs bg-rose-200/60 text-rose-700 px-2 py-1 rounded-full">
+                    👩‍👦 Community Meets
+                  </span>
+                  <span className="text-xs bg-purple-200/60 text-purple-700 px-2 py-1 rounded-full">
+                    ✨ Official Meets
+                  </span>
+                </div>
               </div>
             </Card>
           </Link>
