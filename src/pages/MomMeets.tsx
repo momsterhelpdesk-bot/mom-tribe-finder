@@ -726,7 +726,8 @@ export default function MomMeets() {
         {/* Section 2: Momster-hosted Mom Meets (Coming Soon) */}
         <Card className="mb-8 bg-gradient-to-br from-purple-100 via-indigo-50 to-blue-50 border-purple-200 shadow-lg overflow-hidden">
           <CardContent className="pt-6 pb-6">
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-lg">2️⃣</span>
               <span className="text-2xl">✨</span>
               <h2 className="text-xl font-bold text-purple-800">Momster Official Mom Meets</h2>
             </div>
