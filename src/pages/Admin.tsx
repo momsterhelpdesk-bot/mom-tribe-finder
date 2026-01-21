@@ -13,7 +13,7 @@ import { CheckCircle, XCircle, AlertCircle, ArrowLeft } from "lucide-react";
 import AdminOverview from "@/components/admin/AdminOverview";
 import ForumModeration from "@/components/admin/ForumModeration";
 import UserManagement from "@/components/admin/UserManagement";
-import EventsManagement from "@/components/admin/EventsManagement";
+import MomMeetsManagement from "@/components/admin/MomMeetsManagement";
 import ContentManagement from "@/components/admin/ContentManagement";
 import AppSettings from "@/components/admin/AppSettings";
 import SystemLogs from "@/components/admin/SystemLogs";
@@ -301,7 +301,7 @@ export default function Admin() {
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="mom-meets">Mom Meets</TabsTrigger>
             <TabsTrigger value="content">Content</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="logs">Logs</TabsTrigger>
@@ -340,8 +340,8 @@ export default function Admin() {
             <NotificationsPanel />
           </TabsContent>
 
-          <TabsContent value="events">
-            <EventsManagement />
+          <TabsContent value="mom-meets">
+            <MomMeetsManagement />
           </TabsContent>
 
           <TabsContent value="content">

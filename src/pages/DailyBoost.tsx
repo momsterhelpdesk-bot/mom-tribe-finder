@@ -410,26 +410,25 @@ export default function DailyBoost() {
           {/* Magic Matching - FIRST */}
           <MagicMatching />
 
-          {/* Events Banner */}
-          <Card className="p-6 bg-gradient-to-br from-pink-100 to-rose-100 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
-            <div className="absolute top-3 right-3 bg-rose-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
-              ⭐ Coming Soon
-            </div>
-            <div className="relative space-y-3">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-6 h-6 text-rose-700" />
-                <h2 className="text-xl font-bold text-rose-700">
-                  {language === 'el' ? 'Events' : 'Events'}
-                </h2>
+          {/* Mom Meets Banner */}
+          <Link to="/mom-meets">
+            <Card className="p-6 bg-gradient-to-br from-pink-100 to-rose-100 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all cursor-pointer group rounded-[30px]">
+              <div className="relative space-y-3">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-6 h-6 text-rose-700 group-hover:scale-110 transition-transform" />
+                  <h2 className="text-xl font-bold text-rose-700">
+                    🏡 Mom Meets
+                  </h2>
+                </div>
+                <p className="text-sm text-rose-600">
+                  {language === 'el' 
+                    ? 'Το χωριό συναντιέται — The village in action 🤍' 
+                    : 'The village in action 🤍'}
+                </p>
+                <div className="text-3xl text-center py-2">🫂</div>
               </div>
-              <p className="text-sm text-rose-600">
-                {language === 'el' 
-                  ? 'Βρες τα καλύτερα events για μαμάδες' 
-                  : 'Find the best events for moms'}
-              </p>
-              <div className="text-3xl text-center py-2">🎉</div>
-            </div>
-          </Card>
+            </Card>
+          </Link>
 
           {/* Did You Know Section */}
           <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border-[#F3DCE5] overflow-hidden relative hover:shadow-xl transition-all rounded-[30px]">
