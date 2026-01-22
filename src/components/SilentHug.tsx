@@ -171,10 +171,10 @@ export default function SilentHug({ language }: SilentHugProps) {
       const notifications = selectedUsers.map(user => ({
         user_id: user.user_id,
         type: 'silent_hug',
-        title: language === 'el' ? '🫂 Αγκαλιά' : '🫂 Hug',
+        title: language === 'el' ? '🫂 Σιωπηλή Αγκαλιά' : '🫂 Silent Hug',
         message: language === 'el' 
-          ? 'Μια μαμά χρειάζεται αγκαλιά αυτή τη στιγμή 🫂' 
-          : 'A mom needs a hug right now 🫂',
+          ? 'Μια μαμά χρειάζεται μια αγκαλιά αυτή τη στιγμή. Στείλε της λίγη ζεστασιά 🤍' 
+          : 'A mom needs a hug right now. Send her some warmth 🤍',
         icon: '🫂',
         metadata: {
           hug_request_id: activeUsers ? undefined : undefined, // Keep it anonymous - no ID exposed
