@@ -197,7 +197,7 @@ export default function MomMeets() {
 
       if (error) throw error;
 
-      toast.success("Μια μαμά άναψε φως στο χωριό 💡");
+      toast.success("Μια νέα συνάντηση ξεκινάει 💡");
       setShowCreateDialog(false);
       setFormData({
         area: userArea,
@@ -222,6 +222,15 @@ export default function MomMeets() {
 
     setJoiningMeetId(meetId);
     try {
+      // Get user's name for system message
+      const { data: userProfile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", currentUserId)
+        .single();
+      
+      const firstName = userProfile?.full_name?.split(' ')[0] || 'Μια μαμά';
+
       const { error } = await supabase
         .from("mom_meet_participants")
         .insert({
@@ -231,7 +240,17 @@ export default function MomMeets() {
 
       if (error) throw error;
 
-      toast.success("Μια ακόμα μαμά πλησιάζει 🤍");
+      // Add system message to chat
+      await supabase
+        .from("mom_meet_chats")
+        .insert({
+          mom_meet_id: meetId,
+          sender_id: currentUserId,
+          content: `🎉 Η ${firstName} μπήκε στην παρέα!`,
+          is_system_message: true,
+        });
+
+      toast.success("Μπήκες στην παρέα! 🤍");
       await loadData();
       // Navigate to chat after joining
       navigate(`/mom-meet-chat/${meetId}`);
@@ -259,6 +278,15 @@ export default function MomMeets() {
 
     setCancellingMeetId(meetId);
     try {
+      // Get user's name for system message
+      const { data: userProfile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", currentUserId)
+        .single();
+      
+      const firstName = userProfile?.full_name?.split(' ')[0] || 'Μια μαμά';
+
       const { error } = await supabase
         .from("mom_meet_participants")
         .delete()
@@ -266,6 +294,16 @@ export default function MomMeets() {
         .eq("user_id", currentUserId);
 
       if (error) throw error;
+
+      // Add system message to chat
+      await supabase
+        .from("mom_meet_chats")
+        .insert({
+          mom_meet_id: meetId,
+          sender_id: currentUserId,
+          content: `💫 Η ${firstName} δεν θα μπορέσει τελικά`,
+          is_system_message: true,
+        });
 
       toast.success("Η συμμετοχή σου ακυρώθηκε");
       await loadData();
@@ -364,8 +402,8 @@ export default function MomMeets() {
         <Card className="mb-6 bg-gradient-to-br from-rose-50 to-pink-50 border-rose-200/50">
           <CardContent className="pt-4 pb-4">
             <p className="text-sm text-center text-muted-foreground italic">
-              Το Momster δεν είναι feed. Είναι χωριό.<br />
-              Και εδώ το χωριό συναντιέται.
+              Το Momster δεν είναι feed. Είναι κοινότητα.<br />
+              Και εδώ συναντιόμαστε. Μαζί, απλά.
             </p>
           </CardContent>
         </Card>
@@ -525,9 +563,9 @@ export default function MomMeets() {
             <Card className="bg-white/50">
               <CardContent className="py-8 text-center">
                 <p className="text-muted-foreground">
-                  Σήμερα το χωριό είναι ήσυχο εδώ.<br />
+                  Δεν υπάρχουν ακόμα συναντήσεις εδώ.<br />
                   <span className="text-rose-500 font-medium">
-                    👉 Γίνε η πρώτη μαμά που οργανώνει κάτι εδώ 💗
+                    👉 Γίνε η πρώτη μαμά που οργανώνει κάτι! 💗
                   </span>
                 </p>
               </CardContent>
@@ -800,11 +838,11 @@ export default function MomMeets() {
               Φτιάχτηκε για αληθινές.<br />
               Για μαμάδες που θέλουν παρέα χωρίς πίεση.<br />
               Για μικρές συναντήσεις που ξεκινούν αυθόρμητα.<br />
-              Για ένα χωριό που χτίζεται σιγά — από μαμά σε μαμά.
+              Για μια κοινότητα που χτίζεται σιγά — από μαμά σε μαμά.
             </p>
             <p className="font-medium text-rose-600 mt-3">
               Αυτό είναι το Mom Meets.<br />
-              The village in action 🤍
+              Together, moms thrive 🤍
             </p>
           </CardContent>
         </Card>
