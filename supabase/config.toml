@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.chat-smart-reply]
 verify_jwt = false
+
+[functions.mom-meet-reminders]
+verify_jwt = false
