@@ -755,7 +755,7 @@ export default function MomMeets() {
             </div>
             
             <p className="text-center text-sm text-purple-600 mt-4 italic font-medium">
-              Σύντομα το χωριό θα οργανώνει και μόνο του 🤍
+              Σύντομα θα υπάρχουν και οργανωμένες συναντήσεις από το Momster 🤍
             </p>
           </CardContent>
         </Card>
@@ -764,7 +764,7 @@ export default function MomMeets() {
         <Card className="mb-6 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200/50">
           <CardContent className="py-4 text-center">
             <p className="text-sm italic text-amber-800">
-              "Το χωριό συναντιέται, σιγά και αληθινά."
+              "Mom Meets. Μαζί, απλά."
             </p>
           </CardContent>
         </Card>
