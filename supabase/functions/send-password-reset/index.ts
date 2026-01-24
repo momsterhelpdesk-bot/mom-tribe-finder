@@ -48,17 +48,17 @@ const handler = async (req: Request): Promise<Response> => {
       : `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #FFF5F7;">
           <h1 style="color: #FF69B4; text-align: center;">Momster 🌸</h1>
-          <p>Hello mom! 💕</p>
+          <p>Hey mama 🤍</p>
           <p>We received a request to reset your Momster password.</p>
-          <p>If this was you, click the button below to set a new password:</p>
+          <p>Don't worry — it happens to the best of us 😉</p>
+          <p>Click the button below to set a new password:</p>
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetLink}" style="background: #FF69B4; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">Reset Password</a>
+            <a href="${resetLink}" style="background: #FF69B4; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">👉 Reset Password</a>
           </div>
-          <p style="font-size: 12px; color: #666;">This link will be active for 15 minutes for your security.</p>
-          <p>If you didn't make this request, you can simply ignore this message.</p>
-          <p>We're here for you — always with love 🌸</p>
-          <p style="text-align: center; font-style: italic; color: #FF69B4; margin-top: 20px;">Together, moms thrive! 💫</p>
-          <p style="text-align: center; color: #666;">The Momster Team</p>
+          <p style="font-size: 13px; color: #666;">If you didn't request a password reset, just ignore this email.</p>
+          <p style="font-size: 13px; color: #666;">Your account remains safe and secure ✨</p>
+          <p style="margin-top: 20px;">We're here to help 💗</p>
+          <p style="margin-top: 20px;">With love,<br><strong>The Momster Team 🫶</strong></p>
         </div>
       `;
 
