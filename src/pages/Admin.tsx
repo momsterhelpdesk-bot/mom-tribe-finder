@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, ArrowLeft, Mail } from "lucide-react";
 import AdminOverview from "@/components/admin/AdminOverview";
 import ForumModeration from "@/components/admin/ForumModeration";
 import UserManagement from "@/components/admin/UserManagement";
@@ -25,6 +25,7 @@ import UserRescue from "@/components/admin/UserRescue";
 import MicrocopyManager from "@/components/admin/MicrocopyManager";
 import UserActivityStats from "@/components/admin/UserActivityStats";
 import EmailLogsManager from "@/components/admin/EmailLogsManager";
+import BulkEmailModal from "@/components/admin/BulkEmailModal";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ export default function Admin() {
   const [editingTemplate, setEditingTemplate] = useState<any | null>(null);
   const [marketplaceNotifications, setMarketplaceNotifications] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
+  const [bulkEmailOpen, setBulkEmailOpen] = useState(false);
 
   useEffect(() => {
     checkAdminStatus();
@@ -266,13 +268,21 @@ export default function Admin() {
                   Πλήρης έλεγχος & διαχείριση της κοινότητας
                 </CardDescription>
               </div>
-              <Button variant="outline" onClick={() => navigate("/profile")}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Πίσω στο Προφίλ
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="default" onClick={() => setBulkEmailOpen(true)}>
+                  <Mail className="w-4 h-4 mr-2" />
+                  Μαζικό Email
+                </Button>
+                <Button variant="outline" onClick={() => navigate("/profile")}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Πίσω στο Προφίλ
+                </Button>
+              </div>
             </div>
           </CardHeader>
         </Card>
+
+        <BulkEmailModal open={bulkEmailOpen} onOpenChange={setBulkEmailOpen} />
 
         <Tabs defaultValue="overview" className="w-full" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="flex flex-wrap justify-start gap-2 h-auto p-2">
