@@ -1329,55 +1329,67 @@ export type Database = {
       profiles_safe: {
         Row: {
           area: string | null
+          bio: string | null
           child_age_group: string | null
-          child_names: string | null
+          children: Json | null
           city: string | null
           created_at: string | null
           full_name: string | null
           id: string | null
           interests: string[] | null
           is_blocked: boolean | null
+          latitude: number | null
+          longitude: number | null
+          marital_status: string | null
           match_preference: string | null
           mom_badge: string | null
           profile_completed: boolean | null
           profile_photo_url: string | null
-          selfie_photo_url: string | null
+          profile_photos_urls: string[] | null
           updated_at: string | null
           verified_status: boolean | null
         }
         Insert: {
           area?: string | null
+          bio?: string | null
           child_age_group?: string | null
-          child_names?: string | null
+          children?: Json | null
           city?: string | null
           created_at?: string | null
-          full_name?: string | null
+          full_name?: never
           id?: string | null
           interests?: string[] | null
           is_blocked?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          marital_status?: string | null
           match_preference?: string | null
           mom_badge?: string | null
           profile_completed?: boolean | null
           profile_photo_url?: string | null
-          selfie_photo_url?: string | null
+          profile_photos_urls?: string[] | null
           updated_at?: string | null
           verified_status?: boolean | null
         }
         Update: {
           area?: string | null
+          bio?: string | null
           child_age_group?: string | null
-          child_names?: string | null
+          children?: Json | null
           city?: string | null
           created_at?: string | null
-          full_name?: string | null
+          full_name?: never
           id?: string | null
           interests?: string[] | null
           is_blocked?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          marital_status?: string | null
           match_preference?: string | null
           mom_badge?: string | null
           profile_completed?: boolean | null
           profile_photo_url?: string | null
-          selfie_photo_url?: string | null
+          profile_photos_urls?: string[] | null
           updated_at?: string | null
           verified_status?: boolean | null
         }
