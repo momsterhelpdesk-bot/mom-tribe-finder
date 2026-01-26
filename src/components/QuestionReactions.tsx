@@ -1,44 +1,72 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { hapticFeedback } from "@/hooks/use-haptic";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { cn } from "@/lib/utils";
 
 interface ReactionCounts {
-  thanks: number;
-  same: number;
-  hug: number;
+  [key: string]: number;
 }
 
 interface QuestionReactionsProps {
   questionId: string;
 }
 
-const getReactions = (language: 'el' | 'en') => [
-  { 
-    type: 'thanks' as const, 
-    emoji: '❤️', 
-    tooltip: language === 'el' ? 'Ευχαριστώ για τη βοήθεια!' : 'Thanks for the help!', 
-    label: language === 'el' ? 'Ευχαριστώ' : 'Thanks' 
-  },
-  { 
-    type: 'same' as const, 
-    emoji: '🙋‍♀️', 
-    tooltip: language === 'el' ? 'Κι εγώ το περνάω αυτό!' : 'I\'m going through this too!', 
-    label: language === 'el' ? 'Κι εγώ' : 'Same here' 
-  },
-  { 
-    type: 'hug' as const, 
-    emoji: '🫂', 
-    tooltip: language === 'el' ? 'Σου στέλνω αγκαλιά 🤗' : 'Sending you a hug 🤗', 
-    label: language === 'el' ? 'Αγκαλιά' : 'Virtual hug' 
-  },
+// Reaction categories with pastel colors
+const REACTIONS = [
+  // Understanding - soft pink/nude
+  { type: 'same', emoji: '🤍', label_el: 'Το ζω κι εγώ', label_en: 'Same here', category: 'understanding' },
+  { type: 'not_alone', emoji: '🤍', label_el: 'Δεν είσαι μόνη', label_en: "You're not alone", category: 'understanding' },
+  // Feeling - soft purple
+  { type: 'feel_you', emoji: '🫂', label_el: 'Σε νιώθω', label_en: 'I feel you', category: 'feeling' },
+  { type: 'understand', emoji: '🌷', label_el: 'Σε καταλαβαίνω', label_en: 'I understand', category: 'feeling' },
+  // Presence - soft mint
+  { type: 'here', emoji: '🌷', label_el: 'Είμαι εδώ', label_en: "I'm here", category: 'presence' },
+  // Encouragement - soft lilac
+  { type: 'strength', emoji: '✨', label_el: 'Έχεις δύναμη', label_en: 'You got this', category: 'encouragement' },
+  { type: 'pass', emoji: '✨', label_el: 'Θα περάσει', label_en: 'This will pass', category: 'encouragement' },
+  // Words - soft beige
+  { type: 'courage', emoji: '💬', label_el: 'Κουράγιο μαμά', label_en: 'Courage mama', category: 'words' },
 ];
+
+// Small icon-only reactions
+const SMALL_REACTIONS = [
+  { type: 'heart', emoji: '❤️' },
+  { type: 'hug', emoji: '🫂' },
+];
+
+// Category colors (pastel HSL values)
+const categoryColors = {
+  understanding: {
+    bg: 'bg-[hsl(340,60%,95%)]',
+    bgActive: 'bg-[hsl(340,60%,88%)]',
+    text: 'text-[hsl(340,40%,45%)]',
+  },
+  feeling: {
+    bg: 'bg-[hsl(280,50%,95%)]',
+    bgActive: 'bg-[hsl(280,50%,88%)]',
+    text: 'text-[hsl(280,40%,45%)]',
+  },
+  presence: {
+    bg: 'bg-[hsl(150,40%,93%)]',
+    bgActive: 'bg-[hsl(150,40%,85%)]',
+    text: 'text-[hsl(150,35%,40%)]',
+  },
+  encouragement: {
+    bg: 'bg-[hsl(270,45%,94%)]',
+    bgActive: 'bg-[hsl(270,45%,87%)]',
+    text: 'text-[hsl(270,35%,45%)]',
+  },
+  words: {
+    bg: 'bg-[hsl(30,40%,93%)]',
+    bgActive: 'bg-[hsl(30,40%,85%)]',
+    text: 'text-[hsl(30,35%,40%)]',
+  },
+};
 
 export default function QuestionReactions({ questionId }: QuestionReactionsProps) {
   const { language } = useLanguage();
-  const REACTIONS = getReactions(language);
-  const [counts, setCounts] = useState<ReactionCounts>({ thanks: 0, same: 0, hug: 0 });
+  const [counts, setCounts] = useState<ReactionCounts>({});
   const [userReactions, setUserReactions] = useState<Set<string>>(new Set());
   const [animating, setAnimating] = useState<string | null>(null);
 
@@ -47,7 +75,6 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
   }, [questionId]);
 
   const fetchReactions = async () => {
-    // Fetch reaction counts
     const { data: allReactions, error } = await supabase
       .from('question_reactions')
       .select('reaction_type, user_id')
@@ -59,15 +86,12 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
     }
 
     if (allReactions) {
-      const newCounts: ReactionCounts = { thanks: 0, same: 0, hug: 0 };
+      const newCounts: ReactionCounts = {};
       allReactions.forEach(r => {
-        if (r.reaction_type in newCounts) {
-          newCounts[r.reaction_type as keyof ReactionCounts]++;
-        }
+        newCounts[r.reaction_type] = (newCounts[r.reaction_type] || 0) + 1;
       });
       setCounts(newCounts);
 
-      // Check user's reactions
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const userReacted = allReactions
@@ -78,14 +102,13 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
     }
   };
 
-  const handleReaction = async (reactionType: 'thanks' | 'same' | 'hug') => {
+  const handleReaction = async (reactionType: string) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     const hasReacted = userReactions.has(reactionType);
 
     if (hasReacted) {
-      // Remove reaction
       await supabase
         .from('question_reactions')
         .delete()
@@ -98,9 +121,8 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
         newSet.delete(reactionType);
         return newSet;
       });
-      setCounts(prev => ({ ...prev, [reactionType]: prev[reactionType] - 1 }));
+      setCounts(prev => ({ ...prev, [reactionType]: (prev[reactionType] || 1) - 1 }));
     } else {
-      // Add reaction
       await supabase
         .from('question_reactions')
         .insert({
@@ -110,63 +132,95 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
         });
 
       setUserReactions(prev => new Set([...prev, reactionType]));
-      setCounts(prev => ({ ...prev, [reactionType]: prev[reactionType] + 1 }));
+      setCounts(prev => ({ ...prev, [reactionType]: (prev[reactionType] || 0) + 1 }));
       
-      // Haptic + animate
       hapticFeedback.light();
       setAnimating(reactionType);
       setTimeout(() => setAnimating(null), 600);
     }
   };
 
-  const sameCount = counts.same;
-  const hugCount = counts.hug;
-
   return (
-    <TooltipProvider>
-      <div className="flex items-center gap-1.5">
+    <div className="space-y-3">
+      {/* Main reaction buttons - 2 columns grid */}
+      <div className="grid grid-cols-2 gap-2">
         {REACTIONS.map((reaction) => {
           const isActive = userReactions.has(reaction.type);
           const isAnimating = animating === reaction.type;
-          const count = counts[reaction.type];
+          const count = counts[reaction.type] || 0;
+          const colors = categoryColors[reaction.category as keyof typeof categoryColors];
           
           return (
-            <Tooltip key={reaction.type}>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => handleReaction(reaction.type)}
-                  className={`
-                    flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs
-                    transition-all duration-200 hover:scale-105
-                    ${isActive 
-                      ? 'bg-primary/15 text-primary ring-1 ring-primary/30' 
-                      : 'bg-muted/60 text-muted-foreground hover:bg-muted'
-                    }
-                  `}
-                >
-                  <span className={`text-base ${isAnimating ? 'animate-bounce' : ''}`}>
-                    {reaction.emoji}
-                  </span>
-                  <span className="text-[11px] font-medium">
-                    {reaction.label}
-                  </span>
-                  {count > 0 && (
-                    <span className={`text-[10px] font-bold ml-0.5 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
-                      {count}
-                    </span>
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent 
-                side="top" 
-                className="bg-white/95 border-pink-200 text-foreground shadow-lg rounded-lg px-2 py-1"
-              >
-                <p className="text-xs">{reaction.tooltip}</p>
-              </TooltipContent>
-            </Tooltip>
+            <button
+              key={reaction.type}
+              onClick={() => handleReaction(reaction.type)}
+              className={cn(
+                "flex items-center justify-center gap-2 px-3 py-2.5 rounded-full",
+                "text-xs font-medium transition-all duration-300 ease-out",
+                "border border-transparent",
+                isActive 
+                  ? `${colors.bgActive} ${colors.text} shadow-sm scale-[1.02]` 
+                  : `${colors.bg} ${colors.text} hover:${colors.bgActive} hover:scale-[1.01]`,
+                isAnimating && "animate-pulse scale-105"
+              )}
+            >
+              <span className={cn(
+                "text-base transition-transform duration-300",
+                isAnimating && "scale-125"
+              )}>
+                {reaction.emoji}
+              </span>
+              <span className="truncate">
+                {language === 'el' ? reaction.label_el : reaction.label_en}
+              </span>
+              {count > 0 && (
+                <span className={cn(
+                  "text-[10px] font-bold ml-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full",
+                  isActive ? "bg-white/50" : "bg-white/30"
+                )}>
+                  {count}
+                </span>
+              )}
+            </button>
           );
         })}
       </div>
-    </TooltipProvider>
+      
+      {/* Small icon-only reactions */}
+      <div className="flex items-center justify-center gap-3 pt-1">
+        {SMALL_REACTIONS.map((reaction) => {
+          const isActive = userReactions.has(reaction.type);
+          const isAnimating = animating === reaction.type;
+          const count = counts[reaction.type] || 0;
+          
+          return (
+            <button
+              key={reaction.type}
+              onClick={() => handleReaction(reaction.type)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
+                "text-sm transition-all duration-300 ease-out",
+                isActive 
+                  ? "bg-primary/20 scale-105" 
+                  : "bg-muted/50 hover:bg-muted",
+                isAnimating && "animate-bounce"
+              )}
+            >
+              <span className={cn(
+                "transition-transform duration-300",
+                isAnimating && "scale-150"
+              )}>
+                {reaction.emoji}
+              </span>
+              {count > 0 && (
+                <span className="text-[10px] font-bold text-muted-foreground">
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
