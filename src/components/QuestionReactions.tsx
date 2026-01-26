@@ -145,31 +145,23 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
   const totalReactions = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
   return (
-    <div className="space-y-3">
-      {/* Toggle button to show/hide reactions */}
+    <div className="space-y-2">
+      {/* Subtle toggle - just a small icon with count */}
       <button
         onClick={() => {
           setIsExpanded(!isExpanded);
           hapticFeedback.light();
         }}
         className={cn(
-          "flex items-center gap-2 px-3 py-2 rounded-full",
-          "text-xs font-medium transition-all duration-300",
-          "bg-[hsl(340,60%,95%)] hover:bg-[hsl(340,60%,90%)]",
-          "text-[hsl(340,40%,45%)]"
+          "inline-flex items-center gap-1 px-2 py-1 rounded-full",
+          "text-[11px] transition-all duration-200",
+          "text-muted-foreground hover:text-primary",
+          isExpanded && "text-primary"
         )}
       >
-        <Heart className="w-4 h-4" />
-        <span>{language === 'el' ? 'Στείλε αγκαλιά' : 'Send support'}</span>
+        <Heart className={cn("w-3.5 h-3.5", isExpanded && "fill-primary/30")} />
         {totalReactions > 0 && (
-          <span className="bg-white/50 px-1.5 py-0.5 rounded-full text-[10px] font-bold">
-            {totalReactions}
-          </span>
-        )}
-        {isExpanded ? (
-          <ChevronUp className="w-3 h-3 ml-1" />
-        ) : (
-          <ChevronDown className="w-3 h-3 ml-1" />
+          <span className="font-medium">{totalReactions}</span>
         )}
       </button>
 
