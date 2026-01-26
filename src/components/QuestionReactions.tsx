@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { hapticFeedback } from "@/hooks/use-haptic";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
+import { Heart, ChevronDown, ChevronUp } from "lucide-react";
 
 interface ReactionCounts {
   [key: string]: number;
@@ -69,6 +70,7 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
   const [counts, setCounts] = useState<ReactionCounts>({});
   const [userReactions, setUserReactions] = useState<Set<string>>(new Set());
   const [animating, setAnimating] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     fetchReactions();
@@ -140,87 +142,121 @@ export default function QuestionReactions({ questionId }: QuestionReactionsProps
     }
   };
 
+  const totalReactions = Object.values(counts).reduce((sum, count) => sum + count, 0);
+
   return (
     <div className="space-y-3">
-      {/* Main reaction buttons - 2 columns grid */}
-      <div className="grid grid-cols-2 gap-2">
-        {REACTIONS.map((reaction) => {
-          const isActive = userReactions.has(reaction.type);
-          const isAnimating = animating === reaction.type;
-          const count = counts[reaction.type] || 0;
-          const colors = categoryColors[reaction.category as keyof typeof categoryColors];
+      {/* Toggle button to show/hide reactions */}
+      <button
+        onClick={() => {
+          setIsExpanded(!isExpanded);
+          hapticFeedback.light();
+        }}
+        className={cn(
+          "flex items-center gap-2 px-3 py-2 rounded-full",
+          "text-xs font-medium transition-all duration-300",
+          "bg-[hsl(340,60%,95%)] hover:bg-[hsl(340,60%,90%)]",
+          "text-[hsl(340,40%,45%)]"
+        )}
+      >
+        <Heart className="w-4 h-4" />
+        <span>{language === 'el' ? 'Στείλε αγκαλιά' : 'Send support'}</span>
+        {totalReactions > 0 && (
+          <span className="bg-white/50 px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+            {totalReactions}
+          </span>
+        )}
+        {isExpanded ? (
+          <ChevronUp className="w-3 h-3 ml-1" />
+        ) : (
+          <ChevronDown className="w-3 h-3 ml-1" />
+        )}
+      </button>
+
+      {/* Collapsible reaction buttons */}
+      {isExpanded && (
+        <div className="animate-fade-in space-y-3">
+          {/* Main reaction buttons - 2 columns grid */}
+          <div className="grid grid-cols-2 gap-2">
+            {REACTIONS.map((reaction) => {
+              const isActive = userReactions.has(reaction.type);
+              const isAnimating = animating === reaction.type;
+              const count = counts[reaction.type] || 0;
+              const colors = categoryColors[reaction.category as keyof typeof categoryColors];
+              
+              return (
+                <button
+                  key={reaction.type}
+                  onClick={() => handleReaction(reaction.type)}
+                  className={cn(
+                    "flex items-center justify-center gap-2 px-3 py-2.5 rounded-full",
+                    "text-xs font-medium transition-all duration-300 ease-out",
+                    "border border-transparent",
+                    isActive 
+                      ? `${colors.bgActive} ${colors.text} shadow-sm scale-[1.02]` 
+                      : `${colors.bg} ${colors.text} hover:${colors.bgActive} hover:scale-[1.01]`,
+                    isAnimating && "animate-pulse scale-105"
+                  )}
+                >
+                  <span className={cn(
+                    "text-base transition-transform duration-300",
+                    isAnimating && "scale-125"
+                  )}>
+                    {reaction.emoji}
+                  </span>
+                  <span className="truncate">
+                    {language === 'el' ? reaction.label_el : reaction.label_en}
+                  </span>
+                  {count > 0 && (
+                    <span className={cn(
+                      "text-[10px] font-bold ml-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full",
+                      isActive ? "bg-white/50" : "bg-white/30"
+                    )}>
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
           
-          return (
-            <button
-              key={reaction.type}
-              onClick={() => handleReaction(reaction.type)}
-              className={cn(
-                "flex items-center justify-center gap-2 px-3 py-2.5 rounded-full",
-                "text-xs font-medium transition-all duration-300 ease-out",
-                "border border-transparent",
-                isActive 
-                  ? `${colors.bgActive} ${colors.text} shadow-sm scale-[1.02]` 
-                  : `${colors.bg} ${colors.text} hover:${colors.bgActive} hover:scale-[1.01]`,
-                isAnimating && "animate-pulse scale-105"
-              )}
-            >
-              <span className={cn(
-                "text-base transition-transform duration-300",
-                isAnimating && "scale-125"
-              )}>
-                {reaction.emoji}
-              </span>
-              <span className="truncate">
-                {language === 'el' ? reaction.label_el : reaction.label_en}
-              </span>
-              {count > 0 && (
-                <span className={cn(
-                  "text-[10px] font-bold ml-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full",
-                  isActive ? "bg-white/50" : "bg-white/30"
-                )}>
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-      
-      {/* Small icon-only reactions */}
-      <div className="flex items-center justify-center gap-3 pt-1">
-        {SMALL_REACTIONS.map((reaction) => {
-          const isActive = userReactions.has(reaction.type);
-          const isAnimating = animating === reaction.type;
-          const count = counts[reaction.type] || 0;
-          
-          return (
-            <button
-              key={reaction.type}
-              onClick={() => handleReaction(reaction.type)}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-                "text-sm transition-all duration-300 ease-out",
-                isActive 
-                  ? "bg-primary/20 scale-105" 
-                  : "bg-muted/50 hover:bg-muted",
-                isAnimating && "animate-bounce"
-              )}
-            >
-              <span className={cn(
-                "transition-transform duration-300",
-                isAnimating && "scale-150"
-              )}>
-                {reaction.emoji}
-              </span>
-              {count > 0 && (
-                <span className="text-[10px] font-bold text-muted-foreground">
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+          {/* Small icon-only reactions */}
+          <div className="flex items-center justify-center gap-3 pt-1">
+            {SMALL_REACTIONS.map((reaction) => {
+              const isActive = userReactions.has(reaction.type);
+              const isAnimating = animating === reaction.type;
+              const count = counts[reaction.type] || 0;
+              
+              return (
+                <button
+                  key={reaction.type}
+                  onClick={() => handleReaction(reaction.type)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
+                    "text-sm transition-all duration-300 ease-out",
+                    isActive 
+                      ? "bg-primary/20 scale-105" 
+                      : "bg-muted/50 hover:bg-muted",
+                    isAnimating && "animate-bounce"
+                  )}
+                >
+                  <span className={cn(
+                    "transition-transform duration-300",
+                    isAnimating && "scale-150"
+                  )}>
+                    {reaction.emoji}
+                  </span>
+                  {count > 0 && (
+                    <span className="text-[10px] font-bold text-muted-foreground">
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
