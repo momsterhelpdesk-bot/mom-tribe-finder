@@ -25,27 +25,28 @@ Deno.serve(async (req) => {
 
     // Format dates for comparison
     const todayDate = now.toISOString().split('T')[0];
-    const currentTime = now.toTimeString().slice(0, 5); // HH:MM
     const oneHourLaterTime = oneHourFromNow.toTimeString().slice(0, 5);
 
     console.log(`Looking for meets on ${todayDate} between ${oneHourLaterTime} (1 hour window)`);
 
     // Find Mom Meets happening in approximately 1 hour
-    // We look for meets where date is today and time is between 55-65 minutes from now
+    // Using correct column names from mom_meets table: meet_date, meet_time, meet_type, exact_location, creator_id
     const { data: upcomingMeets, error: meetsError } = await supabase
       .from('mom_meets')
       .select(`
         id,
-        title,
-        date,
-        time,
-        location_name,
-        organizer_id
+        meet_type,
+        meet_date,
+        meet_time,
+        exact_location,
+        area,
+        city,
+        creator_id
       `)
-      .eq('date', todayDate)
+      .eq('meet_date', todayDate)
       .in('status', ['open', 'full'])
-      .gte('time', oneHourLaterTime)
-      .lt('time', twoHoursFromNow.toTimeString().slice(0, 5));
+      .gte('meet_time', oneHourLaterTime)
+      .lt('meet_time', twoHoursFromNow.toTimeString().slice(0, 5));
 
     if (meetsError) {
       console.error('Error fetching meets:', meetsError);
@@ -64,7 +65,9 @@ Deno.serve(async (req) => {
     let notificationsSent = 0;
 
     for (const meet of upcomingMeets) {
-      console.log(`Processing meet: ${meet.title} at ${meet.time}`);
+      // Build a descriptive title from meet_type and location
+      const meetTitle = `${meet.meet_type} - ${meet.area}`;
+      console.log(`Processing meet: ${meetTitle} at ${meet.meet_time}`);
 
       // Get all confirmed participants for this meet
       const { data: participants, error: participantsError } = await supabase
@@ -78,9 +81,9 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Include organizer
+      // Include creator (organizer)
       const allUserIds = [
-        meet.organizer_id,
+        meet.creator_id,
         ...(participants?.map(p => p.user_id) || [])
       ];
 
@@ -103,18 +106,18 @@ Deno.serve(async (req) => {
       }
 
       // Create notifications for all participants
+      const locationText = meet.exact_location || meet.area;
       const notifications = uniqueUserIds.map(userId => ({
         user_id: userId,
         type: 'mom_meet_reminder',
         title: '⏰ Σε 1 ώρα!',
-        message: `Το "${meet.title}" ξεκινάει σε 1 ώρα στις ${meet.time}. Ετοιμάσου! 🏡`,
+        message: `Το "${meetTitle}" ξεκινάει σε 1 ώρα στις ${meet.meet_time}. Ετοιμάσου! 🏡`,
         icon: '🏡',
-        action_url: `/mom-meet-chat/${meet.id}`,
         metadata: {
           meet_id: meet.id,
-          meet_title: meet.title,
-          meet_time: meet.time,
-          location_name: meet.location_name
+          meet_type: meet.meet_type,
+          meet_time: meet.meet_time,
+          location: locationText
         }
       }));
 
