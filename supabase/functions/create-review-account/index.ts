@@ -31,22 +31,28 @@ Deno.serve(async (req) => {
       return json({ error: 'Missing backend configuration' }, 500);
     }
 
-    // Verify caller is authenticated + admin
-    const authClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
+    // Check for service key in header (for automated calls)
+    const serviceKeyHeader = req.headers.get('x-service-key');
+    const isServiceCall = serviceKeyHeader === serviceKey;
 
-    const { data: userData, error: userError } = await authClient.auth.getUser();
-    if (userError || !userData.user) return json({ error: 'Unauthorized' }, 401);
+    if (!isServiceCall) {
+      // Verify caller is authenticated + admin
+      const authClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } },
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
 
-    const { data: isAdmin, error: roleErr } = await authClient.rpc('has_role', {
-      _user_id: userData.user.id,
-      _role: 'admin',
-    });
+      const { data: userData, error: userError } = await authClient.auth.getUser();
+      if (userError || !userData.user) return json({ error: 'Unauthorized' }, 401);
 
-    if (roleErr) return json({ error: 'Role check failed' }, 403);
-    if (!isAdmin) return json({ error: 'Admins only' }, 403);
+      const { data: isAdmin, error: roleErr } = await authClient.rpc('has_role', {
+        _user_id: userData.user.id,
+        _role: 'admin',
+      });
+
+      if (roleErr) return json({ error: 'Role check failed' }, 403);
+      if (!isAdmin) return json({ error: 'Admins only' }, 403);
+    }
 
     const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
