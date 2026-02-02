@@ -50,11 +50,11 @@ export function ProfilePhotoCarousel({
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {displayPhotos.map((photo, index) => (
-            <div key={index} className="flex-[0_0_100%] min-w-0">
+            <div key={index} className="flex-[0_0_100%] min-w-0 bg-secondary/30">
               <img
                 src={photo}
                 alt={`${profileName} - Photo ${index + 1}`}
-                className="w-full h-56 object-cover cursor-pointer"
+                className="w-full h-72 object-contain cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   onImageClick?.();
