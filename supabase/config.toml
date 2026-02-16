@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.mom-meet-reminders]
 verify_jwt = false
+
+[functions.delete-account]
+verify_jwt = false
