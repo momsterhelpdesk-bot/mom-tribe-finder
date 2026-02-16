@@ -133,7 +133,6 @@ export default function Auth() {
               language: 'el'
             }
           });
-          console.log("Welcome email sent");
         } catch (emailError) {
           console.error("Failed to send welcome email:", emailError);
           // Don't block signup if email fails
@@ -286,7 +285,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       {/* Enhanced Language Switcher - Top Right */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed right-4 z-50" style={{ top: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
         <Button
           variant="outline"
           size="sm"

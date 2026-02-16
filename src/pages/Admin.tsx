@@ -18,7 +18,7 @@ import ContentManagement from "@/components/admin/ContentManagement";
 import AppSettings from "@/components/admin/AppSettings";
 import SystemLogs from "@/components/admin/SystemLogs";
 import NotificationsPanel from "@/components/admin/NotificationsPanel";
-import { TestAccountsManager } from "@/components/admin/TestAccountsManager";
+
 import RecipesManagement from "@/components/admin/RecipesManagement";
 import PhotoModeration from "@/components/admin/PhotoModeration";
 import UserRescue from "@/components/admin/UserRescue";
@@ -319,7 +319,6 @@ export default function Admin() {
             <TabsTrigger value="email-logs">📬 Email Logs</TabsTrigger>
             <TabsTrigger value="emails">Email Templates</TabsTrigger>
             <TabsTrigger value="recipes">Συνταγές</TabsTrigger>
-            <TabsTrigger value="test-accounts">Test Accounts</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -635,9 +634,6 @@ export default function Admin() {
             )}
           </TabsContent>
 
-          <TabsContent value="test-accounts">
-            <TestAccountsManager />
-          </TabsContent>
         </Tabs>
       </div>
     </div>

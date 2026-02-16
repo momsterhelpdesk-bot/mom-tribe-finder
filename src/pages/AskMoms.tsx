@@ -419,21 +419,21 @@ export default function AskMoms() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative">
-      <img 
-        src={mascot} 
-        alt="Momster Mascot" 
+      <img
+        src={mascot}
+        alt="Momster Mascot"
         className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none animate-bounce"
       />
-      
+
       {animatingHeart && (
         <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-50">
-          <Heart 
-            className="w-16 h-16 text-primary fill-primary animate-[ping_1s_ease-out]" 
+          <Heart
+            className="w-16 h-16 text-primary fill-primary animate-[ping_1s_ease-out]"
           />
         </div>
       )}
 
-      <div className="max-w-2xl mx-auto pt-20 pb-24 px-4">
+      <div className="max-w-2xl mx-auto pt-20 px-4" style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
         {/* Header with Mom-Code */}
         <div className="mb-6 space-y-4">
           <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>

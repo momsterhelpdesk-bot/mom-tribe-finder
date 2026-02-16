@@ -256,8 +256,27 @@ export default function ChatView() {
     sendMessage(message);
   };
 
-  const handleReport = () => {
-    toast.success("Αναφορά καταχωρήθηκε. Θα εξεταστεί από την ομάδα μας.");
+  const handleReport = async () => {
+    if (!currentUserId || !otherUser) return;
+
+    try {
+      const { error } = await supabase
+        .from("profile_reports")
+        .insert({
+          reporter_id: currentUserId,
+          reported_profile_id: otherUser.id,
+          reason: "chat_report",
+          description: `Αναφορά από chat (match: ${matchId})`,
+          status: "pending"
+        });
+
+      if (error) throw error;
+
+      toast.success("Αναφορά καταχωρήθηκε. Θα εξεταστεί από την ομάδα μας.");
+    } catch (error) {
+      console.error("Error submitting chat report:", error);
+      toast.error("Σφάλμα κατά την υποβολή αναφοράς");
+    }
   };
 
   const handleUnmatch = async () => {
@@ -325,7 +344,7 @@ export default function ChatView() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 flex flex-col">
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-4 flex items-center gap-3 sticky top-0 z-10 shadow-sm">
+      <div className="bg-card border-b border-border px-4 py-4 flex items-center gap-3 sticky top-0 z-10 shadow-sm" style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))' }}>
         <Button
           variant="ghost"
           size="icon"
@@ -580,7 +599,7 @@ export default function ChatView() {
       </div>
 
       {/* Input Area */}
-      <div className="bg-card border-t border-border px-4 py-3 pb-24">
+      <div className="bg-card border-t border-border px-4 py-3" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
         <div className="flex gap-2">
           <Textarea
             value={newMessage}

@@ -33,7 +33,7 @@ export function NotificationPermissionBanner() {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground px-4 py-3 shadow-lg animate-in slide-in-from-top duration-300">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground px-4 py-3 shadow-lg animate-in slide-in-from-top duration-300" style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top, 0px))' }}>
       <div className="max-w-lg mx-auto flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Bell className="h-5 w-5 flex-shrink-0" />

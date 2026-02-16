@@ -135,7 +135,6 @@ export function useMatching() {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log("No user found, skipping profile load");
         setLoading(false);
         return;
       }
@@ -154,7 +153,6 @@ export function useMatching() {
       }
 
       if (!currentProfile) {
-        console.log("No profile found for user");
         setLoading(false);
         return;
       }
@@ -178,9 +176,6 @@ export function useMatching() {
       // Admin profile ID to always exclude
       const ADMIN_PROFILE_ID = 'fb6eac18-8940-4f14-9cc7-8d828c21179a';
       
-      // Test account profile ID (Google reviewer)
-      const TEST_ACCOUNT_ID = '00000000-0000-0000-0000-000000000000'; // Placeholder - will be filtered by email pattern
-      
       let profilesQuery = supabase
         .from("profiles")
         .select("id, full_name, email, profile_photo_url, profile_photos_urls, bio, city, area, interests, children, latitude, longitude")
@@ -201,21 +196,17 @@ export function useMatching() {
         
         // Exclude by name pattern
         if (lowerName.includes('test') || lowerName.includes('demo') || lowerName.includes('review')) {
-          console.log("Excluding test profile by name:", profile.full_name);
           return false;
         }
         
         // Exclude by email pattern
         if (lowerEmail.includes('test') || lowerEmail.includes('demo') || lowerEmail.includes('reviewer')) {
-          console.log("Excluding test profile by email:", profile.full_name);
           return false;
         }
         
         return true;
       });
       
-      console.log("Profiles after test filter:", filteredFromTestProfiles.length, "from", allProfiles?.length);
-
       // Get users who have already swiped "yes" on current user (they liked you!)
       const { data: usersWhoLikedYou, error: likesError } = await supabase
         .from("swipes")
@@ -228,7 +219,6 @@ export function useMatching() {
       }
 
       const likedYouUserIds = new Set((usersWhoLikedYou || []).map(s => s.from_user_id));
-      console.log("Users who liked you:", likedYouUserIds.size);
 
       // Get users that the current user has already swiped on (to exclude them)
       const { data: alreadySwipedOn, error: swipesError } = await supabase
@@ -241,7 +231,6 @@ export function useMatching() {
       }
 
       const alreadySwipedIds = new Set((alreadySwipedOn || []).map(s => s.to_user_id));
-      console.log("Already swiped on:", alreadySwipedIds.size);
 
       // Get existing matches to avoid duplicate chats
       const { data: existingMatches, error: matchesError } = await supabase
@@ -258,10 +247,6 @@ export function useMatching() {
           m.user1_id === user.id ? [m.user2_id] : [m.user1_id]
         )
       );
-      console.log("Already matched with:", matchedUserIds.size);
-
-      console.log("Loaded profiles count:", filteredFromTestProfiles.length);
-
       // Filter out already swiped and already matched users
       let profilesWithScores: ProfileMatch[] = filteredFromTestProfiles
         .filter(profile => !alreadySwipedIds.has(profile.id) && !matchedUserIds.has(profile.id))
@@ -269,8 +254,6 @@ export function useMatching() {
           ...profile,
           hasLikedYou: likedYouUserIds.has(profile.id)
         }));
-
-      console.log("After filtering swiped/matched:", profilesWithScores.length);
 
       // Filter out profiles with empty interests or children arrays (but keep if they have photo)
       const beforeBasicFilter = profilesWithScores.length;
@@ -280,13 +263,8 @@ export function useMatching() {
         const hasPhoto = profile.profile_photo_url || (profile.profile_photos_urls && profile.profile_photos_urls.length > 0);
         // Must have photo and at least one of interests/children
         const passes = hasPhoto && (hasInterests || hasChildren);
-        if (!passes) {
-          console.log("Profile filtered out:", profile.full_name, { hasPhoto, hasInterests, hasChildren });
-        }
         return passes;
       });
-      console.log(`Basic filter: ${beforeBasicFilter} -> ${profilesWithScores.length} profiles`);
-
       // PROFILE-BASED LOCATION MATCHING (NO GPS!)
       // Calculate location boost based on declared city/area only
       const manualDistancePref = userFilters.distancePreferenceKm;
@@ -397,7 +375,6 @@ export function useMatching() {
             )
           );
         });
-        console.log("After required interests filter:", profilesWithInterestScore.length);
       }
 
       // Lifestyle interest IDs for matching

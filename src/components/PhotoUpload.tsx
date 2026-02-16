@@ -141,9 +141,8 @@ export const PhotoUpload = ({ onPhotoUploaded, currentPhotoUrl }: PhotoUploadPro
       if (pendingFile.size > 500 * 1024) { // Compress if > 500KB
         try {
           fileToUpload = await compressImage(pendingFile);
-          console.log(`Compressed from ${pendingFile.size} to ${fileToUpload.size}`);
         } catch (compressError) {
-          console.warn('Compression failed, using original:', compressError);
+          // Compression failed, using original
         }
       }
 

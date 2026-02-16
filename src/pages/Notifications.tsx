@@ -160,7 +160,8 @@ export default function Notifications() {
   return (
     <div 
       ref={containerRef}
-      className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pt-20 pb-24 px-3 overflow-auto"
+      className="min-h-screen bg-gradient-to-b from-background to-secondary/20 px-3 overflow-auto"
+      style={{ paddingTop: 'calc(5rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

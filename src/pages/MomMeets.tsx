@@ -373,10 +373,10 @@ export default function MomMeets() {
   const otherMeets = meets.filter(m => m.area !== userArea && m.city !== userCity);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative pb-32">
-      <img 
-        src={mascot} 
-        alt="Momster Mascot" 
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 relative" style={{ paddingBottom: 'calc(9rem + env(safe-area-inset-bottom, 0px))' }}>
+      <img
+        src={mascot}
+        alt="Momster Mascot"
         className="fixed top-24 right-4 w-16 h-16 opacity-15 object-contain pointer-events-none"
       />
       
@@ -851,7 +851,7 @@ export default function MomMeets() {
       </div>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-background/95 backdrop-blur-md border-t border-border z-40">
+      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-background/95 backdrop-blur-md border-t border-border z-40" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
         <div className="max-w-2xl mx-auto flex items-center justify-center gap-3">
           <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain flex-shrink-0" />
           <span className="text-sm text-muted-foreground text-center leading-snug">

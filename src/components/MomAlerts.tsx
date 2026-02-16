@@ -37,7 +37,8 @@ export default function MomAlerts() {
         onClick={go}
         variant="ghost"
         size="icon"
-        className="fixed top-4 right-4 z-40 rounded-full bg-background/60 backdrop-blur-sm border border-border/50 shadow-sm hover:shadow-md transition-all hover:bg-background/80"
+        className="fixed right-4 z-40 rounded-full bg-background/60 backdrop-blur-sm border border-border/50 shadow-sm hover:shadow-md transition-all hover:bg-background/80"
+        style={{ top: 'calc(0.8rem + env(safe-area-inset-top, 0px))' }}
       >
         <div className="relative">
           <Bell className="w-4 h-4 text-muted-foreground" />
@@ -52,7 +53,8 @@ export default function MomAlerts() {
       {/* Floating bottom bubble - subtle, auto-dismiss, tap anywhere to go */}
       {unreadCount > 0 && !bubbleDismissed && showBubble && (
         <div 
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 animate-in fade-in slide-in-from-bottom-4 duration-300"
+          className="fixed left-1/2 -translate-x-1/2 z-40 animate-in fade-in slide-in-from-bottom-4 duration-300"
+          style={{ bottom: 'calc(6rem + var(--bottom-nav-h))' }}
           onClick={go}
         >
           <div className="bg-background/90 backdrop-blur-md text-foreground border border-border/50 shadow-lg px-4 py-2 rounded-full flex items-center gap-2 cursor-pointer hover:bg-background transition-colors">

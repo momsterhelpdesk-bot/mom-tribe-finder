@@ -87,7 +87,7 @@ export default function Recipes() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}>
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/20 to-primary/10 p-6">
         <h1 className="text-3xl font-bold text-foreground mb-2">

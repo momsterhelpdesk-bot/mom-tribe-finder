@@ -114,7 +114,7 @@ export default function MatchingFilters() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/30 p-4">
       {/* Header with Back and Close buttons */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <button
             onClick={handleGoBack}
@@ -372,7 +372,7 @@ export default function MatchingFilters() {
         </Button>
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
+      <footer className="fixed bottom-0 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}>
         <div className="max-w-md mx-auto flex items-center justify-center gap-2">
           <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
           <span className="text-sm text-muted-foreground">{getText("footer_tagline", "Together, moms thrive!")}</span>

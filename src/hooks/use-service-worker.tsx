@@ -9,7 +9,6 @@ export function useServiceWorker() {
       // Register service worker
       navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
-          console.log('[SW] Service Worker registered:', reg.scope);
           setRegistration(reg);
           setIsReady(true);
         })
@@ -24,7 +23,6 @@ export function useServiceWorker() {
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('[SW] New content available; please refresh.');
               }
             });
           }
@@ -49,7 +47,6 @@ export function useAdminPushNotifications() {
 
   const requestPermission = async (): Promise<boolean> => {
     if (!('Notification' in window)) {
-      console.log('This browser does not support notifications');
       return false;
     }
 
@@ -58,7 +55,6 @@ export function useAdminPushNotifications() {
       setPermissionStatus(permission);
       
       if (permission === 'granted') {
-        console.log('Notification permission granted');
         return true;
       }
       return false;
@@ -70,7 +66,6 @@ export function useAdminPushNotifications() {
 
   const subscribeToPush = async () => {
     if (!registration) {
-      console.log('Service worker not ready');
       return null;
     }
 
@@ -90,7 +85,6 @@ export function useAdminPushNotifications() {
       });
 
       setSubscription(newSubscription);
-      console.log('Push subscription created:', newSubscription);
       return newSubscription;
     } catch (error) {
       console.error('Failed to subscribe to push:', error);
@@ -100,7 +94,6 @@ export function useAdminPushNotifications() {
 
   const showLocalNotification = (title: string, options?: NotificationOptions) => {
     if (permissionStatus !== 'granted') {
-      console.log('Notification permission not granted');
       return;
     }
 

@@ -212,7 +212,6 @@ export default function ProfileSetup() {
     
     // Prevent double submission
     if (loading) {
-      console.log('Already submitting, ignoring...');
       return;
     }
     
@@ -266,14 +265,9 @@ export default function ProfileSetup() {
         description: errors.length > 1 ? `Και ${errors.length - 1} ακόμα σφάλματα` : undefined
       });
       
-      // Log all errors for debugging
-      errors.forEach((err, idx) => {
-        console.log(`Error ${idx + 1}: ${err.path.join('.')} - ${err.message}`);
-      });
       return;
     }
 
-    console.log('Starting profile submission for user:', userId);
     // Submit profile directly without location - location will be requested in Discover
     await submitProfile(null, null);
   };
@@ -309,7 +303,6 @@ export default function ProfileSetup() {
     }
 
     setLoading(true);
-    console.log('Profile submission started, uploading photos...');
 
     try {
       const photoUrls: string[] = [];
@@ -319,11 +312,9 @@ export default function ProfileSetup() {
         const photo = photos[i];
         if (photo.url) {
           // Existing photo, keep the URL
-          console.log(`Photo ${i + 1}: Using existing URL`);
           photoUrls.push(photo.url);
         } else if (photo.file) {
           // New photo, upload it
-          console.log(`Photo ${i + 1}: Uploading new file...`);
           const fileExt = photo.file.name.split('.').pop();
           const fileName = `${userId}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
           const filePath = `${userId}/${fileName}`;
@@ -341,7 +332,6 @@ export default function ProfileSetup() {
             .from('profile-photos')
             .getPublicUrl(filePath);
 
-          console.log(`Photo ${i + 1}: Uploaded successfully`);
           photoUrls.push(publicUrl);
         }
       }
@@ -349,8 +339,6 @@ export default function ProfileSetup() {
       if (photoUrls.length === 0) {
         throw new Error("Δεν ανέβηκε καμία φωτογραφία");
       }
-
-      console.log(`All ${photoUrls.length} photos uploaded, updating profile...`);
 
       const { data: authUserData, error: authUserError } = await supabase.auth.getUser();
       if (authUserError) {
@@ -391,8 +379,6 @@ export default function ProfileSetup() {
         longitude: lng,
       };
       
-      console.log('Updating profile with data:', JSON.stringify(profileData, null, 2));
-      
       const { data: updatedRow, error: updateError } = await supabase
         .from('profiles')
         .update(profileData)
@@ -410,8 +396,6 @@ export default function ProfileSetup() {
         throw new Error("Η αποθήκευση του προφίλ δεν επιβεβαιώθηκε");
       }
 
-      console.log('Profile saved + verified:', updatedRow);
-
       // Check if onboarding has been completed
       const { data: updatedProfile } = await supabase
         .from('profiles')
@@ -421,7 +405,6 @@ export default function ProfileSetup() {
 
       // Show success screen before navigating
       const destination = !updatedProfile?.has_completed_onboarding ? "/onboarding" : "/discover";
-      console.log('Navigation destination:', destination);
       setPendingNavigation(destination);
       setShowSuccessScreen(true);
       toast.success("Το προφίλ αποθηκεύτηκε επιτυχώς! 🎉");

@@ -171,17 +171,31 @@ export default function ProfileNew() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Delete profile data (cascade will handle related data)
-      const { error: deleteError } = await supabase
-        .from("profiles")
-        .delete()
-        .eq("id", user.id);
+      // Try to send goodbye email before deletion
+      try {
+        await supabase.functions.invoke('send-goodbye-email', {
+          body: { email: user.email, fullName: profile?.full_name || '', language }
+        });
+      } catch (emailError) {
+        // Non-fatal: goodbye email is optional
+      }
 
-      if (deleteError) throw deleteError;
+      // Call edge function to fully delete Auth user + cascaded data + storage
+      const { error: fnError } = await supabase.functions.invoke('delete-account');
+
+      if (fnError) {
+        // Fallback: if edge function not deployed yet, delete profile row manually
+        console.error("Edge function error, falling back:", fnError);
+        const { error: deleteError } = await supabase
+          .from("profiles")
+          .delete()
+          .eq("id", user.id);
+        if (deleteError) throw deleteError;
+      }
 
       // Sign out
       await supabase.auth.signOut();
-      
+
       toast.success(language === "el" ? "Ο λογαριασμός σου διαγράφηκε" : "Your account has been deleted");
       navigate("/auth");
     } catch (error) {
@@ -285,10 +299,10 @@ export default function ProfileNew() {
   const currentPhoto = profilePhotos[currentPhotoIndex] || "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400";
 
   return (
-    <div className="min-h-screen pt-20 pb-48 px-4" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)' }}>
+    <div className="min-h-screen pt-20 px-4" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)', paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}>
       {/* Back button for viewing other profiles */}
       {!isOwnProfile && (
-        <div className="fixed top-20 left-4 right-4 z-10 flex justify-between">
+        <div className="fixed top-20 left-4 right-16 z-10 flex justify-between">
           <Button
             variant="ghost"
             size="icon"
@@ -808,7 +822,7 @@ export default function ProfileNew() {
       </div>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 py-6 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
+      <footer className="mt-8 py-6 px-4 border-t border-[#F3DCE5]">
         <div className="max-w-3xl mx-auto">
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="relative inline-block p-3 rounded-full bg-[#F8E9EE]/25 backdrop-blur-sm">

@@ -21,7 +21,6 @@ export function usePushNotifications() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js")
         .then((registration) => {
-          console.log("[Push] Service Worker registered:", registration.scope);
           setServiceWorkerReady(true);
         })
         .catch((error) => {
@@ -32,7 +31,6 @@ export function usePushNotifications() {
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
     if (!supported) {
-      console.log("[Push] Browser doesn't support notifications");
       return false;
     }
 
@@ -41,7 +39,6 @@ export function usePushNotifications() {
       setPermission(result);
       
       if (result === "granted") {
-        console.log("[Push] Permission granted");
         // Save preference to user profile
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
@@ -66,7 +63,6 @@ export function usePushNotifications() {
 
   const showNotification = useCallback((title: string, options?: NotificationOptions & { url?: string }) => {
     if (!supported || permission !== "granted") {
-      console.log("[Push] Notifications not permitted");
       return;
     }
 
@@ -132,7 +128,7 @@ export function useMatchNotifications() {
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch((e) => {
-        console.log("[Push] Could not play notification sound:", e);
+        // Sound playback not available
       });
     }
   }, []);

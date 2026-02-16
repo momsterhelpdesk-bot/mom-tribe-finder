@@ -11,7 +11,6 @@ const MARKETPLACE_SUBSCRIBED_KEY = "momster_marketplace_subscribed";
 
 // Analytics tracking helper
 const trackEvent = (eventName: string, data?: Record<string, any>) => {
-  console.log(`[Analytics] ${eventName}`, data || {});
   // Future: integrate with analytics service
   try {
     // Store in localStorage for basic tracking
@@ -120,7 +119,6 @@ export default function Marketplace() {
         if (emailError) {
           console.error("Email sending error:", emailError);
         } else {
-          console.log("Confirmation email sent successfully");
         }
       } catch (emailErr) {
         console.error("Failed to send confirmation email:", emailErr);
@@ -168,7 +166,7 @@ export default function Marketplace() {
         ))}
       </div>
 
-      <div className="max-w-2xl mx-auto pt-24 pb-32 px-4 relative z-10">
+      <div className="max-w-2xl mx-auto px-4 relative z-10" style={{ paddingTop: 'calc(6rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(9rem + env(safe-area-inset-bottom, 0px))' }}>
         {/* Mascot with hearts animation */}
         <div className="flex justify-center mb-8 relative">
           <div className="relative animate-bounce">
@@ -307,7 +305,7 @@ export default function Marketplace() {
       </div>
 
       {/* Footer with Premium Message */}
-      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]">
+      <footer className="fixed bottom-0 left-0 right-0 py-4 px-4 bg-[#F8E9EE]/95 backdrop-blur-md border-t border-[#F3DCE5]" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
         <div className="max-w-2xl mx-auto text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
             <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />

@@ -9,30 +9,24 @@ const urlsToCache = [
 
 // Install event - cache essential files
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[SW] Caching app shell');
         return cache.addAll(urlsToCache);
       })
-      .catch((error) => {
-        console.log('[SW] Cache failed:', error);
-      })
+      .catch(() => {})
   );
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.filter((cacheName) => {
           return cacheName !== CACHE_NAME;
         }).map((cacheName) => {
-          console.log('[SW] Deleting old cache:', cacheName);
           return caches.delete(cacheName);
         })
       );
@@ -43,8 +37,6 @@ self.addEventListener('activate', (event) => {
 
 // Push notification event
 self.addEventListener('push', (event) => {
-  console.log('[SW] Push received:', event);
-  
   let data = {
     title: 'Momster',
     body: 'Νέα ειδοποίηση!',
@@ -79,7 +71,6 @@ self.addEventListener('push', (event) => {
 
 // Notification click event
 self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notification clicked:', event);
   event.notification.close();
 
   const urlToOpen = event.notification.data?.url || '/';
@@ -104,14 +95,12 @@ self.addEventListener('notificationclick', (event) => {
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
-  console.log('[SW] Sync event:', event.tag);
   if (event.tag === 'sync-notifications') {
     event.waitUntil(syncNotifications());
   }
 });
 
 async function syncNotifications() {
-  console.log('[SW] Syncing notifications...');
   // This would sync any offline notification actions
 }
 

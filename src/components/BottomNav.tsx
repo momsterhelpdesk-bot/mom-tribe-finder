@@ -18,7 +18,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-sm z-50 py-2 shadow-[0_-2px_16px_rgba(200,120,141,0.12)] border-t-0">
+    <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-sm z-50 pt-2 shadow-[0_-2px_16px_rgba(200,120,141,0.12)] border-t-0" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className="max-w-screen-xl mx-auto flex justify-around items-center px-2 gap-1">
         {navItems.map(({ path, icon: Icon, label, badge, isCenter, isMascot }) => {
           const isActive = location.pathname === path || location.pathname.startsWith(path + '/');

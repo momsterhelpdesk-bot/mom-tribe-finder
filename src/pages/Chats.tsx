@@ -188,12 +188,13 @@ export default function Chats() {
         </span>
       </div>
 
-      <img 
-        src={mascot} 
-        alt="Momster Mascot" 
-        className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none"
+      <img
+        src={mascot}
+        alt="Momster Mascot"
+        className="fixed right-4 w-20 h-20 opacity-20 object-contain pointer-events-none"
+        style={{ top: 'calc(6rem + env(safe-area-inset-top, 0px))' }}
       />
-      <div className="max-w-2xl mx-auto pt-20 pb-40 px-4" style={{ marginTop: pullDistance }}>
+      <div className="max-w-2xl mx-auto px-4" style={{ paddingTop: 'calc(5rem + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(12rem + env(safe-area-inset-bottom, 0px))', marginTop: pullDistance }}>
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
             Συνομιλίες

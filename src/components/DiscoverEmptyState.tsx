@@ -8,7 +8,7 @@ import { Sparkles, Bell, Share2 } from "lucide-react";
 export default function DiscoverEmptyState() {
   const navigate = useNavigate();
 
-  const playStoreUrl = 'https://play.google.com/store/apps/details?id=app.lovable.c58e3403aac24acbb98496e3ec2af7ed';
+  const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.momster.community';
 
   const handleInviteMom = async () => {
     if (navigator.share) {
@@ -19,7 +19,6 @@ export default function DiscoverEmptyState() {
           url: playStoreUrl,
         });
       } catch (err) {
-        console.log('Share cancelled');
       }
     } else {
       // Fallback: copy to clipboard

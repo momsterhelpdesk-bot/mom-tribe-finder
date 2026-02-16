@@ -132,15 +132,15 @@ const Index = () => {
             </div>
           )}
           
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap px-4">
             <Link to="/auth">
               <Button size="lg" className="text-lg px-8">
                 {t('joinMomster')}
               </Button>
             </Link>
-            <Button 
-              size="lg" 
-              variant="outline" 
+            <Button
+              size="lg"
+              variant="outline"
               className="text-lg px-8"
               onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
             >

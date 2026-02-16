@@ -169,7 +169,7 @@ export default function MomMeetChat() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 bg-background/95 backdrop-blur-md border-b z-50">
+      <div className="fixed top-0 left-0 right-0 bg-background/95 backdrop-blur-md border-b z-50" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <Button
@@ -266,7 +266,7 @@ export default function MomMeetChat() {
       </div>
 
       {/* Input */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>
         <div className="max-w-2xl mx-auto flex gap-2">
           <Input
             value={newMessage}

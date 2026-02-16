@@ -383,11 +383,12 @@ export default function DailyBoost() {
 
   return (
     <div 
-      className="min-h-screen pt-20 pb-32 px-4 relative overflow-y-auto transition-all duration-500" 
-      style={{ 
-        background: isNightTime 
-          ? 'linear-gradient(135deg, #1F1D2B, #2D2B3D, #1F1D2B)' 
-          : 'linear-gradient(135deg, #F8E9EE, #F5E8F0, #F8E9EE)' 
+      className="min-h-screen pt-20 px-4 relative overflow-y-auto transition-all duration-500"
+      style={{
+        background: isNightTime
+          ? 'linear-gradient(135deg, #1F1D2B, #2D2B3D, #1F1D2B)'
+          : 'linear-gradient(135deg, #F8E9EE, #F5E8F0, #F8E9EE)',
+        paddingBottom: 'calc(9rem + env(safe-area-inset-bottom, 0px))'
       }}
     >
       {/* Animated Mascot - hide in night mode */}

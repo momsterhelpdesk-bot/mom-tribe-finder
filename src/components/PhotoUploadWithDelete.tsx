@@ -137,9 +137,8 @@ export function PhotoUploadWithDelete({ photos, onPhotosUpdated }: PhotoUploadWi
       let fileToUpload: Blob = file;
       try {
         fileToUpload = await compressImage(file, 1080);
-        console.log(`Compressed from ${file.size} to ${fileToUpload.size}`);
       } catch (compressError) {
-        console.warn('Compression failed, using original:', compressError);
+        // Compression failed, using original
       }
 
       const fileExt = file.name.split('.').pop();
@@ -177,6 +176,21 @@ export function PhotoUploadWithDelete({ photos, onPhotosUpdated }: PhotoUploadWi
         .eq('id', user.id);
 
       if (updateError) throw updateError;
+
+      // Add to moderation queue for admin review
+      try {
+        await supabase
+          .from('photo_moderation_queue')
+          .insert({
+            user_id: user.id,
+            photo_url: publicUrl,
+            photo_type: 'profile',
+            ai_status: 'pending'
+          });
+      } catch (moderationError) {
+        // Non-fatal: photo is already live, moderation is secondary
+        console.error('Moderation queue insert error:', moderationError);
+      }
 
       toast.success("Η φωτογραφία ανέβηκε! 📸");
       onPhotosUpdated();
@@ -224,7 +238,7 @@ export function PhotoUploadWithDelete({ photos, onPhotosUpdated }: PhotoUploadWi
             .remove([fileName]);
         }
       } catch (storageError) {
-        console.log('Storage delete error (may be expected):', storageError);
+        // Storage delete error (may be expected)
       }
 
       toast.success("Η φωτογραφία διαγράφηκε! 🗑️");

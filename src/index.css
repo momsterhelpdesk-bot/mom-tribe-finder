@@ -269,6 +269,15 @@ All colors MUST be HSL.
     }
   }
 
+  /* Safe area insets for notches, rounded corners, gesture navigation */
+  html {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+    --bottom-nav-h: calc(5.5rem + var(--sab));
+  }
+
   /* Mobile optimizations */
   @media (max-width: 768px) {
     button {
@@ -283,10 +292,6 @@ All colors MUST be HSL.
 
     .swiper-spacing {
       gap: 10px;
-    }
-
-    .bottom-safe-area {
-      padding-bottom: 24px;
     }
   }
 }

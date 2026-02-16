@@ -237,13 +237,6 @@ export default function Discover() {
     return true;
   });
   
-  // Debug log to track filtering
-  console.log("Discover profiles:", {
-    totalFromHook: profiles.length,
-    afterFiltering: filteredProfiles.length,
-    currentUserId: currentUserId || "not set yet",
-  });
-
   const currentProfile = filteredProfiles[currentIndex];
 
   // If new profiles arrive while we're "past the end" (common after refresh/new users), reset index.
@@ -259,7 +252,6 @@ export default function Discover() {
     if (refreshingRef.current) return;
     refreshingRef.current = true;
 
-    console.log("Pull to refresh triggered");
     setCurrentIndex(0);
     setReachedEndOfProfiles(false);
 
@@ -275,8 +267,6 @@ export default function Discover() {
   };
 
   const handleSwipe = async (liked: boolean) => {
-    console.log(liked ? "Liked!" : "Passed");
-    
     // Show quick emoji feedback
     if (!liked) {
       setShowNopeEmoji(true);
@@ -464,9 +454,6 @@ export default function Discover() {
     }
   }, [filteredProfiles.length, loading, showEmptyDiscover]);
 
-  // Debug logging
-  // console.log("Discover render - loading:", loading, "profiles:", profiles.length, "filteredProfiles:", filteredProfiles.length, "currentIndex:", currentIndex, "currentProfile:", currentProfile?.full_name);
-
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center relative" style={{ background: 'linear-gradient(135deg, #F8E9EE, #F5E8F0)' }}>
@@ -481,7 +468,6 @@ export default function Discover() {
 
   // Show empty state inline when no profiles available OR when user swiped through all
   if (!currentProfile || reachedEndOfProfiles) {
-    console.log("No currentProfile - showing empty state inline");
     return <DiscoverEmptyState />;
   }
 
@@ -608,8 +594,8 @@ export default function Discover() {
     >
       {/* Pull-to-refresh indicator */}
       <div
-        className="fixed top-0 left-0 right-0 z-20 flex justify-center pointer-events-none"
-        style={{ transform: `translateY(${Math.min(48, pullDistance)}px)` }}
+        className="fixed left-0 right-0 z-20 flex justify-center pointer-events-none"
+        style={{ top: 'env(safe-area-inset-top, 0px)', transform: `translateY(${Math.min(48, pullDistance)}px)` }}
         aria-hidden="true"
       >
         <div className="mt-2 rounded-full bg-background/90 border border-border shadow-sm px-3 py-1.5 flex items-center gap-2">
@@ -633,12 +619,12 @@ export default function Discover() {
         onDeny={handleDenyLocation}
       />
 
-      <img 
-        src={mascot} 
-        alt="Momster Mascot" 
+      <img
+        src={mascot}
+        alt="Momster Mascot"
         className="fixed top-24 right-4 w-20 h-20 opacity-20 object-contain pointer-events-none animate-[bounce_3s_ease-in-out_infinite]"
       />
-      
+
       <Button
         variant="outline"
         size="icon"
@@ -647,7 +633,7 @@ export default function Discover() {
       >
         <Settings className="w-4 h-4" />
       </Button>
-      
+
       {/* Pull to Refresh Button */}
       <Button
         variant="outline"
@@ -659,7 +645,7 @@ export default function Discover() {
         <RefreshCw className="w-4 h-4" />
       </Button>
 
-      <div className="max-w-md mx-auto pt-32 pb-32 space-y-4">
+      <div className="max-w-md mx-auto pt-32 space-y-4" style={{ paddingBottom: 'calc(10rem + env(safe-area-inset-bottom, 0px))' }}>
       <h1 className="text-2xl font-bold text-center mb-2 text-foreground" style={{ fontFamily: "'Pacifico', cursive" }}>
           {getText("discover_title", "Ανακάλυψε Μαμάδες")}
         </h1>
@@ -968,7 +954,7 @@ export default function Discover() {
       </div>
 
       {/* Footer */}
-      <footer className="fixed bottom-16 left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border">
+      <footer className="fixed left-0 right-0 py-3 px-4 bg-background/80 backdrop-blur-md border-t border-border" style={{ bottom: 'var(--bottom-nav-h)' }}>
         <div className="max-w-md mx-auto flex items-center justify-center gap-2">
           <img src={mascot} alt="Momster Mascot" className="w-8 h-8 object-contain" />
           <span className="text-sm text-muted-foreground">Together, moms thrive!</span>
