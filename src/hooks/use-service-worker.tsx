@@ -71,14 +71,14 @@ export function useAdminPushNotifications() {
 
     try {
       // Check if already subscribed
-      const existingSubscription = await registration.pushManager.getSubscription();
+      const existingSubscription = await (registration as any).pushManager.getSubscription();
       if (existingSubscription) {
         setSubscription(existingSubscription);
         return existingSubscription;
       }
 
       // Subscribe to push
-      const newSubscription = await registration.pushManager.subscribe({
+      const newSubscription = await (registration as any).pushManager.subscribe({
         userVisibleOnly: true,
         // Note: In production, you'd use a VAPID key here
         // applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
